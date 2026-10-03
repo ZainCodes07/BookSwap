@@ -1,6 +1,24 @@
-<p>
-    hjbhjjhbjjb
-</p>
-<p>
-    hdjdkdhkjhjbhjjhbjjb
-</p>
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>BookSwap - Test Page</title>
+  <link rel="stylesheet" href="css/global.css">
+</head>
+<body>
+
+  <div data-include="nav"></div>
+
+  <main style="min-height: 60vh; display: grid; place-items: center; text-align: center; padding: 80px 20px; font-family: var(--font);">
+    <div>
+      <h1 style="margin:0 0 10px; color: var(--dark);">Your Next Chapter Awaits</h1>
+      <p style="margin:0; color: var(--text);">Test page: navigation &amp; footer are loaded via include.js</p>
+    </div>
+  </main>
+
+  <div data-include="footer"></div>
+
+  <script src="js/include.js"></script>
+</body>
+</html>

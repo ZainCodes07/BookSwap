@@ -1390,3 +1390,232 @@ body {
 }
 
 /* ========== HOME PAGE CSS END ========== */
+
+/* ========== CONTACT PAGE CSS STARTED (Member 3 - Ghauri) ========== */
+/* Everything here starts with .contact or contact- so it never clashes with other pages */
+
+.contact {
+  --ink: #0F172A;
+  --ink-muted: #475569;
+  --surface: #FFFFFF;
+  --danger: #DC2626;
+  color: var(--ink);
+}
+
+.contact :focus-visible {
+  outline: 3px solid var(--primary-light);
+  outline-offset: 3px;
+}
+
+.contact-wrap {
+  max-width: 1120px;
+  margin: 0 auto;
+  padding: 0 32px;
+}
+
+/* ---------- HEADER ---------- */
+.contact-hero {
+  padding: 64px 0 120px;
+  color: #fff;
+  background: var(--dark);
+}
+
+.contact-hero h1 {
+  margin: 0 0 12px;
+  font-size: clamp(32px, 4.6vw, 52px);
+  font-weight: 700;
+  line-height: 1.1;
+  letter-spacing: -1.2px;
+}
+
+.contact-hero p {
+  margin: 0;
+  max-width: 52ch;
+  font-size: 16px;
+  line-height: 1.7;
+  color: #CBD5E1;
+}
+
+/* ---------- FORM + ASIDE ---------- */
+.contact-body { padding-bottom: 40px; }
+
+/* the form card overlaps the dark header a little */
+.contact-grid {
+  display: grid;
+  grid-template-columns: minmax(0, 1.6fr) minmax(0, 1fr);
+  gap: 40px;
+  margin-top: -72px;
+  align-items: start;
+}
+
+.contact-card {
+  padding: 32px;
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: 18px;
+  box-shadow: 0 20px 40px rgba(15, 23, 42, 0.12);
+}
+
+.field-row {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 18px;
+}
+
+.field { margin-bottom: 18px; }
+
+.field label {
+  display: block;
+  margin-bottom: 6px;
+  font-size: 13.5px;
+  font-weight: 600;
+}
+
+.field input,
+.field select,
+.field textarea {
+  width: 100%;
+  padding: 12px 14px;
+  font-family: var(--font);
+  font-size: 14.5px;
+  color: var(--ink);
+  background: #F8FAFC;
+  border: 1.5px solid var(--border);
+  border-radius: 10px;
+  outline: 0;
+  transition: border-color 0.2s ease, background 0.2s ease;
+}
+
+.field textarea { resize: vertical; min-height: 140px; line-height: 1.6; }
+
+.field input:focus,
+.field select:focus,
+.field textarea:focus {
+  background: #fff;
+  border-color: var(--primary-light);
+}
+
+.field [aria-invalid="true"] { border-color: var(--danger); background: #FEF2F2; }
+
+.field-error {
+  min-height: 0;
+  margin: 6px 0 0;
+  font-size: 12.5px;
+  color: var(--danger);
+}
+.field-error:empty { margin: 0; }
+
+.field-foot {
+  display: flex;
+  justify-content: space-between;
+  gap: 12px;
+}
+
+.char-count {
+  margin-top: 6px;
+  margin-left: auto;
+  font-size: 12px;
+  color: var(--ink-muted);
+}
+
+.contact-btn {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  height: 48px;
+  padding: 0 28px;
+  font-family: var(--font);
+  font-size: 14.5px;
+  font-weight: 600;
+  color: #fff;
+  background: var(--primary);
+  border: 1.5px solid var(--primary);
+  border-radius: 12px;
+  cursor: pointer;
+  transition: background 0.2s ease, color 0.2s ease;
+}
+.contact-btn:hover { background: var(--secondary); border-color: var(--secondary); }
+.contact-btn:disabled { opacity: 0.7; cursor: wait; }
+
+.contact-btn-ghost { color: var(--primary); background: transparent; }
+.contact-btn-ghost:hover { color: #fff; background: var(--primary); border-color: var(--primary); }
+
+/* Message sent box */
+.contact-sent { padding: 24px 0; text-align: center; outline: 0; }
+.contact-sent .icon { width: 48px; height: 48px; color: #16A34A; }
+.contact-sent h2 { margin: 12px 0 8px; font-size: 22px; }
+.contact-sent p { margin: 0 auto 22px; max-width: 40ch; line-height: 1.7; color: var(--ink-muted); }
+
+/* Side column */
+.contact-aside { padding-top: 96px; }
+
+.aside-block + .aside-block {
+  margin-top: 32px;
+  padding-top: 28px;
+  border-top: 1px solid var(--border);
+}
+
+.aside-block h2 {
+  margin: 0 0 10px;
+  font-size: 17px;
+}
+
+.aside-block > p {
+  margin: 6px 0 0;
+  font-size: 13.5px;
+  line-height: 1.65;
+  color: var(--ink-muted);
+}
+
+.contact-aside details {
+  border-bottom: 1px solid var(--border);
+}
+
+.contact-aside summary {
+  position: relative;
+  padding: 12px 28px 12px 0;
+  font-size: 14px;
+  font-weight: 600;
+  list-style: none;
+  cursor: pointer;
+}
+.contact-aside summary::-webkit-details-marker { display: none; }
+
+/* plus sign that turns into a minus when open */
+.contact-aside summary::after {
+  content: "+";
+  position: absolute;
+  right: 4px;
+  top: 9px;
+  font-size: 20px;
+  font-weight: 400;
+  color: var(--primary);
+}
+.contact-aside details[open] summary::after { content: "\2212"; }
+
+.contact-aside details p {
+  margin: 0 0 14px;
+  font-size: 13.5px;
+  line-height: 1.65;
+  color: var(--ink-muted);
+}
+
+/* ---------- CONTACT RESPONSIVE ---------- */
+@media (max-width: 900px) {
+  .contact-grid { grid-template-columns: minmax(0, 1fr); gap: 32px; }
+  .contact-aside { padding-top: 0; }
+}
+
+@media (max-width: 640px) {
+  .contact-wrap { padding: 0 18px; }
+  .contact-hero { padding: 44px 0 96px; }
+  .contact-card { padding: 22px 18px; }
+  .field-row { grid-template-columns: 1fr; gap: 0; }
+  .contact-btn { width: 100%; }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .field input, .field select, .field textarea, .contact-btn { transition: none; }
+}
+
+/* ========== CONTACT PAGE CSS END ========== */

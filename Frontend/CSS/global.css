@@ -585,3 +585,274 @@ body {
   .footer-bottom { flex-direction: column; align-items: flex-start; }
 }
 /* ========== FOOTER CSS END ========== */
+
+/* ========== ABOUT PAGE CSS STARTED (Member 3 - Ghauri) ========== */
+/* Everything here starts with .about or about- so it never clashes with other pages */
+
+.about {
+  --ink: #0F172A;
+  --ink-muted: #475569;
+  --surface: #FFFFFF;
+  color: var(--ink);
+}
+
+.about :focus-visible {
+  outline: 3px solid var(--primary-light);
+  outline-offset: 3px;
+}
+
+.about-wrap {
+  max-width: 1120px;
+  margin: 0 auto;
+  padding: 0 32px;
+}
+
+.about-section { padding: 56px 0; }
+.about-section-tint { background: #EEF2F7; }
+
+.about-section h2 {
+  margin: 0 0 24px;
+  font-size: 26px;
+  font-weight: 700;
+  letter-spacing: -0.4px;
+}
+
+/* ---------- HERO ---------- */
+.about-hero {
+  padding: 72px 0 64px;
+  color: #fff;
+  background: var(--dark);
+  overflow: hidden;
+}
+
+.about-title {
+  margin: 0 0 16px;
+  font-size: clamp(36px, 5.4vw, 64px);
+  font-weight: 700;
+  line-height: 1.05;
+  letter-spacing: -1.5px;
+}
+
+.about-lead {
+  margin: 0 0 56px;
+  max-width: 58ch;
+  font-size: 16.5px;
+  line-height: 1.7;
+  color: #CBD5E1;
+}
+
+/* Journey: 4 stops in a row, a line under them, one book slides along it */
+.journey {
+  display: grid;
+  grid-template-columns: repeat(4, 1fr);
+  gap: 24px;
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+
+.journey-sem {
+  display: block;
+  margin-bottom: 6px;
+  font-size: 13px;
+  font-weight: 600;
+  color: var(--success);
+}
+
+.journey-stop p {
+  margin: 0;
+  font-size: 14px;
+  line-height: 1.6;
+  color: #E2E8F0;
+}
+.journey-stop strong { color: #fff; }
+
+.journey-track {
+  position: relative;
+  height: 64px;
+  margin-top: 28px;
+}
+
+.journey-line {
+  position: absolute;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  height: 6px;
+  background: linear-gradient(90deg, var(--primary), var(--secondary));
+  border-radius: 3px;
+}
+
+/* one dot under the start of each stop (same 4 columns + 24px gap as .journey) */
+.journey-dot {
+  position: absolute;
+  bottom: -4px;
+  width: 14px;
+  height: 14px;
+  margin-left: 15px;          /* centres the dot under the 44px book */
+  background: #fff;
+  border: 3px solid var(--primary);
+  border-radius: 50%;
+}
+.journey-dot:nth-child(2) { left: 0; }
+.journey-dot:nth-child(3) { left: calc(25% + 6px); }
+.journey-dot:nth-child(4) { left: calc(50% + 12px); }
+.journey-dot:nth-child(5) { left: calc(75% + 18px); }
+
+.journey-book {
+  position: absolute;
+  bottom: 8px;
+  left: 0;
+  width: 44px;
+  height: 56px;
+  display: grid;
+  place-items: center;
+  font-size: 11px;
+  font-weight: 700;
+  color: #fff;
+  background: var(--secondary);
+  border-radius: 3px 6px 6px 3px;
+  box-shadow: inset 5px 0 0 rgba(0, 0, 0, 0.2), 0 10px 24px rgba(168, 85, 247, 0.45);
+  animation: book-journey 4.5s cubic-bezier(.45, 0, .55, 1) 0.4s both;
+}
+
+/* the book pauses above each dot, then rests on the last one */
+@keyframes book-journey {
+  0%, 18%   { left: 0; }
+  33%, 51%  { left: calc(25% + 6px); }
+  66%, 84%  { left: calc(50% + 12px); }
+  100%      { left: calc(75% + 18px); }
+}
+
+/* ---------- STORY ---------- */
+.story-cols {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 40px;
+}
+
+.story-cols p {
+  margin: 0;
+  max-width: 60ch;
+  font-size: 15.5px;
+  line-height: 1.8;
+  color: var(--ink-muted);
+}
+
+/* ---------- PROMISES ---------- */
+.promise-list {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+
+.promise {
+  display: flex;
+  gap: 14px;
+  padding: 4px 28px;
+  border-left: 2px solid #CBD5E1;
+}
+.promise:first-child { padding-left: 0; border-left: 0; }
+
+.promise .icon {
+  flex-shrink: 0;
+  width: 26px;
+  height: 26px;
+  color: var(--primary);
+}
+
+.promise h3 {
+  margin: 0 0 6px;
+  font-size: 16px;
+}
+
+.promise p {
+  margin: 0;
+  font-size: 14px;
+  line-height: 1.65;
+  color: var(--ink-muted);
+}
+
+/* ---------- CALL TO ACTION ---------- */
+.about-cta {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 24px;
+}
+
+.about-cta h2 { margin-bottom: 6px; }
+.about-cta p  { margin: 0; color: var(--ink-muted); }
+
+.about-cta-actions { display: flex; gap: 12px; flex-shrink: 0; }
+
+.about-btn {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  height: 46px;
+  padding: 0 24px;
+  font-family: var(--font);
+  font-size: 14px;
+  font-weight: 600;
+  text-decoration: none;
+  border-radius: 12px;
+  transition: background 0.2s ease, color 0.2s ease, border-color 0.2s ease;
+}
+
+.about-btn-primary { color: #fff; background: var(--primary); }
+.about-btn-primary:hover { background: var(--secondary); }
+
+.about-btn-ghost {
+  color: var(--primary);
+  border: 1.5px solid var(--primary);
+}
+.about-btn-ghost:hover { color: #fff; background: var(--primary); }
+
+/* ---------- ABOUT RESPONSIVE ---------- */
+@media (max-width: 900px) {
+  .promise-list { grid-template-columns: 1fr; gap: 22px; }
+  .promise, .promise:first-child { padding: 0; border-left: 0; }
+  .about-cta { flex-direction: column; align-items: flex-start; }
+}
+
+/* On phones the journey becomes a vertical timeline */
+@media (max-width: 700px) {
+  .about-wrap { padding: 0 18px; }
+  .about-hero { padding: 48px 0 44px; }
+  .about-lead { margin-bottom: 32px; }
+  .about-section { padding: 40px 0; }
+  .about-section h2 { font-size: 21px; }
+
+  .journey {
+    grid-template-columns: 1fr;
+    gap: 22px;
+    padding-left: 28px;
+    border-left: 4px solid var(--primary);
+  }
+  .journey-stop { position: relative; }
+  .journey-stop::before {
+    content: "";
+    position: absolute;
+    left: -36px;
+    top: 4px;
+    width: 12px;
+    height: 12px;
+    background: #fff;
+    border: 3px solid var(--primary);
+    border-radius: 50%;
+  }
+  .journey-track { display: none; }
+
+  .story-cols { grid-template-columns: 1fr; gap: 16px; }
+  .about-cta-actions { flex-direction: column; width: 100%; }
+  .about-btn { width: 100%; }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .journey-book { animation: none; left: calc(75% + 18px); }
+}
+
+/* ========== ABOUT PAGE CSS END ========== */

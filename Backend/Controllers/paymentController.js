@@ -1,5 +1,5 @@
-const Order = require("../models/Order");
-const Transaction = require("../models/Transaction");
+const Order = require("../Models/Order");
+const Transaction = require("../Models/Transaction");
 
 // Get all orders
 const getAllOrders = async (req, res) => {

@@ -1,7 +1,7 @@
-const User = require("../models/User");
-const Book = require("../models/Book");
-const Order = require("../models/Order");
-const Transaction = require("../models/Transaction");
+const User = require("../Models/User");
+const Book = require("../Models/Book");
+const Order = require("../Models/Order");
+const Transaction = require("../Models/Transaction");
 
 // Get all users
 const getAllUsers = async (req, res) => {

@@ -1,4 +1,4 @@
-const Cart = require("../models/Cart");
+const Cart = require("../Models/Cart");
 
 // Get all cart items
 const getAllCartItems = async (req, res) => {

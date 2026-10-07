@@ -14,7 +14,6 @@ const Book = {
         return result.recordset;
     },
 
-
     // Get book by ID
     getBookById: async (bookId) => {
         await connectDB();
@@ -32,7 +31,6 @@ const Book = {
         return result.recordset[0];
     },
 
-
     // Get books by seller
     getBooksBySeller: async (sellerId) => {
         await connectDB();
@@ -49,7 +47,6 @@ const Book = {
 
         return result.recordset;
     },
-
 
     // Create new book
     createBook: async (book) => {
@@ -98,7 +95,6 @@ const Book = {
         return result.recordset[0];
     },
 
-
     // Update book
     updateBook: async (bookId, book) => {
         await connectDB();
@@ -135,7 +131,6 @@ const Book = {
         return result.recordset[0];
     },
 
-
     // Delete book
     deleteBook: async (bookId) => {
         await connectDB();
@@ -150,8 +145,54 @@ const Book = {
         `);
 
         return result.rowsAffected[0];
-    }
+    },
 
+    // Search books
+    searchBooks: async (searchTerm) => {
+        await connectDB();
+
+        const request = new sql.Request();
+
+        request.input(
+            "SearchTerm",
+            sql.NVarChar(200),
+            `%${searchTerm}%`
+        );
+
+        const result = await request.query(`
+            SELECT
+                b.BookID,
+                b.SellerID,
+                b.CategoryID,
+                b.CourseID,
+                b.Title,
+                b.Author,
+                b.Description,
+                b.Price,
+                b.BookCondition,
+                b.ListingType,
+                b.Status,
+                b.CreatedAt,
+                c.CategoryName,
+                co.CourseName,
+                co.CourseCode
+            FROM Books b
+            INNER JOIN Categories c
+                ON b.CategoryID = c.CategoryID
+            LEFT JOIN Courses co
+                ON b.CourseID = co.CourseID
+            WHERE
+                b.Title LIKE @SearchTerm
+                OR b.Author LIKE @SearchTerm
+                OR b.Description LIKE @SearchTerm
+                OR c.CategoryName LIKE @SearchTerm
+                OR co.CourseName LIKE @SearchTerm
+                OR co.CourseCode LIKE @SearchTerm
+            ORDER BY b.CreatedAt DESC
+        `);
+
+        return result.recordset;
+    }
 };
 
 module.exports = Book;

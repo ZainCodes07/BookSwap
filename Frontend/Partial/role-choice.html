@@ -1,0 +1,41 @@
+<!-- ===== PARTIAL: Buyer or Seller choice (used inside login-modal.html) ===== -->
+<p class="auth-reason" data-auth-reason hidden></p>
+<h2 class="auth-title" id="authTitle-role">Join BookSwap</h2>
+<p class="auth-sub">How do you want to use BookSwap?</p>
+
+<div class="auth-roles">
+  <button type="button" class="auth-role" data-auth-role="buyer">
+    <span class="auth-role-icon" aria-hidden="true">
+      <svg viewBox="0 0 24 24"><circle cx="9" cy="21" r="1"/><circle cx="20" cy="21" r="1"/><path d="M1 1h4l2.68 13.39a2 2 0 0 0 2 1.61h9.72a2 2 0 0 0 2-1.61L23 6H6"/></svg>
+    </span>
+    <span class="auth-role-name">I'm a Buyer</span>
+    <span class="auth-role-desc">Find used books for your courses at a lower price.</span>
+    <span class="auth-role-list">
+      <span>Browse and buy books</span>
+      <span>Chat with sellers</span>
+      <span>Quick, simple sign up</span>
+    </span>
+    <span class="auth-role-go">Continue as Buyer &rarr;</span>
+  </button>
+
+  <button type="button" class="auth-role auth-role-seller" data-auth-role="seller">
+    <span class="auth-role-badge">Buy + Sell</span>
+    <span class="auth-role-icon" aria-hidden="true">
+      <svg viewBox="0 0 24 24"><path d="M3 9l1.5-5h15L21 9"/><path d="M3 9h18v2a3 3 0 0 1-6 0 3 3 0 0 1-6 0 3 3 0 0 1-6 0z"/><path d="M5 13v8h14v-8"/><path d="M10 21v-5h4v5"/></svg>
+    </span>
+    <span class="auth-role-name">I'm a Seller</span>
+    <span class="auth-role-desc">Sell last semester's books and buy new ones too.</span>
+    <span class="auth-role-list">
+      <span>Everything a buyer can do</span>
+      <span>List your own books</span>
+      <span>Get paid to Easypaisa, JazzCash or bank</span>
+    </span>
+    <span class="auth-role-go">Continue as Seller &rarr;</span>
+  </button>
+</div>
+
+<p class="auth-note">Starting as a buyer? You can switch to seller anytime from your profile.</p>
+
+<p class="auth-switch">Already have an account?
+  <button type="button" class="auth-link" data-auth-go="login">Sign in</button>
+</p>

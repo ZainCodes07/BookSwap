@@ -1,0 +1,108 @@
+<!-- ===== PARTIAL: Seller payout account (used inside login-modal.html)
+     Shown after seller sign up, when a buyer switches to seller,
+     and when a seller edits payout details from the profile page. ===== -->
+<h2 class="auth-title" id="authTitle-payout" data-payout-title>How should we pay you?</h2>
+<p class="auth-sub">
+  <span data-payout-sub>When a buyer pays for your book, we send the money here.</span>
+  <span class="auth-badge">Optional</span>
+</p>
+
+<form class="auth-form" id="payoutForm" novalidate>
+  <div class="auth-alert" role="alert" hidden></div>
+
+  <fieldset class="auth-field auth-methods">
+    <legend>Payout method</legend>
+
+    <label class="auth-method">
+      <input type="radio" name="method" value="easypaisa">
+      <span class="auth-method-card">
+        <span class="auth-method-icon auth-ep" aria-hidden="true">EP</span>
+        <span class="auth-method-name">Easypaisa</span>
+        <span class="auth-method-type">Mobile wallet</span>
+      </span>
+    </label>
+
+    <label class="auth-method">
+      <input type="radio" name="method" value="jazzcash">
+      <span class="auth-method-card">
+        <span class="auth-method-icon auth-jc" aria-hidden="true">JC</span>
+        <span class="auth-method-name">JazzCash</span>
+        <span class="auth-method-type">Mobile wallet</span>
+      </span>
+    </label>
+
+    <label class="auth-method">
+      <input type="radio" name="method" value="bank">
+      <span class="auth-method-card">
+        <span class="auth-method-icon auth-bk" aria-hidden="true">
+          <svg viewBox="0 0 24 24"><path d="M3 10h18L12 4z"/><path d="M5 10v8M9.5 10v8M14.5 10v8M19 10v8M3 20h18"/></svg>
+        </span>
+        <span class="auth-method-name">Bank account</span>
+        <span class="auth-method-type">Any Pakistani bank</span>
+      </span>
+    </label>
+
+    <p class="auth-error" id="payoutMethod-err"></p>
+  </fieldset>
+
+  <div class="auth-payout-fields" data-payout-fields hidden>
+    <div class="auth-field">
+      <label for="payoutTitle">Account holder name</label>
+      <div class="auth-input">
+        <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"/><circle cx="12" cy="7" r="4"/></svg>
+        <input type="text" id="payoutTitle" name="title" autocomplete="name" placeholder="Name exactly as on the account" aria-describedby="payoutTitle-err">
+      </div>
+      <p class="auth-error" id="payoutTitle-err"></p>
+    </div>
+
+    <!-- Easypaisa / JazzCash -->
+    <div class="auth-field" data-for="wallet">
+      <label for="payoutNumber"><span data-wallet-name>Easypaisa</span> number</label>
+      <div class="auth-input">
+        <svg viewBox="0 0 24 24" aria-hidden="true"><rect x="6" y="2" width="12" height="20" rx="2"/><path d="M11 18h2"/></svg>
+        <input type="tel" id="payoutNumber" name="number" inputmode="tel" placeholder="03XX XXXXXXX" aria-describedby="payoutNumber-err">
+      </div>
+      <p class="auth-error" id="payoutNumber-err"></p>
+    </div>
+
+    <!-- Bank -->
+    <div class="auth-field" data-for="bank">
+      <label for="payoutBank">Bank</label>
+      <div class="auth-input auth-select">
+        <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M3 10h18L12 4z"/><path d="M5 10v8M9.5 10v8M14.5 10v8M19 10v8M3 20h18"/></svg>
+        <select id="payoutBank" name="bank" aria-describedby="payoutBank-err">
+          <option value="">Choose your bank</option>
+          <option>Allied Bank</option>
+          <option>Askari Bank</option>
+          <option>Bank Al Habib</option>
+          <option>Bank Alfalah</option>
+          <option>Faysal Bank</option>
+          <option>Habib Bank (HBL)</option>
+          <option>MCB Bank</option>
+          <option>Meezan Bank</option>
+          <option>Standard Chartered</option>
+          <option>United Bank (UBL)</option>
+          <option>Other</option>
+        </select>
+      </div>
+      <p class="auth-error" id="payoutBank-err"></p>
+    </div>
+
+    <div class="auth-field" data-for="bank">
+      <label for="payoutIban">IBAN</label>
+      <div class="auth-input">
+        <svg viewBox="0 0 24 24" aria-hidden="true"><rect x="2" y="6" width="20" height="12" rx="2"/><path d="M6 12h.01M10 12h8"/></svg>
+        <input type="text" id="payoutIban" name="iban" autocomplete="off" spellcheck="false" placeholder="PK36 SCBL 0000 0011 2345 6702" aria-describedby="payoutIban-hint payoutIban-err">
+      </div>
+      <p class="auth-hint" id="payoutIban-hint">24 characters, starts with PK. You can find it in your banking app.</p>
+      <p class="auth-error" id="payoutIban-err"></p>
+    </div>
+  </div>
+
+  <p class="auth-note auth-note-lock">Only the last 4 digits are shown on your profile. You can change this anytime.</p>
+
+  <div class="auth-actions">
+    <button type="button" class="auth-btn auth-btn-ghost" data-auth-skip>Skip for now</button>
+    <button type="submit" class="auth-btn auth-btn-primary" data-payout-submit>Save &amp; finish</button>
+  </div>
+</form>

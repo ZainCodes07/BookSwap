@@ -1,0 +1,77 @@
+<!-- ===== PARTIAL: Sign up form for buyers and sellers (used inside login-modal.html) ===== -->
+<h2 class="auth-title" id="authTitle-signup">Create your account</h2>
+<p class="auth-sub">Signing up as <strong data-auth-rolename>Buyer</strong> &middot;
+  <button type="button" class="auth-link" data-auth-go="role">Change</button>
+</p>
+
+<form class="auth-form" id="signupForm" novalidate>
+  <div class="auth-alert" role="alert" hidden></div>
+
+  <div class="auth-field">
+    <label for="signupName">Full name</label>
+    <div class="auth-input">
+      <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"/><circle cx="12" cy="7" r="4"/></svg>
+      <input type="text" id="signupName" name="name" autocomplete="name" placeholder="e.g. Ali Raza" aria-describedby="signupName-err">
+    </div>
+    <p class="auth-error" id="signupName-err"></p>
+  </div>
+
+  <div class="auth-grid-2">
+    <div class="auth-field">
+      <label for="signupEmail">Email</label>
+      <div class="auth-input">
+        <svg viewBox="0 0 24 24" aria-hidden="true"><rect x="3" y="5" width="18" height="14" rx="2"/><path d="m3 7 9 6 9-6"/></svg>
+        <input type="email" id="signupEmail" name="email" autocomplete="email" placeholder="you@example.com" aria-describedby="signupEmail-err">
+      </div>
+      <p class="auth-error" id="signupEmail-err"></p>
+    </div>
+
+    <div class="auth-field">
+      <label for="signupPhone">Phone number</label>
+      <div class="auth-input">
+        <svg viewBox="0 0 24 24" aria-hidden="true"><rect x="6" y="2" width="12" height="20" rx="2"/><path d="M11 18h2"/></svg>
+        <input type="tel" id="signupPhone" name="phone" autocomplete="tel" inputmode="tel" placeholder="03XX XXXXXXX" aria-describedby="signupPhone-err">
+      </div>
+      <p class="auth-error" id="signupPhone-err"></p>
+    </div>
+  </div>
+
+  <div class="auth-field">
+    <label for="signupPassword">Password</label>
+    <div class="auth-input">
+      <svg viewBox="0 0 24 24" aria-hidden="true"><rect x="4" y="11" width="16" height="10" rx="2"/><path d="M8 11V7a4 4 0 0 1 8 0v4"/></svg>
+      <input type="password" id="signupPassword" name="password" autocomplete="new-password" placeholder="At least 8 characters" aria-describedby="signupPassword-hint signupPassword-err">
+      <button type="button" class="auth-eye" data-auth-eye aria-label="Show password">
+        <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M1 12s4-7 11-7 11 7 11 7-4 7-11 7S1 12 1 12z"/><circle cx="12" cy="12" r="3"/></svg>
+      </button>
+    </div>
+    <div class="auth-strength" data-strength="0" aria-hidden="true">
+      <span></span><span></span><span></span><span></span>
+    </div>
+    <p class="auth-hint" id="signupPassword-hint">Use 8+ characters with letters and numbers.</p>
+    <p class="auth-error" id="signupPassword-err"></p>
+  </div>
+
+  <div class="auth-field">
+    <label for="signupConfirm">Confirm password</label>
+    <div class="auth-input">
+      <svg viewBox="0 0 24 24" aria-hidden="true"><rect x="4" y="11" width="16" height="10" rx="2"/><path d="M8 11V7a4 4 0 0 1 8 0v4"/></svg>
+      <input type="password" id="signupConfirm" name="confirm" autocomplete="new-password" placeholder="Type it again" aria-describedby="signupConfirm-err">
+    </div>
+    <p class="auth-error" id="signupConfirm-err"></p>
+  </div>
+
+  <div class="auth-field">
+    <label class="auth-check">
+      <input type="checkbox" id="signupTerms" name="terms" aria-describedby="signupTerms-err">
+      <span>I agree to the BookSwap terms and privacy policy</span>
+    </label>
+    <p class="auth-error" id="signupTerms-err"></p>
+  </div>
+
+  <button type="submit" class="auth-btn auth-btn-primary auth-btn-block" data-signup-submit>Create account</button>
+</form>
+
+<p class="auth-switch">Already have an account?
+  <button type="button" class="auth-link" data-auth-go="login">Sign in</button>
+</p>

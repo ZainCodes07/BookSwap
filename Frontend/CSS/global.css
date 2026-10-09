@@ -3502,3 +3502,639 @@ html.auth-lock { overflow: hidden; }
 @media (max-width: 720px) { .sh-hero .al-hero-text { max-width: none; } }
 /* ===== SELLER THEME END ===== */
 /* ========== SELLER HUB PLUS CSS END ========== */
+
+
+
+
+/* ========== ADD LISTING: 4 PHOTOS (Member 4 - Aleena) ========== */
+/* Thumbnails inside the drop box on Seller/add-listing.html. First photo = cover. */
+.al-thumbs {
+  display: grid;
+  grid-template-columns: repeat(4, minmax(0, 1fr));
+  gap: 12px;
+}
+
+.al-thumb {
+  position: relative;
+  aspect-ratio: 4 / 5;
+  overflow: hidden;
+  background: #F1F5F9;
+  border-radius: 12px;
+}
+
+.al-thumb img { width: 100%; height: 100%; object-fit: cover; display: block; }
+.al-thumb.is-cover { box-shadow: 0 0 0 2px var(--primary); }
+
+.al-thumb-tag {
+  position: absolute;
+  left: 6px;
+  bottom: 6px;
+  padding: 2px 8px;
+  font-size: 11px;
+  font-weight: 600;
+  color: #fff;
+  background: var(--primary);
+  border-radius: 999px;
+}
+
+.al-thumb-btn {
+  position: absolute;
+  top: 6px;
+  width: 28px;
+  height: 28px;
+  display: grid;
+  place-items: center;
+  padding: 0;
+  color: #0F172A;
+  background: rgba(255, 255, 255, 0.92);
+  border: 0;
+  border-radius: 50%;
+  cursor: pointer;
+  box-shadow: 0 2px 8px rgba(15, 23, 42, 0.15);
+}
+
+.al-thumb-btn svg { width: 14px; height: 14px; }
+.al-thumb-del { right: 6px; }
+.al-thumb-del:hover { color: #fff; background: #DC2626; }
+.al-thumb-star { left: 6px; }
+.al-thumb-star:hover { color: #fff; background: var(--primary); }
+
+.al-thumb-add {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 4px;
+  color: var(--primary);
+  background: #fff;
+  border: 2px dashed #C4B5FD;
+  cursor: pointer;
+  text-align: center;
+}
+
+.al-thumb-add:hover { background: var(--auth-soft); }
+.al-thumb-add svg { width: 22px; height: 22px; }
+.al-thumb-add span { font-size: 12.5px; font-weight: 600; }
+.al-thumb-add small { font-size: 11px; color: #64748B; }
+
+@media (max-width: 560px) {
+  .al-thumbs { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+}
+/* ========== ADD LISTING: 4 PHOTOS END ========== */
+
+
+/* ========== MY SHOP CSS STARTED (Member 4 - Aleena) ========== */
+/* Seller/my-shop.html - the public shop page buyers see.
+   Style 1 "Minimal": white page, seller photos like OLX, lots of space.
+   Reuses .sd- (gate, empty state, confirm box). New classes start with .ms- */
+
+.ms-main { background: #fff; }
+
+.ms-wrap {
+  max-width: 1180px;
+  margin: 0 auto;
+}
+
+/* --- Header --- */
+.ms-head {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: flex-end;
+  justify-content: space-between;
+  gap: 20px 24px;
+  padding: 8px 0 28px;
+  border-bottom: 1px solid #EEF0F4;
+}
+
+.ms-who {
+  display: flex;
+  align-items: center;
+  gap: 20px;
+  min-width: 0;
+}
+
+.ms-avatar {
+  flex: 0 0 76px;
+  width: 76px;
+  height: 76px;
+  display: grid;
+  place-items: center;
+  font-size: 30px;
+  font-weight: 600;
+  color: #fff;
+  background: var(--dark);
+  border-radius: 50%;
+}
+
+.ms-kicker { margin: 0; font-size: 13px; color: #64748B; }
+
+.ms-head h1 {
+  margin: 2px 0 8px;
+  font-size: 36px;
+  font-weight: 600;
+  line-height: 1.15;
+  letter-spacing: -1px;
+  color: var(--sd-ink);
+  overflow-wrap: anywhere;
+}
+
+.ms-meta {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 6px 18px;
+  margin: 0;
+  padding: 0;
+  list-style: none;
+  font-size: 14px;
+  color: #475569;
+}
+
+.ms-meta strong { color: var(--sd-ink); font-weight: 600; }
+
+.ms-actions {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 10px;
+}
+
+.ms-pill {
+  height: 44px;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  padding: 0 20px;
+  font: 600 14px var(--font);
+  color: var(--sd-ink);
+  text-decoration: none;
+  background: #fff;
+  border: 1px solid #E2E8F0;
+  border-radius: 999px;
+  cursor: pointer;
+  transition: border-color 0.2s ease, background 0.2s ease;
+}
+
+.ms-pill svg { width: 16px; height: 16px; }
+.ms-pill:hover { border-color: #CBD5E1; background: #F8FAFC; }
+.ms-pill-dark { color: #fff; background: var(--dark); border-color: var(--dark); }
+.ms-pill-dark:hover { background: #1E293B; border-color: #1E293B; }
+.ms-pill-purple { color: #fff; background: var(--primary); border-color: var(--primary); }
+.ms-pill-purple:hover { background: #5B2EE0; border-color: #5B2EE0; }
+
+/* --- Owner note --- */
+.ms-owner {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  margin: 22px 0 0;
+  padding: 12px 16px;
+  font-size: 14px;
+  color: #475569;
+  background: #F8FAFC;
+  border-radius: 12px;
+}
+
+.ms-owner svg { flex: 0 0 18px; width: 18px; height: 18px; color: var(--primary); }
+.ms-owner strong { color: var(--sd-ink); }
+.ms-owner a { margin-left: auto; font-weight: 600; color: var(--primary); white-space: nowrap; text-decoration: none; }
+.ms-owner a:hover { text-decoration: underline; }
+
+/* --- Title + search + sort, then course tabs --- */
+.ms-bar {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  justify-content: space-between;
+  gap: 14px 16px;
+  margin: 34px 0 14px;
+}
+
+.ms-shelf-title { margin: 0; font-size: 22px; font-weight: 600; color: var(--sd-ink); }
+
+.ms-tabs {
+  display: flex;
+  gap: 26px;
+  margin-bottom: 30px;
+  overflow-x: auto;
+  border-bottom: 1px solid #EEF0F4;
+  scrollbar-width: none;
+}
+
+.ms-tabs::-webkit-scrollbar { display: none; }
+
+.ms-tab {
+  flex: 0 0 auto;
+  margin-bottom: -1px;
+  padding: 6px 0 12px;
+  font: 500 14px var(--font);
+  color: #64748B;
+  background: none;
+  border: 0;
+  border-bottom: 2px solid transparent;
+  cursor: pointer;
+  transition: color 0.2s ease, border-color 0.2s ease;
+}
+
+.ms-tab span { margin-left: 2px; font-size: 12px; color: #94A3B8; }
+.ms-tab:hover { color: var(--sd-ink); }
+.ms-tab.is-active { font-weight: 600; color: var(--sd-ink); border-bottom-color: var(--primary); }
+
+.ms-tools { display: flex; gap: 10px; flex: 0 0 auto; }
+.ms-search { position: relative; display: block; }
+
+.ms-search svg {
+  position: absolute;
+  top: 50%;
+  left: 15px;
+  width: 16px;
+  height: 16px;
+  transform: translateY(-50%);
+  color: #94A3B8;
+  pointer-events: none;
+}
+
+.ms-search input,
+.ms-sort select {
+  height: 42px;
+  font: 14px var(--font);
+  color: var(--sd-ink);
+  background: #fff;
+  border: 1px solid #E2E8F0;
+  border-radius: 999px;
+  outline: none;
+  transition: border-color 0.2s ease, box-shadow 0.2s ease;
+}
+
+.ms-search input { width: 230px; padding: 0 16px 0 40px; }
+.ms-sort select { padding: 0 14px; cursor: pointer; }
+
+.ms-search input:focus,
+.ms-sort select:focus {
+  border-color: var(--primary);
+  box-shadow: 0 0 0 4px rgba(108, 56, 255, 0.10);
+}
+
+/* --- Book grid --- */
+.ms-grid {
+  display: grid;
+  grid-template-columns: repeat(4, minmax(0, 1fr));
+  gap: 36px 26px;
+}
+
+.ms-card { position: relative; display: flex; flex-direction: column; }
+
+/* photo box (seller photos, like OLX) */
+.ms-pic {
+  position: relative;
+  display: block;
+  aspect-ratio: 4 / 5;
+  overflow: hidden;
+  background: #F1F5F9;
+  border-radius: 16px;
+}
+
+.ms-img {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  transition: opacity 0.35s ease, transform 0.5s ease;
+}
+
+.ms-img-2 { opacity: 0; }
+.ms-card:hover .ms-img { transform: scale(1.03); }
+.ms-card:hover .ms-img-2 { opacity: 1; }      /* hover shows the 2nd photo */
+
+.ms-count {
+  position: absolute;
+  left: 12px;
+  bottom: 12px;
+  display: inline-flex;
+  align-items: center;
+  gap: 5px;
+  padding: 4px 9px;
+  font-size: 12px;
+  font-weight: 600;
+  color: #fff;
+  background: rgba(15, 23, 42, 0.6);
+  border-radius: 999px;
+}
+
+.ms-count svg { width: 13px; height: 13px; }
+
+/* no photo: clean pastel cover */
+.ms-plain {
+  position: absolute;
+  inset: 0;
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between;
+  padding: 64px 20px 20px;
+}
+
+.ms-plain i {
+  display: block;
+  width: 28px;
+  height: 3px;
+  margin-bottom: 10px;
+  background: currentColor;
+  border-radius: 2px;
+  opacity: 0.45;
+}
+
+.ms-plain strong {
+  display: -webkit-box;
+  font-size: 22px;
+  font-weight: 600;
+  line-height: 1.15;
+  letter-spacing: -0.4px;
+  -webkit-line-clamp: 4;
+  -webkit-box-orient: vertical;
+  overflow: hidden;
+}
+
+.ms-plain em { font-style: normal; font-size: 12px; opacity: 0.75; }
+
+.ms-label {
+  position: absolute;
+  top: 12px;
+  left: 12px;
+  padding: 4px 10px;
+  font-size: 11.5px;
+  font-weight: 600;
+  color: var(--sd-ink);
+  background: #fff;
+  border-radius: 999px;
+}
+
+.ms-label.is-sold { color: #fff; background: var(--dark); }
+
+.ms-heart {
+  position: absolute;
+  top: 12px;
+  right: 12px;
+  z-index: 1;
+  width: 34px;
+  height: 34px;
+  display: grid;
+  place-items: center;
+  padding: 0;
+  color: var(--sd-ink);
+  background: #fff;
+  border: 0;
+  border-radius: 50%;
+  cursor: pointer;
+  transition: transform 0.15s ease, color 0.2s ease;
+}
+
+.ms-heart svg { width: 16px; height: 16px; }
+.ms-heart:hover { transform: scale(1.08); color: #E11D48; }
+.ms-heart.is-on { color: #E11D48; }
+.ms-heart.is-on svg { fill: currentColor; }
+
+/* text under the photo */
+.ms-info { flex: 1; display: flex; flex-direction: column; padding: 14px 2px 0; }
+.ms-info h3 { margin: 0; font-size: 15px; font-weight: 600; line-height: 1.35; }
+.ms-info h3 a { color: var(--sd-ink); text-decoration: none; }
+.ms-info h3 a:hover { color: var(--primary); }
+.ms-by { margin: 3px 0 10px; font-size: 13px; color: #64748B; }
+
+.ms-row { display: flex; align-items: baseline; justify-content: space-between; gap: 10px; }
+.ms-price { font-size: 17px; font-weight: 600; color: var(--sd-ink); }
+.ms-price.is-swap { color: #0F766E; }
+.ms-cond { font-size: 12px; color: #64748B; white-space: nowrap; }
+
+.ms-wants { margin: 6px 0 0; font-size: 12.5px; line-height: 1.45; color: #64748B; }
+
+.ms-cta { display: grid; gap: 8px; margin-top: auto; padding-top: 12px; }
+.ms-cta.is-two { grid-template-columns: 1fr auto; }
+
+.ms-btn {
+  height: 40px;
+  display: grid;
+  place-items: center;
+  padding: 0 16px;
+  font: 600 13px var(--font);
+  color: var(--sd-ink);
+  text-decoration: none;
+  background: #fff;
+  border: 1px solid var(--sd-ink);
+  border-radius: 999px;
+  cursor: pointer;
+  transition: background 0.2s ease, color 0.2s ease;
+}
+
+.ms-btn:hover { color: #fff; background: var(--sd-ink); }
+.ms-btn-ghost { border-color: #E2E8F0; }
+.ms-btn-ghost:hover { color: var(--sd-ink); background: #F8FAFC; }
+
+/* --- Sold --- */
+.ms-sold { margin-top: 56px; padding-top: 32px; border-top: 1px solid #EEF0F4; }
+.ms-sold-head { margin-bottom: 22px; }
+.ms-sold-head h2 { margin: 0; font-size: 22px; font-weight: 600; }
+.ms-sold-head p { margin: 4px 0 0; font-size: 14px; color: #64748B; }
+
+.ms-grid-small { grid-template-columns: repeat(6, minmax(0, 1fr)); gap: 24px 18px; }
+.ms-card.is-sold .ms-pic { filter: grayscale(0.9); opacity: 0.7; }
+.ms-card.is-sold .ms-plain { padding: 40px 12px 12px; }
+.ms-card.is-sold .ms-plain strong { font-size: 13px; }
+.ms-card.is-sold .ms-plain em { font-size: 9px; }
+.ms-card.is-sold .ms-label { top: 8px; left: 8px; font-size: 10.5px; }
+.ms-card.is-sold h3 { font-size: 13.5px; }
+.ms-card.is-sold h3 a { color: #475569; }
+.ms-card.is-sold .ms-by { margin-bottom: 6px; font-size: 12px; }
+.ms-card.is-sold .ms-price { font-size: 14px; color: #94A3B8; text-decoration: line-through; }
+.ms-card.is-sold .ms-cond { font-size: 11px; }
+
+.ms-empty { padding: 50px 0; }
+
+/* --- Swap offer box --- */
+.ms-swap-box { max-width: 460px; }
+.ms-swap-box .auth-field { margin-bottom: 14px; }
+.ms-swap-box .sd-confirm-actions { margin-top: 6px; }
+.ms-swap-box textarea {
+  width: 100%;
+  padding: 12px 14px;
+  font: 14.5px/1.5 var(--font);
+  color: var(--sd-ink);
+  background: #fff;
+  border: 1.5px solid var(--sd-line);
+  border-radius: 12px;
+  outline: none;
+  resize: vertical;
+}
+.ms-swap-box textarea:focus { border-color: var(--primary); box-shadow: 0 0 0 4px rgba(108, 56, 255, 0.12); }
+.ms-optional { font-weight: 400; color: #94A3B8; }
+.ms-swap-box .auth-error { margin: 6px 0 0; font-size: 12.5px; font-weight: 500; color: #DC2626; }
+.ms-swap-box .auth-error:empty { display: none; }
+.ms-gate .auth-btn { min-width: 160px; }
+
+/* --- Responsive --- */
+@media (max-width: 1100px) {
+  .ms-grid { grid-template-columns: repeat(3, minmax(0, 1fr)); }
+  .ms-grid-small { grid-template-columns: repeat(4, minmax(0, 1fr)); }
+}
+
+@media (max-width: 720px) {
+  .ms-head h1 { font-size: 28px; }
+  .ms-avatar { flex-basis: 60px; width: 60px; height: 60px; font-size: 24px; }
+  .ms-actions { width: 100%; }
+  .ms-actions .ms-pill { flex: 1; }
+  .ms-tools { width: 100%; }
+  .ms-tabs { gap: 22px; margin-bottom: 22px; }
+  .ms-search { flex: 1; }
+  .ms-search input { width: 100%; }
+  .ms-grid { grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 26px 14px; }
+  .ms-grid-small { grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 18px 12px; }
+  .ms-plain { padding: 56px 14px 14px; }
+  .ms-plain strong { font-size: 17px; }
+  .ms-owner { flex-wrap: wrap; }
+  .ms-owner a { margin-left: 30px; }
+}
+
+@media (max-width: 420px) {
+  .ms-who { gap: 14px; }
+  .ms-tabs { gap: 20px; }
+  .ms-plain strong { font-size: 15px; }
+  .ms-cta.is-two { grid-template-columns: 1fr; }
+  .ms-btn { height: 38px; }
+  .ms-grid-small { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .ms-img, .ms-heart { transition: none; }
+}
+
+/* Phone fix for the seller dashboard: the flying books sit
+   under the buttons instead of on top of them */
+@media (max-width: 720px) {
+  .sh-hero { padding-bottom: 176px; }
+  .sh-hero .sd-top-actions { margin-top: 4px; }
+}
+/* ========== MY SHOP CSS END ========== */
+
+
+
+
+/* ========== MY SHOP: SLIDING BOOKS IN THE HEADER (Member 4 - Aleena) ========== */
+/* Soft lavender band at the top of Seller/my-shop.html.
+   The shop's books slide in from the right, one every 1.5 seconds (moved by listing.js). */
+.ms-head {
+  position: relative;
+  overflow: hidden;
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  justify-content: center;
+  gap: 22px;
+  min-height: 260px;
+  padding: 36px 40px;
+  background:
+    radial-gradient(420px 260px at 85% 30%, rgba(236, 72, 153, 0.10), transparent 70%),
+    radial-gradient(520px 300px at 70% 90%, rgba(108, 56, 255, 0.10), transparent 70%),
+    #F7F5FF;
+  border-bottom: 0;
+  border-radius: 28px;
+}
+
+.ms-head > :not(.ms-slides) { position: relative; z-index: 1; max-width: 50%; }
+
+/* buttons line up under the shop name, not under the avatar */
+.ms-head .ms-actions { margin-left: 96px; }
+
+/* the slide window, edges fade out */
+.ms-head > .ms-slides { position: absolute; z-index: 0; max-width: none; }
+.ms-slides {
+  position: absolute;
+  top: 0;
+  right: 0;
+  bottom: 0;
+  width: 46%;
+  display: flex;
+  align-items: center;
+  overflow: hidden;
+  -webkit-mask-image: linear-gradient(90deg, transparent, #000 14%, #000 86%, transparent);
+          mask-image: linear-gradient(90deg, transparent, #000 14%, #000 86%, transparent);
+  pointer-events: none;
+}
+
+.ms-track {
+  display: flex;
+  align-items: center;
+  column-gap: 26px;
+  padding-left: 30px;
+  will-change: transform;
+}
+
+.ms-sbook {
+  position: relative;
+  flex: 0 0 112px;
+  height: 156px;
+  display: flex;
+  flex-direction: column;
+  justify-content: flex-end;
+  gap: 5px;
+  padding: 0 12px 14px 20px;
+  overflow: hidden;
+  border-radius: 4px 12px 12px 4px;
+  box-shadow: 6px 6px 0 -2px #fff, 7px 7px 0 -2px #E9E3FF, 0 18px 30px rgba(76, 29, 149, 0.22);
+}
+
+.ms-sbook:nth-child(odd)  { transform: rotate(-5deg); }
+.ms-sbook:nth-child(even) { transform: rotate(4deg) translateY(-8px); }
+
+.ms-sbook::before {                 /* spine */
+  content: "";
+  position: absolute;
+  top: 0;
+  bottom: 0;
+  left: 0;
+  width: 9px;
+  background: rgba(0, 0, 0, 0.18);
+}
+
+.ms-sbook b {
+  position: absolute;
+  top: 14px;
+  left: 20px;
+  right: 10px;
+  font-size: 12px;
+  font-weight: 700;
+  line-height: 1.2;
+  color: #fff;
+  overflow-wrap: break-word;
+}
+
+.ms-sbook.is-long b { font-size: 10px; }
+.ms-sbook.is-xlong b { font-size: 8.5px; }
+
+.ms-sbook i {
+  display: block;
+  width: 70%;
+  height: 3px;
+  background: rgba(255, 255, 255, 0.7);
+  border-radius: 2px;
+}
+
+.ms-sbook i + i { width: 42%; opacity: 0.6; }
+
+.ms-sbook.has-photo { padding: 0; }
+.ms-sbook.has-photo::before { z-index: 1; }
+.ms-sbook img { width: 100%; height: 100%; object-fit: cover; display: block; }
+
+@media (max-width: 1100px) {
+  .ms-head .ms-actions { margin-left: 0; }
+}
+
+@media (max-width: 720px) {
+  .ms-head { padding: 24px 20px 200px; border-radius: 22px; }
+  .ms-head > :not(.ms-slides) { max-width: none; }
+  .ms-slides { top: auto; height: 190px; width: 100%; }
+  .ms-track { column-gap: 18px; padding-left: 20px; }
+  .ms-sbook { flex-basis: 92px; height: 128px; padding: 0 9px 10px 15px; }
+  .ms-sbook b { top: 10px; left: 15px; font-size: 10px; }
+  .ms-sbook.is-long b { font-size: 8px; }
+  .ms-sbook.is-xlong b { font-size: 6.5px; }
+}
+/* ========== MY SHOP: SLIDING BOOKS END ========== */

@@ -1502,3 +1502,414 @@ html.auth-lock { overflow: hidden; }
   .auth-reason { margin-right: 44px; }
 }
 /* ========== LOGIN / SIGN UP POPUP CSS END ========== */
+
+/* ========== PROFILE PAGE CSS STARTED (Member 4 - Aleena) ========== */
+/* Used by profile.html. Everything starts with .pf- so it cannot clash with other pages.
+   Form fields and buttons reuse the .auth- styles from the login popup. */
+
+.pf-main {
+  --pf-ink: #0F172A;
+  --pf-muted: #475569;
+  --pf-line: #E2E8F0;
+  --pf-soft: #F5F3FF;
+  --auth-ink: #0F172A;
+  --auth-muted: #475569;
+  --auth-line: #E2E8F0;
+  --auth-soft: #F5F3FF;
+  --auth-danger: #DC2626;
+  --auth-ok: #16A34A;
+  min-height: 60vh;
+  padding: 48px 16px 72px;
+  font-family: var(--font);
+  color: var(--pf-ink);
+}
+
+.pf-main [hidden] { display: none !important; }
+
+.pf-main :focus-visible {
+  outline: 3px solid var(--primary-light);
+  outline-offset: 2px;
+}
+
+.pf-main svg {
+  fill: none;
+  stroke: currentColor;
+  stroke-width: 2;
+  stroke-linecap: round;
+  stroke-linejoin: round;
+}
+
+.pf-wrap {
+  max-width: 1120px;
+  margin: 0 auto;
+  display: grid;
+  gap: 24px;
+}
+
+/* --- Guest view --- */
+.pf-guest {
+  max-width: 480px;
+  margin: 40px auto;
+  padding: 40px 28px;
+  text-align: center;
+  background: #fff;
+  border: 1px solid var(--pf-line);
+  border-radius: 24px;
+  box-shadow: 0 20px 50px rgba(15, 23, 42, 0.08);
+}
+
+.pf-guest-icon {
+  width: 72px;
+  height: 72px;
+  margin: 0 auto 18px;
+  display: grid;
+  place-items: center;
+  color: #fff;
+  background: linear-gradient(135deg, var(--primary), var(--secondary));
+  border-radius: 50%;
+}
+
+.pf-guest-icon svg { width: 32px; height: 32px; }
+.pf-guest h1 { margin: 0 0 8px; font-size: 26px; }
+.pf-guest p { margin: 0 0 24px; color: var(--pf-muted); line-height: 1.6; }
+
+.pf-guest-actions {
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: center;
+  gap: 12px;
+}
+
+/* --- Header card --- */
+.pf-head {
+  position: relative;
+  display: flex;
+  align-items: center;
+  gap: 22px;
+  padding: 28px 32px;
+  color: #fff;
+  border-radius: 24px;
+  background:
+    radial-gradient(circle at 100% 0%, rgba(168, 85, 247, 0.55), transparent 55%),
+    linear-gradient(135deg, #1E1B4B 0%, var(--dark) 75%);
+  box-shadow: 0 20px 50px rgba(15, 23, 42, 0.18);
+}
+
+.pf-avatar {
+  flex: 0 0 84px;
+  width: 84px;
+  height: 84px;
+  display: grid;
+  place-items: center;
+  font-size: 34px;
+  font-weight: 700;
+  color: #fff;
+  background: linear-gradient(135deg, var(--primary), var(--secondary));
+  border: 4px solid rgba(255, 255, 255, 0.2);
+  border-radius: 50%;
+}
+
+.pf-head-text { min-width: 0; }
+
+.pf-head h1 {
+  margin: 0 0 4px;
+  font-size: 26px;
+  line-height: 1.2;
+  overflow-wrap: anywhere;
+}
+
+.pf-head p {
+  margin: 0 0 12px;
+  font-size: 14px;
+  color: #CBD5E1;
+  overflow-wrap: anywhere;
+}
+
+.pf-badges {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 10px;
+}
+
+.pf-badge {
+  padding: 4px 12px;
+  font-size: 12px;
+  font-weight: 600;
+  color: #fff;
+  background: rgba(255, 255, 255, 0.14);
+  border: 1px solid rgba(255, 255, 255, 0.25);
+  border-radius: 999px;
+}
+
+.pf-badge.is-seller {
+  background: linear-gradient(135deg, var(--primary), var(--secondary));
+  border-color: transparent;
+}
+
+.pf-since { font-size: 12px; color: #94A3B8; }
+
+.pf-signout {
+  margin-left: auto;
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  padding: 10px 16px;
+  font: inherit;
+  font-size: 14px;
+  font-weight: 600;
+  color: #fff;
+  background: rgba(255, 255, 255, 0.08);
+  border: 1px solid rgba(255, 255, 255, 0.2);
+  border-radius: 12px;
+  cursor: pointer;
+  transition: background 0.2s ease;
+}
+
+.pf-signout:hover { background: rgba(255, 255, 255, 0.16); }
+.pf-signout svg { width: 18px; height: 18px; }
+
+/* --- Layout --- */
+.pf-grid {
+  display: grid;
+  grid-template-columns: minmax(0, 1.5fr) minmax(0, 1fr);
+  gap: 24px;
+  align-items: start;
+}
+
+.pf-side { display: grid; gap: 24px; }
+
+.pf-card {
+  padding: 28px;
+  background: #fff;
+  border: 1px solid var(--pf-line);
+  border-radius: 20px;
+  box-shadow: 0 10px 30px rgba(15, 23, 42, 0.05);
+  scroll-margin-top: 110px;
+}
+
+.pf-card h2 {
+  margin: 0 0 6px;
+  font-size: 20px;
+  font-weight: 700;
+}
+
+.pf-card-sub {
+  margin: 0 0 22px;
+  font-size: 13.5px;
+  line-height: 1.6;
+  color: var(--pf-muted);
+}
+
+.pf-optional { font-weight: 400; color: #94A3B8; }
+
+.pf-main .auth-field { align-content: start; }
+
+.pf-main .auth-input input[readonly] {
+  color: #64748B;
+  background: #F8FAFC;
+  cursor: not-allowed;
+}
+
+.pf-form-actions {
+  display: flex;
+  justify-content: flex-end;
+}
+
+/* --- Switch to Seller card (buyers) --- */
+.pf-upgrade {
+  background: linear-gradient(180deg, var(--pf-soft), #fff 60%);
+  border-color: #DDD6FE;
+}
+
+.pf-upgrade p {
+  margin: 0 0 16px;
+  font-size: 14px;
+  line-height: 1.6;
+  color: var(--pf-muted);
+}
+
+.pf-upgrade-tag {
+  display: inline-block;
+  margin-bottom: 12px;
+  padding: 3px 10px;
+  font-size: 11px;
+  font-weight: 600;
+  color: var(--primary);
+  background: #fff;
+  border: 1px solid #DDD6FE;
+  border-radius: 999px;
+}
+
+.pf-tag-seller {
+  color: #fff;
+  background: linear-gradient(135deg, var(--primary), var(--secondary));
+  border-color: transparent;
+}
+
+.pf-ticks {
+  list-style: none;
+  margin: 0 0 20px;
+  padding: 0;
+  display: grid;
+  gap: 8px;
+  font-size: 14px;
+}
+
+.pf-ticks li {
+  display: flex;
+  align-items: flex-start;
+  gap: 8px;
+}
+
+.pf-ticks li::before {
+  content: "";
+  flex: 0 0 16px;
+  height: 16px;
+  margin-top: 3px;
+  background: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='%236C38FF' stroke-width='3' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpath d='M5 12l5 5L20 7'/%3E%3C/svg%3E") center / contain no-repeat;
+}
+
+/* --- Seller tools --- */
+.pf-links {
+  display: grid;
+  gap: 10px;
+  margin-bottom: 22px;
+}
+
+.pf-link {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  padding: 12px 14px;
+  font-size: 14px;
+  font-weight: 600;
+  color: var(--pf-ink);
+  text-decoration: none;
+  border: 1px solid var(--pf-line);
+  border-radius: 12px;
+  transition: border-color 0.2s ease, background 0.2s ease;
+}
+
+.pf-link:hover { border-color: var(--primary); background: var(--pf-soft); }
+
+.pf-link svg {
+  width: 20px;
+  height: 20px;
+  color: var(--primary);
+}
+
+.pf-link::after {
+  content: "\203A";
+  margin-left: auto;
+  font-size: 20px;
+  color: #94A3B8;
+}
+
+.pf-payout {
+  padding: 18px;
+  background: #F8FAFC;
+  border: 1px solid var(--pf-line);
+  border-radius: 14px;
+}
+
+.pf-payout h3 {
+  margin: 0 0 6px;
+  font-size: 13px;
+  font-weight: 600;
+  color: var(--pf-muted);
+}
+
+.pf-payout-line {
+  margin: 0 0 14px;
+  font-size: 16px;
+  font-weight: 600;
+}
+
+.pf-payout-line.is-empty { color: #94A3B8; }
+
+.pf-payout-warn {
+  margin: -6px 0 14px;
+  padding: 10px 12px;
+  font-size: 13px;
+  line-height: 1.5;
+  color: #92400E;
+  background: #FFFBEB;
+  border: 1px solid #FDE68A;
+  border-radius: 10px;
+}
+
+/* --- Wishlist --- */
+.pf-empty {
+  display: grid;
+  justify-items: center;
+  gap: 10px;
+  padding: 18px 8px 6px;
+  text-align: center;
+}
+
+.pf-empty svg {
+  width: 40px;
+  height: 40px;
+  color: #C4B5FD;
+}
+
+.pf-empty p {
+  margin: 0;
+  max-width: 280px;
+  font-size: 14px;
+  line-height: 1.6;
+  color: var(--pf-muted);
+}
+
+/* --- Responsive --- */
+@media (max-width: 900px) {
+  .pf-grid { grid-template-columns: 1fr; }
+}
+
+@media (max-width: 640px) {
+  .pf-main { padding: 24px 16px 56px; }
+
+  .pf-head {
+    flex-wrap: wrap;
+    gap: 16px;
+    padding: 22px 20px;
+  }
+
+  .pf-avatar { flex-basis: 64px; width: 64px; height: 64px; font-size: 26px; }
+  .pf-head h1 { font-size: 22px; }
+  .pf-signout { margin-left: 0; width: 100%; justify-content: center; }
+  .pf-card { padding: 22px 18px; }
+  .pf-form-actions .auth-btn { width: 100%; }
+}
+/* ========== PROFILE PAGE CSS END ========== */
+
+/* ========== LOGIN POPUP FIX (Member 4 - Aleena) ==========
+   On some laptops the form inside the popup was cut off.
+   Now the whole popup scrolls instead of only the right side. */
+.auth-modal {
+  place-items: start center;
+  overflow-y: auto;
+  overscroll-behavior: contain;
+}
+
+.auth-dialog {
+  margin: auto 0;
+  max-height: none;
+}
+
+.auth-main {
+  max-height: none;
+  overflow: visible;
+}
+
+@media (max-width: 560px) {
+  .auth-modal { place-items: end center; overflow: hidden; }
+
+  .auth-dialog {
+    margin: 0;
+    max-height: 94vh;
+    overflow-y: auto;
+  }
+}
+/* ========== LOGIN POPUP FIX END ========== */

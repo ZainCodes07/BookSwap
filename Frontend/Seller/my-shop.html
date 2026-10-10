@@ -1,0 +1,171 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Seller Shop - BookSwap</title>
+  <link rel="stylesheet" href="../css/global.css">
+</head>
+<body class="seller" data-page="my-shop">
+
+  <!-- ===== NAVIGATION (loaded by include.js) ===== -->
+  <div data-include="nav"></div>
+
+  <!-- Public shop page. Anyone can open it, no sign in needed.
+       Opened from the share link:  Seller/my-shop.html?seller=<seller id>
+       Without ?seller=... a signed-in seller sees their own shop. -->
+  <main class="sd-main ms-main">
+
+    <!-- ===== No shop to show ===== -->
+    <section class="sd-gate ms-gate" id="msMissing" hidden>
+      <div class="sd-gate-icon" aria-hidden="true">
+        <svg viewBox="0 0 24 24"><path d="M3 9l1.5-5h15L21 9"/><path d="M3 9h18v2a3 3 0 0 1-6 0 3 3 0 0 1-6 0 3 3 0 0 1-6 0z"/><path d="M5 13v8h14v-8"/></svg>
+      </div>
+      <h1 id="msMissingTitle">Shop Not Found</h1>
+      <p id="msMissingText">This link may be old, or the seller closed their shop.</p>
+      <div class="sd-gate-actions">
+        <a href="../index.html" class="auth-btn auth-btn-primary">Browse books</a>
+        <button type="button" class="auth-btn auth-btn-outline" id="msStartSelling" data-seller-required>Start your own shop</button>
+      </div>
+    </section>
+
+    <!-- ===== The shop ===== -->
+    <div class="ms-wrap" id="msPage" hidden>
+
+      <!-- Shop header -->
+      <header class="ms-head">
+        <!-- the shop's own books slide past, one every 1.5 s (filled by listing.js) -->
+        <div class="ms-slides" aria-hidden="true">
+          <div class="ms-track" id="msTrack"></div>
+        </div>
+        <div class="ms-who">
+          <span class="ms-avatar" id="msAvatar" aria-hidden="true">B</span>
+          <div>
+            <p class="ms-kicker">BookSwap shop</p>
+            <h1 id="msName">Seller's Shelf</h1>
+            <ul class="ms-meta">
+              <li><strong id="msStatLive">0</strong> on the shelf</li>
+              <li><strong id="msStatSold">0</strong> sold</li>
+              <li><strong id="msStatSwaps">0</strong> swaps</li>
+              <li id="msCity" hidden></li>
+              <li id="msSince" hidden></li>
+            </ul>
+          </div>
+        </div>
+        <div class="ms-actions">
+          <button type="button" class="ms-pill" id="msCopy">
+            <svg viewBox="0 0 24 24" aria-hidden="true"><circle cx="18" cy="5" r="3"/><circle cx="6" cy="12" r="3"/><circle cx="18" cy="19" r="3"/><path d="m8.6 13.5 6.8 4M15.4 6.5l-6.8 4"/></svg>
+            Copy link
+          </button>
+          <a href="#" class="ms-pill ms-pill-dark" id="msWa" target="_blank" rel="noopener">
+            <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M21 11.5a8.4 8.4 0 0 1-12.6 7.3L3 20.5l1.8-5.2A8.4 8.4 0 1 1 21 11.5z"/></svg>
+            WhatsApp
+          </a>
+          <a href="seller-dashboard.html" class="ms-pill ms-pill-purple" id="msManage" hidden>Manage listings</a>
+        </div>
+      </header>
+
+      <!-- Only the owner sees this -->
+      <p class="ms-owner" id="msOwner" hidden>
+        <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M1 12s4-7 11-7 11 7 11 7-4 7-11 7S1 12 1 12z"/><circle cx="12" cy="12" r="3"/></svg>
+        <span><strong>This is your shop as buyers see it.</strong> <span id="msOwnerNote"></span></span>
+        <a href="add-listing.html">List a book</a>
+      </p>
+
+      <!-- Title + search + sort, then course tabs -->
+      <div class="ms-bar">
+        <h2 class="ms-shelf-title">On the shelf</h2>
+        <div class="ms-tools">
+          <label class="ms-search">
+            <span class="sr-only">Search this shop</span>
+            <svg viewBox="0 0 24 24" aria-hidden="true"><circle cx="11" cy="11" r="8"/><path d="m21 21-4.35-4.35"/></svg>
+            <input type="search" id="msSearch" placeholder="Search this shop" autocomplete="off">
+          </label>
+          <label class="ms-sort">
+            <span class="sr-only">Sort books</span>
+            <select id="msSort">
+              <option value="new">Newest</option>
+              <option value="low">Price: low to high</option>
+              <option value="high">Price: high to low</option>
+            </select>
+          </label>
+        </div>
+      </div>
+      <div class="ms-tabs" id="msChips" role="group" aria-label="Filter by course"></div>
+
+      <!-- Books -->
+      <section aria-label="Books on the shelf">
+        <div class="ms-grid" id="msGrid"></div>
+
+        <!-- Shelf is empty -->
+        <div class="sd-empty ms-empty" id="msEmpty" hidden>
+          <div class="sd-empty-books" aria-hidden="true"><span></span><span></span><span></span></div>
+          <h3>Shelf's Empty For Now</h3>
+          <p id="msEmptyText">New books land here as soon as they're approved. Check back soon.</p>
+        </div>
+
+        <!-- Search / filter found nothing -->
+        <p class="sd-none" id="msNone" hidden>Nothing matches that. Try another course or word.</p>
+      </section>
+
+      <!-- Sold books -->
+      <section class="ms-sold" id="msSoldWrap" aria-labelledby="msSoldTitle" hidden>
+        <div class="ms-sold-head">
+          <h2 id="msSoldTitle">Already Gone</h2>
+          <p>Sold to other students.</p>
+        </div>
+        <div class="ms-grid ms-grid-small" id="msSoldGrid"></div>
+      </section>
+    </div>
+
+    <!-- Swap offer box -->
+    <div class="sd-confirm" id="msSwap" hidden role="dialog" aria-modal="true" aria-labelledby="msSwapTitle">
+      <form class="sd-confirm-box ms-swap-box" id="msSwapForm" novalidate>
+        <h3 id="msSwapTitle">Offer A Swap</h3>
+        <p>For <strong id="msSwapBook">this book</strong>. <span id="msSwapWants"></span></p>
+
+        <div class="auth-field">
+          <label for="msOffer">Your book</label>
+          <div class="auth-input">
+            <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M4 19.5A2.5 2.5 0 0 1 6.5 17H20V3H6.5A2.5 2.5 0 0 0 4 5.5z"/><path d="M4 19.5A2.5 2.5 0 0 0 6.5 22H20v-5"/></svg>
+            <input type="text" id="msOffer" name="offer" maxlength="80" placeholder="e.g. Operating System Concepts" aria-describedby="msOffer-err">
+          </div>
+          <p class="auth-error" id="msOffer-err"></p>
+        </div>
+
+        <div class="auth-field">
+          <label for="msOfferCond">Its condition</label>
+          <div class="auth-input auth-select">
+            <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M20 6 9 17l-5-5"/></svg>
+            <select id="msOfferCond" name="condition" aria-describedby="msOfferCond-err">
+              <option value="">Choose one</option>
+              <option>Like new</option>
+              <option>Good</option>
+              <option>Fair</option>
+              <option>Heavily used</option>
+            </select>
+          </div>
+          <p class="auth-error" id="msOfferCond-err"></p>
+        </div>
+
+        <div class="auth-field">
+          <label for="msOfferNote">Note <span class="ms-optional">(optional)</span></label>
+          <textarea id="msOfferNote" name="note" rows="2" maxlength="160" placeholder="e.g. Can meet at the library after 2 pm"></textarea>
+        </div>
+
+        <div class="sd-confirm-actions">
+          <button type="button" class="auth-btn auth-btn-ghost" id="msSwapCancel">Cancel</button>
+          <button type="submit" class="auth-btn auth-btn-primary">Send offer</button>
+        </div>
+      </form>
+    </div>
+  </main>
+
+  <!-- ===== FOOTER (loaded by include.js) ===== -->
+  <div data-include="footer"></div>
+
+  <script src="../js/include.js"></script>
+  <script src="../js/auth.js"></script>
+  <script src="../js/listing.js"></script>
+</body>
+</html>

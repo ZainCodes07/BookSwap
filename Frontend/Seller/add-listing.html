@@ -168,25 +168,17 @@
 
           <!-- 4. Photo and details -->
           <section class="sd-card al-section" aria-labelledby="alSec4">
-            <h2 id="alSec4"><span class="al-num">4</span> Photo &amp; details</h2>
+            <h2 id="alSec4"><span class="al-num">4</span> Photos &amp; details</h2>
 
             <div class="al-drop" id="alDrop">
-              <input type="file" id="alPhoto" accept="image/png, image/jpeg, image/webp" class="sr-only">
+              <input type="file" id="alPhoto" accept="image/png, image/jpeg, image/webp" multiple class="sr-only">
               <div class="al-drop-empty" id="alDropEmpty">
                 <svg viewBox="0 0 24 24" aria-hidden="true"><rect x="3" y="3" width="18" height="18" rx="2"/><circle cx="8.5" cy="8.5" r="1.5"/><path d="m21 15-5-5L5 21"/></svg>
-                <p><strong>Drop a cover pic</strong> or <label for="alPhoto" class="auth-link">browse</label></p>
-                <small>JPG or PNG · max 5 MB · front cover works best</small>
+                <p><strong>Drop up to 4 photos</strong> or <label for="alPhoto" class="auth-link">browse</label></p>
+                <small>Front cover first, then back, spine or any marks · JPG or PNG · max 5 MB each</small>
               </div>
-              <div class="al-drop-full" id="alDropFull" hidden>
-                <img id="alPhotoImg" alt="Your cover photo">
-                <div>
-                  <p><strong>Looking sharp.</strong></p>
-                  <div class="al-drop-actions">
-                    <label for="alPhoto" class="sd-act">Replace</label>
-                    <button type="button" class="sd-act is-danger" id="alPhotoRemove">Remove</button>
-                  </div>
-                </div>
-              </div>
+              <!-- Thumbnails (filled by listing.js). The first photo is the cover buyers see. -->
+              <div class="al-thumbs" id="alThumbs" hidden></div>
             </div>
             <p class="auth-error" id="alPhoto-err"></p>
 

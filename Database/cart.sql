@@ -1,0 +1,15 @@
+CREATE TABLE Cart (
+    CartID INT IDENTITY(1,1) PRIMARY KEY,
+    UserID INT NOT NULL,
+    BookID INT NOT NULL,
+    AddedAt DATETIME2 NOT NULL DEFAULT GETDATE(),
+
+    CONSTRAINT FK_Cart_User
+        FOREIGN KEY (UserID) REFERENCES Users(UserID),
+
+    CONSTRAINT FK_Cart_Book
+        FOREIGN KEY (BookID) REFERENCES Books(BookID),
+
+    CONSTRAINT UQ_Cart_User_Book
+        UNIQUE (UserID, BookID)
+);

@@ -1,0 +1,91 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Sign In - BookSwap</title>
+  <link rel="stylesheet" href="css/global.css">
+</head>
+<body class="auth-page" data-auth-page>
+
+  <!-- ===== NAVIGATION (loaded by include.js) ===== -->
+  <div data-include="nav"></div>
+
+  <!-- ===== PAGE BEHIND THE POPUP =====
+       Shown only when someone opens login-modal.html directly. -->
+  <main class="auth-page-main">
+    <div class="auth-page-box" id="authPageBox">
+      <h1>Sign In To BookSwap</h1>
+      <p>Buy, sell and swap used books with students from your department.</p>
+      <button type="button" class="auth-btn auth-btn-primary" data-auth-open="login">Sign in</button>
+      <button type="button" class="auth-btn auth-btn-ghost" data-auth-open="role">Create an account</button>
+    </div>
+  </main>
+
+  <!-- ==========================================================
+       LOGIN / SIGN UP POPUP  (Member 4 - Aleena)
+       auth.js copies this block onto any page that needs it,
+       then fills each [data-auth-part] with a file from Partial/.
+       ========================================================== -->
+  <div class="auth-modal" id="authModal" hidden>
+    <div class="auth-backdrop" data-auth-close></div>
+
+    <div class="auth-dialog" role="dialog" aria-modal="true" aria-labelledby="authTitle-login">
+
+      <!-- Left purple panel (hidden on phones) -->
+      <aside class="auth-side" aria-hidden="true">
+        <div class="auth-side-brand">Book<span>Swap</span></div>
+        <div class="auth-side-text">
+          <h2 data-side-title>Good to see you again</h2>
+          <p data-side-text>Your next book is only a few clicks away.</p>
+        </div>
+        <ul class="auth-side-list">
+          <li>Books for every core course</li>
+          <li>Chat with the seller before you buy</li>
+          <li>Pay online or swap on campus</li>
+        </ul>
+        <div class="auth-side-books">
+          <span></span><span></span><span></span><span></span>
+        </div>
+      </aside>
+
+      <!-- Right side: the forms -->
+      <section class="auth-main">
+        <button type="button" class="auth-close" data-auth-close aria-label="Close">
+          <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M18 6 6 18M6 6l12 12"/></svg>
+        </button>
+
+        <!-- Seller sign up progress (only shown for sellers) -->
+        <ol class="auth-steps" data-auth-steps hidden>
+          <li data-step="1"><span>1</span> Your details</li>
+          <li data-step="2"><span>2</span> Payout account</li>
+        </ol>
+
+        <div class="auth-view" data-view="login"  data-auth-part="Partial/login-form"></div>
+        <div class="auth-view" data-view="role"   data-auth-part="Partial/role-choice" hidden></div>
+        <div class="auth-view" data-view="signup" data-auth-part="Partial/signup-form" hidden></div>
+        <div class="auth-view" data-view="payout" data-auth-part="Partial/payout-form" hidden></div>
+
+        <!-- Success screen -->
+        <div class="auth-view" data-view="done" hidden>
+          <div class="auth-done">
+            <div class="auth-done-icon" aria-hidden="true">
+              <svg viewBox="0 0 52 52"><circle cx="26" cy="26" r="24"/><path d="M15 27l7 7 15-16"/></svg>
+            </div>
+            <h2 class="auth-title" id="authTitle-done" data-done-title>You're all set!</h2>
+            <p class="auth-sub" data-done-text></p>
+            <a href="#" class="auth-btn auth-btn-primary" data-done-link>Start browsing</a>
+            <button type="button" class="auth-btn auth-btn-ghost" data-auth-close>Close</button>
+          </div>
+        </div>
+      </section>
+    </div>
+  </div>
+
+  <!-- ===== FOOTER (loaded by include.js) ===== -->
+  <div data-include="footer"></div>
+
+  <script src="js/include.js"></script>
+  <script src="js/auth.js"></script>
+</body>
+</html>

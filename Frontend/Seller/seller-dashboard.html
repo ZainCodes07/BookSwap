@@ -11,7 +11,7 @@
   <!-- ===== NAVIGATION (loaded by include.js) ===== -->
   <div data-include="nav"></div>
 
-  <main class="sd-main">
+  <main class="sd-main al-main sh-main">
 
     <!-- ===== Guest: not signed in ===== -->
     <section class="sd-gate" id="sdGuest" hidden>
@@ -43,10 +43,19 @@
     <div class="sd-wrap" id="sdPage" hidden>
 
       <!-- Top bar -->
-      <header class="sd-top">
-        <div>
+      <header class="sd-top al-hero sh-hero">
+        <div class="al-fly" aria-hidden="true">
+          <span class="al-fly-book al-b1"><b>C++</b><i></i><i></i></span>
+          <span class="al-fly-book al-b2"><b>Data Structures</b><i></i><i></i></span>
+          <span class="al-fly-book al-b3"><b>Operating Systems</b><i></i><i></i></span>
+          <span class="al-fly-book al-b4"><b>Databases</b><i></i><i></i></span>
+          <span class="al-fly-book al-b5"><b>Networks</b><i></i><i></i></span>
+          <span class="al-fly-book al-b6"><b>OOP</b><i></i><i></i></span>
+        </div>
+        <div class="al-hero-text">
           <p class="sd-kicker">Seller dashboard</p>
           <h1 id="sdHello">Hey, Reader!</h1>
+          <p class="al-sub">Your shelf, your numbers, all in one place.</p>
         </div>
         <div class="sd-top-actions">
           <a href="#" class="auth-btn auth-btn-outline" id="sdShopLink">View my shop</a>
@@ -85,6 +94,54 @@
           <span class="sd-stat-label">Total earned</span>
           <strong id="sdStatEarned">Rs 0</strong>
           <span class="sd-stat-note">Paid to: <span id="sdPayoutLine">Not added yet</span></span>
+        </div>
+      </section>
+
+      <!-- Earnings + badges -->
+      <div class="sd-grid">
+        <section class="sd-card sh-earn" aria-labelledby="shEarnTitle">
+          <div class="sd-card-head">
+            <div>
+              <h2 id="shEarnTitle">Earnings</h2>
+              <p class="sh-muted">Last 6 months · sold books only</p>
+            </div>
+            <div class="sh-net">
+              <span>You keep</span>
+              <strong id="shNet">Rs 0</strong>
+            </div>
+          </div>
+          <div class="sh-chart" id="shChart" role="img" aria-label="Earnings for the last 6 months"></div>
+          <dl class="sh-split">
+            <div><dt>Book sales</dt><dd id="shGross">Rs 0</dd></div>
+            <div><dt>BookSwap fee <span class="sh-muted">(5%)</span></dt><dd id="shFee">− Rs 0</dd></div>
+            <div><dt>Paid out to you</dt><dd id="shNet2">Rs 0</dd></div>
+          </dl>
+          <!-- BACKEND: GET /api/seller/earnings?months=6 -->
+        </section>
+
+        <section class="sd-card" aria-labelledby="shBadgeTitle">
+          <div class="sd-card-head">
+            <h2 id="shBadgeTitle">Badges</h2>
+            <span class="sh-count" id="shBadgeCount">0 / 6</span>
+          </div>
+          <ul class="sh-badges" id="shBadges"></ul>
+        </section>
+      </div>
+
+      <!-- Share my shop -->
+      <section class="sd-card sh-share" aria-labelledby="shShareTitle">
+        <div class="sh-share-text">
+          <h2 id="shShareTitle">Share Your Shop</h2>
+          <p class="sh-muted">Drop it in your class group. More eyes, faster sales.</p>
+        </div>
+        <div class="sh-share-row">
+          <label class="sr-only" for="shLink">Your shop link</label>
+          <input type="text" id="shLink" readonly>
+          <button type="button" class="auth-btn auth-btn-outline" id="shCopy">Copy link</button>
+          <a href="#" class="auth-btn sh-wa" id="shWa" target="_blank" rel="noopener">
+            <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M21 11.5a8.4 8.4 0 0 1-12.6 7.3L3 20.5l1.8-5.2A8.4 8.4 0 1 1 21 11.5z"/></svg>
+            WhatsApp
+          </a>
         </div>
       </section>
 
@@ -130,13 +187,17 @@
 
       <!-- Bottom row -->
       <div class="sd-grid">
-        <section class="sd-card" aria-labelledby="sdOrdersTitle">
-          <h2 id="sdOrdersTitle">Recent Orders</h2>
-          <div class="sd-empty sd-empty-small">
-            <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M6 2 3 6v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2V6l-3-4z"/><path d="M3 6h18M16 10a4 4 0 0 1-8 0"/></svg>
-            <p>When a buyer orders one of your books, it will show up here.</p>
+        <section class="sd-card" aria-labelledby="shSwapTitle">
+          <div class="sd-card-head">
+            <h2 id="shSwapTitle">Swap Requests</h2>
+            <span class="sh-count" id="shSwapCount">0 new</span>
           </div>
-          <!-- BACKEND: GET /api/seller/orders -> list recent orders here -->
+          <ul class="sh-swaps" id="shSwaps"></ul>
+          <div class="sd-empty sd-empty-small" id="shSwapEmpty" hidden>
+            <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M17 1l4 4-4 4"/><path d="M3 11V9a4 4 0 0 1 4-4h14M7 23l-4-4 4-4"/><path d="M21 13v2a4 4 0 0 1-4 4H3"/></svg>
+            <p>No swap offers yet. List a book as Swap or Either and they will land here.</p>
+          </div>
+          <!-- BACKEND: GET /api/seller/swaps  ·  POST /api/swaps/:id/accept | /decline -->
         </section>
 
         <section class="sd-card sd-tips" aria-labelledby="sdTipsTitle">

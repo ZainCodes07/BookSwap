@@ -1,0 +1,286 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>List a Book - BookSwap</title>
+  <link rel="stylesheet" href="../css/global.css">
+</head>
+<body class="seller" data-page="add-listing">
+
+  <!-- ===== NAVIGATION (loaded by include.js) ===== -->
+  <div data-include="nav"></div>
+
+  <main class="sd-main al-main">
+
+    <!-- ===== Guest: not signed in ===== -->
+    <section class="sd-gate" id="sdGuest" hidden>
+      <div class="sd-gate-icon" aria-hidden="true">
+        <svg viewBox="0 0 24 24"><rect x="4" y="11" width="16" height="10" rx="2"/><path d="M8 11V7a4 4 0 0 1 8 0v4"/></svg>
+      </div>
+      <h1>Sign In To Start Selling</h1>
+      <p>Your old books could be someone's new ones.</p>
+      <div class="sd-gate-actions">
+        <button type="button" class="auth-btn auth-btn-primary" data-auth-open="login">Sign in</button>
+        <button type="button" class="auth-btn auth-btn-outline" data-auth-open="role">Create an account</button>
+      </div>
+    </section>
+
+    <!-- ===== Buyer: needs to switch to seller first ===== -->
+    <section class="sd-gate" id="sdBuyer" hidden>
+      <div class="sd-gate-icon" aria-hidden="true">
+        <svg viewBox="0 0 24 24"><path d="M3 9l1.5-5h15L21 9"/><path d="M3 9h18v2a3 3 0 0 1-6 0 3 3 0 0 1-6 0 3 3 0 0 1-6 0z"/><path d="M5 13v8h14v-8"/></svg>
+      </div>
+      <h1>One Switch Away</h1>
+      <p>Flip to seller to list books. Buying stays the same.</p>
+      <div class="sd-gate-actions">
+        <button type="button" class="auth-btn auth-btn-primary" id="sdSwitch">Switch to Seller</button>
+        <a href="../index.html" class="auth-btn auth-btn-outline">Keep browsing</a>
+      </div>
+    </section>
+
+    <!-- ===== Seller: the form ===== -->
+    <div class="sd-wrap" id="sdPage" hidden>
+
+      <header class="sd-top al-hero">
+        <div class="al-fly" aria-hidden="true">
+          <span class="al-fly-book al-b1"><b>C++</b><i></i><i></i></span>
+          <span class="al-fly-book al-b2"><b>Data Structures</b><i></i><i></i></span>
+          <span class="al-fly-book al-b3"><b>Operating Systems</b><i></i><i></i></span>
+          <span class="al-fly-book al-b4"><b>Databases</b><i></i><i></i></span>
+          <span class="al-fly-book al-b5"><b>Networks</b><i></i><i></i></span>
+          <span class="al-fly-book al-b6"><b>OOP</b><i></i><i></i></span>
+        </div>
+        <div class="al-hero-text">
+          <a href="seller-dashboard.html" class="al-back">
+            <svg viewBox="0 0 24 24" aria-hidden="true"><path d="m15 18-6-6 6-6"/></svg>
+            Seller dashboard
+          </a>
+          <h1 id="alHeading">Pass It On</h1>
+          <p class="al-sub" id="alSub">60 seconds. We review it, then it goes live.</p>
+        </div>
+        <p class="al-draft" id="alDraft" hidden>
+          <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M20 6 9 17l-5-5"/></svg>
+          <span>Draft saved</span>
+        </p>
+      </header>
+
+      <div class="al-layout" id="alFormWrap">
+
+        <!-- ================= FORM ================= -->
+        <form class="auth-form al-form" id="alForm" novalidate>
+
+          <!-- 1. The book -->
+          <section class="sd-card al-section" aria-labelledby="alSec1">
+            <h2 id="alSec1"><span class="al-num">1</span> The book</h2>
+
+            <div class="auth-field">
+              <label for="alTitle">Title</label>
+              <div class="auth-input">
+                <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M4 19.5A2.5 2.5 0 0 1 6.5 17H20V3H6.5A2.5 2.5 0 0 0 4 5.5z"/><path d="M4 19.5A2.5 2.5 0 0 0 6.5 22H20v-5"/></svg>
+                <input type="text" id="alTitle" name="title" maxlength="120" placeholder="e.g. C++ How to Program" aria-describedby="alTitle-err">
+              </div>
+              <p class="auth-error" id="alTitle-err"></p>
+            </div>
+
+            <div class="auth-grid-2">
+              <div class="auth-field">
+                <label for="alAuthor">Author</label>
+                <div class="auth-input">
+                  <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"/><circle cx="12" cy="7" r="4"/></svg>
+                  <input type="text" id="alAuthor" name="author" maxlength="80" placeholder="e.g. Deitel & Deitel" aria-describedby="alAuthor-err">
+                </div>
+                <p class="auth-error" id="alAuthor-err"></p>
+              </div>
+
+              <div class="auth-field">
+                <label for="alEdition">Edition <span class="pf-optional">(optional)</span></label>
+                <div class="auth-input">
+                  <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M12 2 2 7l10 5 10-5z"/><path d="m2 17 10 5 10-5M2 12l10 5 10-5"/></svg>
+                  <input type="text" id="alEdition" name="edition" maxlength="30" placeholder="e.g. 10th">
+                </div>
+              </div>
+            </div>
+
+            <div class="auth-field">
+              <label for="alCourse">Course</label>
+              <div class="auth-input auth-select">
+                <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M22 10 12 5 2 10l10 5z"/><path d="M6 12v5c3 2 9 2 12 0v-5"/></svg>
+                <select id="alCourse" name="course" aria-describedby="alCourse-err">
+                  <option value="">Pick a course</option>
+                </select>
+              </div>
+              <p class="auth-error" id="alCourse-err"></p>
+            </div>
+          </section>
+
+          <!-- 2. Condition -->
+          <section class="sd-card al-section" aria-labelledby="alSec2">
+            <h2 id="alSec2"><span class="al-num">2</span> Condition</h2>
+            <p class="al-hint-top">Keep it real. Honest listings sell faster.</p>
+            <fieldset class="auth-field al-choices al-choices-4">
+              <legend class="sr-only">Condition</legend>
+              <!-- options are added by listing.js -->
+              <p class="auth-error" id="alCondition-err"></p>
+            </fieldset>
+          </section>
+
+          <!-- 3. Price or swap -->
+          <section class="sd-card al-section" aria-labelledby="alSec3">
+            <h2 id="alSec3"><span class="al-num">3</span> Price or swap</h2>
+
+            <fieldset class="auth-field al-choices al-choices-3">
+              <legend class="sr-only">How do you want to pass it on?</legend>
+              <label class="al-choice">
+                <input type="radio" name="type" value="sell">
+                <span class="al-choice-card"><strong>Sell</strong><small>Cash in</small></span>
+              </label>
+              <label class="al-choice">
+                <input type="radio" name="type" value="swap">
+                <span class="al-choice-card"><strong>Swap</strong><small>Trade it up</small></span>
+              </label>
+              <label class="al-choice">
+                <input type="radio" name="type" value="both">
+                <span class="al-choice-card"><strong>Either</strong><small>Open to both</small></span>
+              </label>
+              <p class="auth-error" id="alType-err"></p>
+            </fieldset>
+
+            <div class="auth-field" data-for-type="price" hidden>
+              <label for="alPrice">Price</label>
+              <div class="auth-input al-price">
+                <span class="al-rs" aria-hidden="true">Rs</span>
+                <input type="text" id="alPrice" name="price" inputmode="numeric" maxlength="6" placeholder="1200" aria-describedby="alPriceHint alPrice-err">
+              </div>
+              <p class="auth-hint al-price-hint" id="alPriceHint"></p>
+              <p class="auth-error" id="alPrice-err"></p>
+            </div>
+
+            <div class="auth-field" data-for-type="swap" hidden>
+              <label for="alSwap">What would you swap for?</label>
+              <div class="auth-input">
+                <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M17 1l4 4-4 4"/><path d="M3 11V9a4 4 0 0 1 4-4h14M7 23l-4-4 4-4"/><path d="M21 13v2a4 4 0 0 1-4 4H3"/></svg>
+                <input type="text" id="alSwap" name="swapFor" maxlength="80" placeholder="e.g. Any Operating Systems book" aria-describedby="alSwap-err">
+              </div>
+              <p class="auth-error" id="alSwap-err"></p>
+            </div>
+          </section>
+
+          <!-- 4. Photo and details -->
+          <section class="sd-card al-section" aria-labelledby="alSec4">
+            <h2 id="alSec4"><span class="al-num">4</span> Photo &amp; details</h2>
+
+            <div class="al-drop" id="alDrop">
+              <input type="file" id="alPhoto" accept="image/png, image/jpeg, image/webp" class="sr-only">
+              <div class="al-drop-empty" id="alDropEmpty">
+                <svg viewBox="0 0 24 24" aria-hidden="true"><rect x="3" y="3" width="18" height="18" rx="2"/><circle cx="8.5" cy="8.5" r="1.5"/><path d="m21 15-5-5L5 21"/></svg>
+                <p><strong>Drop a cover pic</strong> or <label for="alPhoto" class="auth-link">browse</label></p>
+                <small>JPG or PNG · max 5 MB · front cover works best</small>
+              </div>
+              <div class="al-drop-full" id="alDropFull" hidden>
+                <img id="alPhotoImg" alt="Your cover photo">
+                <div>
+                  <p><strong>Looking sharp.</strong></p>
+                  <div class="al-drop-actions">
+                    <label for="alPhoto" class="sd-act">Replace</label>
+                    <button type="button" class="sd-act is-danger" id="alPhotoRemove">Remove</button>
+                  </div>
+                </div>
+              </div>
+            </div>
+            <p class="auth-error" id="alPhoto-err"></p>
+
+            <div class="auth-field">
+              <label for="alDesc">Anything buyers should know? <span class="pf-optional">(optional)</span></label>
+              <textarea id="alDesc" name="description" maxlength="500" rows="4" placeholder="Highlights, notes, a bent cover… keep it honest."></textarea>
+              <p class="auth-hint al-count"><span id="alDescCount">0</span>/500</p>
+            </div>
+          </section>
+
+          <div class="al-submit">
+            <button type="button" class="auth-btn auth-btn-ghost" id="alReset">Clear all</button>
+            <button type="submit" class="auth-btn auth-btn-primary" id="alSubmit">Submit for review</button>
+          </div>
+        </form>
+
+        <!-- ================= LIVE PREVIEW ================= -->
+        <aside class="al-aside" aria-label="Preview">
+          <div class="al-sticky">
+            <p class="al-aside-label">Buyer's view</p>
+
+            <article class="al-card" aria-live="polite">
+              <div class="al-cover" id="alCover">
+                <img id="alCoverImg" alt="" hidden>
+                <div class="al-cover-art" id="alCoverArt">
+                  <span class="al-cover-frame"></span>
+                  <span class="al-cover-course" id="pvCourseTag">BookSwap</span>
+                  <span class="al-cover-mid">
+                    <span class="al-cover-rule"></span>
+                    <strong id="pvCoverTitle">Your book title</strong>
+                    <span class="al-cover-rule"></span>
+                  </span>
+                  <span class="al-cover-author" id="pvCoverAuthor">Author</span>
+                </div>
+                <span class="al-badge" id="pvType" hidden>Swap only</span>
+              </div>
+              <div class="al-card-body">
+                <div class="al-card-tags">
+                  <span class="al-chip" id="pvCourseChip">Course</span>
+                  <span class="al-card-cond" id="pvCond" hidden>Good</span>
+                </div>
+                <h3 id="pvTitle">Your book title</h3>
+                <p class="al-card-meta" id="pvMeta">Author</p>
+                <div class="al-card-row">
+                  <span class="al-card-price" id="pvPrice">Rs —</span>
+                  <span class="al-card-heart" aria-hidden="true">
+                    <svg viewBox="0 0 24 24"><path d="M20.84 4.61a5.5 5.5 0 0 0-7.78 0L12 5.67l-1.06-1.06a5.5 5.5 0 0 0-7.78 7.78l1.06 1.06L12 21.23l7.78-7.78 1.06-1.06a5.5 5.5 0 0 0 0-7.78z"/></svg>
+                  </span>
+                </div>
+                <p class="al-card-swap" id="pvSwap" hidden></p>
+                <div class="al-card-cta" aria-hidden="true">
+                  <span class="al-cta-main">Add to cart</span>
+                  <span class="al-cta-alt">Chat</span>
+                </div>
+                <div class="al-card-seller">
+                  <span class="al-avatar" id="pvAvatar">Y</span>
+                  <span><strong id="pvSeller">You</strong><small>Seller · just now</small></span>
+                </div>
+              </div>
+            </article>
+
+            <div class="al-strength">
+              <div class="al-strength-top">
+                <span id="alStrengthLabel">Just started</span>
+                <span id="alStrengthPct">0%</span>
+              </div>
+              <div class="al-bar"><span id="alBar"></span></div>
+              <p id="alStrengthTip">Title first. The rest is easy.</p>
+            </div>
+          </div>
+        </aside>
+      </div>
+
+      <!-- ================= SUCCESS ================= -->
+      <section class="sd-card al-done" id="alDone" hidden aria-labelledby="alDoneTitle">
+        <div class="al-done-icon" aria-hidden="true">
+          <svg viewBox="0 0 24 24"><path d="M20 6 9 17l-5-5"/></svg>
+        </div>
+        <h2 id="alDoneTitle">In review</h2>
+        <p id="alDoneText">Quick check from us, then it's live. Find it under <strong>Waiting</strong>.</p>
+        <div class="al-done-actions">
+          <a href="seller-dashboard.html" class="auth-btn auth-btn-primary">Dashboard</a>
+          <button type="button" class="auth-btn auth-btn-outline" id="alAnother">List another</button>
+          <button type="button" class="auth-btn auth-btn-ghost" id="alCopy">Copy link</button>
+        </div>
+      </section>
+    </div>
+  </main>
+
+  <!-- ===== FOOTER (loaded by include.js) ===== -->
+  <div data-include="footer"></div>
+
+  <script src="../js/include.js"></script>
+  <script src="../js/auth.js"></script>
+  <script src="../js/listing.js"></script>
+</body>
+</html>

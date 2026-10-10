@@ -1,0 +1,15 @@
+CREATE TABLE Orders (
+    OrderID INT IDENTITY(1,1) PRIMARY KEY,
+    BookID INT NOT NULL,
+    BuyerID INT NOT NULL,
+    OrderType NVARCHAR(20) NOT NULL,
+    OrderStatus NVARCHAR(30) NOT NULL DEFAULT 'Pending',
+    OrderDate DATETIME2 NOT NULL DEFAULT GETDATE(),
+
+    CONSTRAINT FK_Orders_Book
+        FOREIGN KEY (BookID) REFERENCES Books(BookID),
+
+    CONSTRAINT FK_Orders_Buyer
+        FOREIGN KEY (BuyerID) REFERENCES Users(UserID)
+);
+GO

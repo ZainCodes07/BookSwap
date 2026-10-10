@@ -1,0 +1,141 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>BookSwap - Categories</title>
+  <link rel="stylesheet" href="CSS/global.css">
+</head>
+<body>
+
+  <nav class="site-nav">
+    <div class="nav-container">
+      <a href="index.html" class="nav-logo">
+        <span class="bs-logo-mark">BS</span>
+        <span class="nav-logo-text">
+          <span class="nav-logo-name">Book<span>Swap</span></span>
+          <span class="nav-tagline">READ · SWAP · GROW</span>
+        </span>
+      </a>
+      <ul class="nav-links">
+        <li><a href="index.html">Home</a></li>
+        <li><a href="category.html" class="active" aria-current="page">Categories</a></li>
+        <li><a href="search.html">Search</a></li>
+        <li><a href="about.html">About</a></li>
+        <li><a href="contact.html">Contact</a></li>
+      </ul>
+      <form class="nav-search" action="search.html" method="get" role="search">
+        <svg class="icon" viewBox="0 0 24 24"><circle cx="11" cy="11" r="7"/><line x1="21" y1="21" x2="16.65" y2="16.65"/></svg>
+        <input type="text" name="q" placeholder="Search books..." aria-label="Search books">
+      </form>
+      <div class="nav-actions">
+        <a href="cart-drawer.html" class="nav-icon-btn" aria-label="Cart">
+          <svg class="icon" viewBox="0 0 24 24"><circle cx="9" cy="21" r="1"/><circle cx="20" cy="21" r="1"/><path d="M1 1h4l2.7 13.4a2 2 0 002 1.6h9.7a2 2 0 002-1.6L23 6H6"/></svg>
+          <span class="nav-badge" id="navCartBadge">0</span>
+        </a>
+        <a href="profile.html" class="nav-avatar" aria-label="Profile">A</a>
+      </div>
+      <button class="nav-toggle" type="button" aria-label="Menu"><span></span><span></span><span></span></button>
+    </div>
+    <svg class="nav-wave" viewBox="0 0 1440 28" preserveAspectRatio="none"><path d="M0,16 C360,32 1080,0 1440,16 L1440,0 L0,0 Z"/></svg>
+  </nav>
+
+  <main class="cat-page">
+
+    <div class="cat-bg" aria-hidden="true">
+      <svg viewBox="0 0 64 48"><path d="M2 6c8-4 20-4 28 0v36c-8-4-20-4-28 0z"/><path d="M62 6c-8-4-20-4-28 0v36c8-4 20-4 28 0z"/></svg>
+      <svg viewBox="0 0 64 48"><path d="M2 6c8-4 20-4 28 0v36c-8-4-20-4-28 0z"/><path d="M62 6c-8-4-20-4-28 0v36c8-4 20-4 28 0z"/></svg>
+      <svg viewBox="0 0 48 48"><path d="M16 12L4 24l12 12M32 12l12 12-12 12"/></svg>
+      <svg viewBox="0 0 48 48"><circle cx="24" cy="24" r="8"/><path d="M24 2v8M24 38v8M2 24h8M38 24h8M8 8l6 6M34 34l6 6M40 8l-6 6M14 34l-6 6"/></svg>
+      <svg viewBox="0 0 96 64"><path d="M4 32h20M76 32h16M24 32a8 8 0 018-8h16a8 8 0 018 8 8 8 0 01-8 8H32a8 8 0 01-8-8z"/><circle cx="12" cy="32" r="3"/><circle cx="84" cy="32" r="3"/></svg>
+      <svg viewBox="0 0 48 48"><rect x="8" y="10" width="32" height="22" rx="2"/><path d="M4 38h40"/></svg>
+    </div>
+
+    <header class="cat-header">
+      <h1>Browse by Degree</h1>
+      <p>Select your program to find textbooks for your semester</p>
+    </header>
+
+    <div class="cat-grid">
+
+      <div class="cat-card">
+        <button class="cat-toggle" type="button" aria-expanded="false" aria-controls="cat-subjects-se">
+          <span class="cat-icon"><svg viewBox="0 0 24 24"><path d="M8 4L2 12l6 8M16 4l6 8-6 8"/></svg></span>
+          <span class="cat-name">Software Engineering</span>
+          <span class="cat-count">4 subjects</span>
+          <span class="cat-hint">Subjects <svg viewBox="0 0 24 24"><path d="M6 9l6 6 6-6"/></svg></span>
+        </button>
+        <ul class="cat-subjects" id="cat-subjects-se">
+          <li><a href="search.html?dept=se&amp;sub=programming">Programming Fundamentals <span>&rsaquo;</span></a></li>
+          <li><a href="search.html?dept=se&amp;sub=maths">Calculus &amp; Analytic Geometry <span>&rsaquo;</span></a></li>
+          <li><a href="search.html?dept=se&amp;sub=physics">Applied Physics <span>&rsaquo;</span></a></li>
+          <li><a href="search.html?dept=se&amp;sub=english">English Composition <span>&rsaquo;</span></a></li>
+        </ul>
+      </div>
+
+      <div class="cat-card">
+        <button class="cat-toggle" type="button" aria-expanded="false" aria-controls="cat-subjects-ai">
+          <span class="cat-icon"><svg viewBox="0 0 24 24"><path d="M12 2a5 5 0 015 5c0 2-1 3-2 4v3H9v-3c-1-1-2-2-2-4a5 5 0 015-5z"/><path d="M9 19h6M10 22h4"/></svg></span>
+          <span class="cat-name">Artificial Intelligence</span>
+          <span class="cat-count">4 subjects</span>
+          <span class="cat-hint">Subjects <svg viewBox="0 0 24 24"><path d="M6 9l6 6 6-6"/></svg></span>
+        </button>
+        <ul class="cat-subjects" id="cat-subjects-ai">
+          <li><a href="search.html?dept=ai&amp;sub=python">Python Programming <span>&rsaquo;</span></a></li>
+          <li><a href="search.html?dept=ai&amp;sub=maths">Linear Algebra <span>&rsaquo;</span></a></li>
+          <li><a href="search.html?dept=ai&amp;sub=stats">Probability &amp; Statistics <span>&rsaquo;</span></a></li>
+          <li><a href="search.html?dept=ai&amp;sub=ml">Intro to Machine Learning <span>&rsaquo;</span></a></li>
+        </ul>
+      </div>
+
+      <div class="cat-card">
+        <button class="cat-toggle" type="button" aria-expanded="false" aria-controls="cat-subjects-cs">
+          <span class="cat-icon"><svg viewBox="0 0 24 24"><rect x="3" y="4" width="18" height="12" rx="1"/><path d="M8 20h8M12 16v4"/></svg></span>
+          <span class="cat-name">Computer Science</span>
+          <span class="cat-count">4 subjects</span>
+          <span class="cat-hint">Subjects <svg viewBox="0 0 24 24"><path d="M6 9l6 6 6-6"/></svg></span>
+        </button>
+        <ul class="cat-subjects" id="cat-subjects-cs">
+          <li><a href="search.html?dept=cs&amp;sub=programming">Programming Fundamentals <span>&rsaquo;</span></a></li>
+          <li><a href="search.html?dept=cs&amp;sub=ds">Data Structures <span>&rsaquo;</span></a></li>
+          <li><a href="search.html?dept=cs&amp;sub=os">Operating Systems <span>&rsaquo;</span></a></li>
+          <li><a href="search.html?dept=cs&amp;sub=db">Database Systems <span>&rsaquo;</span></a></li>
+        </ul>
+      </div>
+
+    </div>
+  </main>
+
+  <footer class="site-footer">
+    <svg class="footer-wave" viewBox="0 0 1440 70" preserveAspectRatio="none"><path class="footer-wave-dark" d="M0,20 C400,60 1040,0 1440,30 L1440,70 L0,70 Z"/></svg>
+    <div class="footer-container">
+      <div class="footer-grid">
+        <div class="footer-brand">
+          <a href="index.html" class="footer-logo">
+            <span class="bs-logo-mark">BS</span>
+            <span class="footer-logo-text">
+              <span class="footer-logo-name">Book<span>Swap</span></span>
+              <span class="footer-tagline">READ · SWAP · GROW</span>
+            </span>
+          </a>
+          <p class="footer-about">BookSwap is a community platform for book lovers. Buy, sell and swap books with people who love reading just like you.</p>
+        </div>
+        <div>
+          <h4 class="footer-title">Explore</h4>
+          <ul class="footer-list">
+            <li><a href="category.html">Categories</a></li>
+            <li><a href="search.html">Search</a></li>
+            <li><a href="about.html">About</a></li>
+            <li><a href="contact.html">Contact</a></li>
+          </ul>
+        </div>
+      </div>
+      <div class="footer-bottom">
+        <p>&copy; 2026 BookSwap. All rights reserved.</p>
+      </div>
+    </div>
+  </footer>
+
+  <script src="JS/category.js"></script>
+</body>
+</html>

@@ -1,0 +1,117 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta name="description" content="About BookSwap - a place where CS students pass their books on to the next semester.">
+  <title>About - BookSwap</title>
+  <link rel="stylesheet" href="css/global.css">
+</head>
+<body class="about">
+
+  <!-- ===== NAVIGATION (loaded by include.js) ===== -->
+  <div data-include="nav"></div>
+
+  <main>
+
+    <!-- ===== HERO: one book travelling through semesters ===== -->
+    <section class="about-hero">
+      <div class="about-wrap">
+        <h1 class="about-title">One Book. Many Semesters.</h1>
+        <p class="about-lead">Every CS student buys the same core books. Most of them sit on a shelf after the exam. BookSwap passes them on to the student who needs them next.</p>
+
+        <!-- The journey is a real sequence, so it is a numbered list -->
+        <ol class="journey" aria-label="How one book moves between students">
+          <li class="journey-stop">
+            <span class="journey-sem">Semester 1</span>
+            <p>Ali buys <strong>C++ How to Program</strong> new for Rs&nbsp;3,900.</p>
+          </li>
+          <li class="journey-stop">
+            <span class="journey-sem">Semester 2</span>
+            <p>He lists it on BookSwap. A junior buys it for Rs&nbsp;1,200.</p>
+          </li>
+          <li class="journey-stop">
+            <span class="journey-sem">Semester 3</span>
+            <p>The junior swaps it for a Data Structures book.</p>
+          </li>
+          <li class="journey-stop">
+            <span class="journey-sem">Next semester</span>
+            <p>Someone new picks it up. Same book, still working.</p>
+          </li>
+        </ol>
+
+        <!-- The book that slides along the timeline (decoration only) -->
+        <div class="journey-track" aria-hidden="true">
+          <span class="journey-line"></span>
+          <span class="journey-dot"></span>
+          <span class="journey-dot"></span>
+          <span class="journey-dot"></span>
+          <span class="journey-dot"></span>
+          <span class="journey-book">C++</span>
+        </div>
+      </div>
+    </section>
+
+    <!-- ===== WHY WE BUILT IT ===== -->
+    <section class="about-section">
+      <div class="about-wrap about-story">
+        <h2>Why We Built BookSwap</h2>
+        <div class="story-cols">
+          <p>New textbooks cost thousands of rupees, and the shops near campus rarely have the edition your teacher asked for. Meanwhile, the senior sitting next to you in the library has that exact book and no use for it anymore.</p>
+          <p>We are a team of five CS students who built BookSwap for our Software Project Management course. We wanted one place inside the department where those two students can find each other, agree on a price or a swap, and meet on campus.</p>
+        </div>
+      </div>
+    </section>
+
+    <!-- ===== WHAT WE PROMISE ===== -->
+    <section class="about-section about-section-tint">
+      <div class="about-wrap">
+        <h2>What You Can Count On</h2>
+        <ul class="promise-list">
+          <li class="promise">
+            <svg class="icon" viewBox="0 0 24 24" aria-hidden="true"><path d="M2 3h6a4 4 0 0 1 4 4v14a3 3 0 0 0-3-3H2z"/><path d="M22 3h-6a4 4 0 0 0-4 4v14a3 3 0 0 1 3-3h7z"/></svg>
+            <div>
+              <h3>Books For Your Courses</h3>
+              <p>Listings are sorted by CS core course, from Programming Fundamentals to Operating Systems, so you find the right book fast.</p>
+            </div>
+          </li>
+          <li class="promise">
+            <svg class="icon" viewBox="0 0 24 24" aria-hidden="true"><path d="M21 11.5a8.38 8.38 0 0 1-.9 3.8 8.5 8.5 0 0 1-7.6 4.7 8.38 8.38 0 0 1-3.8-.9L3 21l1.9-5.7a8.38 8.38 0 0 1-.9-3.8 8.5 8.5 0 0 1 4.7-7.6 8.38 8.38 0 0 1 3.8-.9h.5a8.48 8.48 0 0 1 8 8v.5z"/></svg>
+            <div>
+              <h3>Talk Before You Pay</h3>
+              <p>Chat with the seller first. Ask about highlights or missing pages, and see the book in person on campus.</p>
+            </div>
+          </li>
+          <li class="promise">
+            <svg class="icon" viewBox="0 0 24 24" aria-hidden="true"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/></svg>
+            <div>
+              <h3>Safe Payments</h3>
+              <p>Pay with JazzCash or Easypaisa. The seller gets the money only after you confirm you have the book.</p>
+            </div>
+          </li>
+        </ul>
+      </div>
+    </section>
+
+    <!-- ===== CALL TO ACTION ===== -->
+    <section class="about-section">
+      <div class="about-wrap about-cta">
+        <div>
+          <h2>Got A Book From Last Semester?</h2>
+          <p>List it in under a minute and let a junior use it this semester.</p>
+        </div>
+        <div class="about-cta-actions">
+          <a href="seller/add-listing.html" class="about-btn about-btn-primary">List a book</a>
+          <a href="category.html" class="about-btn about-btn-ghost">Browse books</a>
+        </div>
+      </div>
+    </section>
+
+  </main>
+
+  <!-- ===== FOOTER (loaded by include.js) ===== -->
+  <div data-include="footer"></div>
+
+  <script src="js/include.js"></script>
+</body>
+</html>

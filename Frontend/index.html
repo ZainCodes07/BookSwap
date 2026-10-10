@@ -3,22 +3,156 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>BookSwap - Test Page</title>
+  <meta name="description" content="BookSwap - buy, sell and swap used academic books with students in your department.">
+  <title>BookSwap - Used Books for Your Department</title>
   <link rel="stylesheet" href="css/global.css">
 </head>
-<body>
+<body class="home">
 
+  <!-- ===== NAVIGATION (loaded by include.js) ===== -->
   <div data-include="nav"></div>
 
-  <main style="min-height: 60vh; display: grid; place-items: center; text-align: center; padding: 80px 20px; font-family: var(--font);">
-    <div>
-      <h1 style="margin:0 0 10px; color: var(--dark);">Your Next Chapter Awaits</h1>
-      <p style="margin:0; color: var(--text);">Test page: navigation &amp; footer are loaded via include.js</p>
-    </div>
+  <main>
+
+    <!-- ===== HERO: headline + search + bookshelf ===== -->
+    <section class="hero">
+      <div class="home-container hero-grid">
+
+        <div class="hero-text">
+          <h1 class="hero-title">Last Semester's Books At This Semester's Price.</h1>
+          <p class="hero-sub">Buy, sell or swap textbooks with students in your own department. No bookshop markup, no hunting across markets.</p>
+
+          <!-- Hero search: sends user to search.html?q=... -->
+          <form class="hero-search" id="heroSearchForm" role="search">
+            <svg class="icon" viewBox="0 0 24 24" aria-hidden="true"><circle cx="11" cy="11" r="8"/><line x1="21" y1="21" x2="16.65" y2="16.65"/></svg>
+            <input type="text" id="heroSearchInput" placeholder="Book title, author or subject" aria-label="Search books">
+            <button type="submit" class="btn btn-primary">Search</button>
+          </form>
+
+          <!-- Quick subject chips (filled by main.js) -->
+          <div class="hero-chips" id="heroChips" aria-label="Popular subjects"></div>
+
+          <p class="hero-note"><strong id="heroBookCount">0</strong> books listed by students right now</p>
+        </div>
+
+        <!-- Bookshelf of best sellers (filled by main.js) -->
+        <div class="hero-shelf" aria-label="Top picks from CS students">
+          <div class="shelf-area">
+            <div class="shelf-books" id="shelfBooks"></div>
+
+            <!-- Magic floating book (decoration only) -->
+            <div class="float-book" aria-hidden="true">
+              <span class="float-glow"></span>
+              <svg class="float-svg" viewBox="0 0 120 80">
+                <path class="fb-cover" d="M4 16 Q32 6 60 18 Q88 6 116 16 L116 74 Q88 64 60 76 Q32 64 4 74 Z"/>
+                <path class="fb-page" d="M10 12 Q34 2 58 14 L58 70 Q34 60 10 68 Z"/>
+                <path class="fb-page" d="M62 14 Q86 2 110 12 L110 68 Q86 60 62 70 Z"/>
+                <path class="fb-line" d="M18 24 Q32 18 50 25 M18 33 Q32 27 50 34 M18 42 Q32 36 50 43 M18 51 Q30 46 42 51"/>
+                <path class="fb-line" d="M70 25 Q88 18 102 24 M70 34 Q88 27 102 33 M70 43 Q88 36 102 42 M70 52 Q86 46 96 50"/>
+              </svg>
+              <span class="sparkle s1">✦</span>
+              <span class="sparkle s2">✦</span>
+              <span class="sparkle s3">✦</span>
+            </div>
+            <span class="float-shadow" aria-hidden="true"></span>
+          </div>
+          <div class="shelf-plank" aria-hidden="true"></div>
+          <p class="shelf-caption">Top picks from CS students. Tap a book to open it.</p>
+        </div>
+
+      </div>
+    </section>
+
+    <!-- ===== CORE COURSES (subject tiles) ===== -->
+    <section class="home-section">
+      <div class="home-container">
+        <div class="section-head">
+          <div>
+            <h2>Books For Every Core Course</h2>
+            <p class="section-sub">One core course each semester, from PF to OS. Pick yours.</p>
+          </div>
+          <a href="category.html" class="section-link">All courses</a>
+        </div>
+        <div class="subject-grid" id="subjectGrid"></div>
+      </div>
+    </section>
+
+    <!-- ===== BEST SELLING (auto-moving row, loops forever) ===== -->
+    <section class="home-section">
+      <div class="home-container">
+        <div class="section-head">
+          <h2>Best Selling 🔥</h2>
+        </div>
+        <div class="book-marquee" id="bestSellers"></div>
+      </div>
+    </section>
+
+    <!-- ===== SWAP BANNER ===== -->
+    <section class="home-section">
+      <div class="home-container">
+        <div class="swap-banner">
+          <div>
+            <h2>Done With A Book? Swap It For The One You Need.</h2>
+            <p>List your old textbook in under a minute. Sell it for cash or trade it with a junior for next semester's book.</p>
+          </div>
+          <div class="swap-actions">
+            <a href="seller/add-listing.html" class="btn btn-light">List a book</a>
+            <a href="search.html?swap=1" class="btn btn-outline-light">Browse swaps</a>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- ===== RECENTLY LISTED (filter tabs + grid) ===== -->
+    <section class="home-section">
+      <div class="home-container">
+        <div class="section-head">
+          <h2>Recently Listed</h2>
+          <div class="filter-tabs" id="filterTabs" role="tablist">
+            <button type="button" class="tab active" data-filter="all" role="tab" aria-selected="true">All</button>
+            <button type="button" class="tab" data-filter="like-new" role="tab" aria-selected="false">Like new</button>
+            <button type="button" class="tab" data-filter="swap" role="tab" aria-selected="false">Open to swap</button>
+          </div>
+        </div>
+        <div class="book-grid" id="recentGrid"></div>
+      </div>
+    </section>
+
+    <!-- ===== HOW IT WORKS (a real sequence, so numbered) ===== -->
+    <section class="home-section">
+      <div class="home-container">
+        <div class="section-head">
+          <h2>How BookSwap Works</h2>
+        </div>
+        <ol class="steps">
+          <li class="step">
+            <span class="step-num">1</span>
+            <h3>Find Your Book</h3>
+            <p>Search by title or open a subject. Every listing shows the condition and the seller's semester.</p>
+          </li>
+          <li class="step">
+            <span class="step-num">2</span>
+            <h3>Chat With The Seller</h3>
+            <p>Ask about highlights or missing pages, agree on a price or a swap, and pick a meeting spot on campus.</p>
+          </li>
+          <li class="step">
+            <span class="step-num">3</span>
+            <h3>Pay Or Swap</h3>
+            <p>Pay through JazzCash or Easypaisa, or hand over your old book. The seller is paid once you confirm.</p>
+          </li>
+        </ol>
+      </div>
+    </section>
+
   </main>
 
+  <!-- Small popup message (e.g. "Added to cart") -->
+  <div class="toast" id="toast" role="status" aria-live="polite"></div>
+
+  <!-- ===== FOOTER (loaded by include.js) ===== -->
   <div data-include="footer"></div>
 
   <script src="js/include.js"></script>
+  <script src="js/main.js"></script>
 </body>
 </html>

@@ -1,0 +1,7 @@
+CREATE TABLE Courses (
+    CourseID INT IDENTITY(1,1) PRIMARY KEY,
+    CourseName NVARCHAR(150) NOT NULL,
+    CourseCode NVARCHAR(20) NOT NULL UNIQUE,
+    Description NVARCHAR(255) NULL
+);
+GO

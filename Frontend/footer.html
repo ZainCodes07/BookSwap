@@ -9,8 +9,23 @@
         <stop offset="1" stop-color="#A855F7"/>
       </linearGradient>
     </defs>
-    <path class="footer-wave-purple" d="M0 30C240 0 460 8 720 34C980 60 1200 40 1440 6V70H0Z"/>
-    <path class="footer-wave-dark" d="M0 46C260 16 480 28 740 52C1000 76 1220 58 1440 30V70H0Z"/>
+    <!-- Both waves change shape slowly, like sea waves (animation added by Member 3) -->
+    <path class="footer-wave-purple" d="M0 30C240 0 460 8 720 34C980 60 1200 40 1440 6V70H0Z">
+      <animate attributeName="d" dur="10s" repeatCount="indefinite" calcMode="spline"
+        keyTimes="0;0.33;0.66;1" keySplines=".45 0 .55 1;.45 0 .55 1;.45 0 .55 1"
+        values="M0 30C240 0 460 8 720 34C980 60 1200 40 1440 6V70H0Z;
+                M0 14C220 40 480 52 740 26C1000 0 1220 10 1440 32V70H0Z;
+                M0 24C260 6 500 44 760 40C1020 36 1180 4 1440 18V70H0Z;
+                M0 30C240 0 460 8 720 34C980 60 1200 40 1440 6V70H0Z"/>
+    </path>
+    <path class="footer-wave-dark" d="M0 46C260 16 480 28 740 52C1000 76 1220 58 1440 30V70H0Z">
+      <animate attributeName="d" dur="10s" repeatCount="indefinite" calcMode="spline"
+        keyTimes="0;0.33;0.66;1" keySplines=".45 0 .55 1;.45 0 .55 1;.45 0 .55 1"
+        values="M0 46C260 16 480 28 740 52C1000 76 1220 58 1440 30V70H0Z;
+                M0 32C240 54 500 64 760 42C1020 20 1230 26 1440 46V70H0Z;
+                M0 40C280 24 510 58 780 54C1040 50 1200 20 1440 34V70H0Z;
+                M0 46C260 16 480 28 740 52C1000 76 1220 58 1440 30V70H0Z"/>
+    </path>
   </svg>
 
   <div class="footer-container">

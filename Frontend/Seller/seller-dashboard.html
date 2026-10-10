@@ -1,0 +1,175 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Seller Dashboard - BookSwap</title>
+  <link rel="stylesheet" href="../css/global.css">
+</head>
+<body class="seller" data-page="seller-dashboard">
+
+  <!-- ===== NAVIGATION (loaded by include.js) ===== -->
+  <div data-include="nav"></div>
+
+  <main class="sd-main">
+
+    <!-- ===== Guest: not signed in ===== -->
+    <section class="sd-gate" id="sdGuest" hidden>
+      <div class="sd-gate-icon" aria-hidden="true">
+        <svg viewBox="0 0 24 24"><rect x="4" y="11" width="16" height="10" rx="2"/><path d="M8 11V7a4 4 0 0 1 8 0v4"/></svg>
+      </div>
+      <h1>Sign In To Open Your Dashboard</h1>
+      <p>Your listings, sales and earnings are waiting for you.</p>
+      <div class="sd-gate-actions">
+        <button type="button" class="auth-btn auth-btn-primary" data-auth-open="login">Sign in</button>
+        <button type="button" class="auth-btn auth-btn-outline" data-auth-open="role">Create an account</button>
+      </div>
+    </section>
+
+    <!-- ===== Buyer: needs to switch to seller first ===== -->
+    <section class="sd-gate" id="sdBuyer" hidden>
+      <div class="sd-gate-icon" aria-hidden="true">
+        <svg viewBox="0 0 24 24"><path d="M3 9l1.5-5h15L21 9"/><path d="M3 9h18v2a3 3 0 0 1-6 0 3 3 0 0 1-6 0 3 3 0 0 1-6 0z"/><path d="M5 13v8h14v-8"/></svg>
+      </div>
+      <h1>This Page Is For Sellers</h1>
+      <p>You have a buyer account. Switch to seller to list your books. You can still buy books like before.</p>
+      <div class="sd-gate-actions">
+        <button type="button" class="auth-btn auth-btn-primary" id="sdSwitch">Switch to Seller</button>
+        <a href="../index.html" class="auth-btn auth-btn-outline">Keep browsing</a>
+      </div>
+    </section>
+
+    <!-- ===== Seller dashboard ===== -->
+    <div class="sd-wrap" id="sdPage" hidden>
+
+      <!-- Top bar -->
+      <header class="sd-top">
+        <div>
+          <p class="sd-kicker">Seller dashboard</p>
+          <h1 id="sdHello">Hey, Reader!</h1>
+        </div>
+        <div class="sd-top-actions">
+          <a href="#" class="auth-btn auth-btn-outline" id="sdShopLink">View my shop</a>
+          <a href="add-listing.html" class="auth-btn auth-btn-primary">
+            <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M12 5v14M5 12h14"/></svg>
+            List a book
+          </a>
+        </div>
+      </header>
+
+      <!-- No payout account yet -->
+      <div class="sd-banner" id="sdPayoutWarn" hidden>
+        <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M12 9v4M12 17h.01"/><path d="M10.3 3.9 1.8 18a2 2 0 0 0 1.7 3h17a2 2 0 0 0 1.7-3L13.7 3.9a2 2 0 0 0-3.4 0z"/></svg>
+        <p><strong>Add a payout account.</strong> We need it to send you money when a book sells.</p>
+        <button type="button" class="sd-banner-btn" data-auth-payout>Add now</button>
+      </div>
+
+      <!-- Stat tiles -->
+      <section class="sd-stats" aria-label="Your numbers">
+        <div class="sd-stat">
+          <span class="sd-stat-label">Live listings</span>
+          <strong id="sdStatLive">0</strong>
+          <span class="sd-stat-note" id="sdStatViews">0 views in total</span>
+        </div>
+        <div class="sd-stat">
+          <span class="sd-stat-label">Waiting for review</span>
+          <strong id="sdStatPending">0</strong>
+          <span class="sd-stat-note">Admin checks new books first</span>
+        </div>
+        <div class="sd-stat">
+          <span class="sd-stat-label">Books sold</span>
+          <strong id="sdStatSold">0</strong>
+          <span class="sd-stat-note">Swaps are not counted</span>
+        </div>
+        <div class="sd-stat sd-stat-money">
+          <span class="sd-stat-label">Total earned</span>
+          <strong id="sdStatEarned">Rs 0</strong>
+          <span class="sd-stat-note">Paid to: <span id="sdPayoutLine">Not added yet</span></span>
+        </div>
+      </section>
+
+      <!-- Listings -->
+      <section class="sd-card" aria-labelledby="sdListTitle">
+        <div class="sd-card-head">
+          <h2 id="sdListTitle">My Listings</h2>
+          <div class="sd-tabs" role="tablist" aria-label="Filter listings">
+            <button type="button" class="sd-tab is-active" role="tab" data-sd-filter="all">All <span id="sdCountAll">0</span></button>
+            <button type="button" class="sd-tab" role="tab" data-sd-filter="live">Live <span id="sdCountLive">0</span></button>
+            <button type="button" class="sd-tab" role="tab" data-sd-filter="pending">Waiting <span id="sdCountPending">0</span></button>
+            <button type="button" class="sd-tab" role="tab" data-sd-filter="sold">Sold <span id="sdCountSold">0</span></button>
+          </div>
+        </div>
+
+        <!-- Nothing listed yet -->
+        <div class="sd-empty" id="sdEmpty" hidden>
+          <div class="sd-empty-books" aria-hidden="true"><span></span><span></span><span></span></div>
+          <h3>No Books Listed Yet</h3>
+          <p>List a book from last semester. It takes about a minute.</p>
+          <a href="add-listing.html" class="auth-btn auth-btn-primary">List your first book</a>
+        </div>
+
+        <!-- Nothing in this tab -->
+        <p class="sd-none" id="sdNone" hidden>No books in this list.</p>
+
+        <div class="sd-table-wrap">
+          <table class="sd-table" id="sdTable" hidden>
+            <thead>
+              <tr>
+                <th scope="col">Book</th>
+                <th scope="col">Price</th>
+                <th scope="col">Status</th>
+                <th scope="col">Views</th>
+                <th scope="col">Listed</th>
+                <th scope="col"><span class="sr-only">Actions</span></th>
+              </tr>
+            </thead>
+            <tbody id="sdRows"></tbody>
+          </table>
+        </div>
+      </section>
+
+      <!-- Bottom row -->
+      <div class="sd-grid">
+        <section class="sd-card" aria-labelledby="sdOrdersTitle">
+          <h2 id="sdOrdersTitle">Recent Orders</h2>
+          <div class="sd-empty sd-empty-small">
+            <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M6 2 3 6v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2V6l-3-4z"/><path d="M3 6h18M16 10a4 4 0 0 1-8 0"/></svg>
+            <p>When a buyer orders one of your books, it will show up here.</p>
+          </div>
+          <!-- BACKEND: GET /api/seller/orders -> list recent orders here -->
+        </section>
+
+        <section class="sd-card sd-tips" aria-labelledby="sdTipsTitle">
+          <h2 id="sdTipsTitle">Sell Faster</h2>
+          <ul>
+            <li><strong>Add a clear photo</strong> of the cover. Books with photos get more views.</li>
+            <li><strong>Pick the right course</strong> so juniors find it when they search.</li>
+            <li><strong>Be honest about condition.</strong> Mention highlights or missing pages.</li>
+            <li><strong>Reply quickly</strong> when a buyer messages you.</li>
+          </ul>
+          <button type="button" class="auth-btn auth-btn-outline auth-btn-block" id="sdPayoutBtn">Payout account</button>
+        </section>
+      </div>
+    </div>
+
+    <!-- Confirm box (Mark sold / Delete) -->
+    <div class="sd-confirm" id="sdConfirm" hidden role="alertdialog" aria-modal="true" aria-labelledby="sdConfirmTitle" aria-describedby="sdConfirmText">
+      <div class="sd-confirm-box">
+        <h3 id="sdConfirmTitle" data-confirm-title>Are you sure?</h3>
+        <p id="sdConfirmText" data-confirm-text></p>
+        <div class="sd-confirm-actions">
+          <button type="button" class="auth-btn auth-btn-ghost" data-confirm-cancel>Cancel</button>
+          <button type="button" class="auth-btn auth-btn-primary" data-confirm-ok>Yes</button>
+        </div>
+      </div>
+    </div>
+  </main>
+
+  <!-- ===== FOOTER (loaded by include.js) ===== -->
+  <div data-include="footer"></div>
+
+  <script src="../js/include.js"></script>
+  <script src="../js/auth.js"></script>
+  <script src="../js/listing.js"></script>
+</body>
+</html>

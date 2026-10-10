@@ -1926,6 +1926,32 @@ html.auth-lock { overflow: hidden; }
   }
 }
 /* ========== LOGIN POPUP FIX END ========== */
+
+/* ========== SELLER DASHBOARD CSS STARTED (Member 4 - Aleena) ========== */
+/* Used by Seller/seller-dashboard.html. Everything starts with .sd- so it cannot clash.
+   Buttons reuse the .auth-btn styles from the login popup. */
+
+.sd-main {
+  --sd-ink: #0F172A;
+  --sd-muted: #475569;
+  --sd-line: #E2E8F0;
+  --sd-soft: #F5F3FF;
+  min-height: 60vh;
+  padding: 40px 16px 72px;
+  font-family: var(--font);
+  color: var(--sd-ink);
+}
+
+.sd-main [hidden] { display: none !important; }
+
+.sd-main :focus-visible {
+  outline: 3px solid var(--primary-light);
+  outline-offset: 2px;
+}
+
+.sd-main svg {
+  fill: none;
+  stroke: currentColor;
 .sr-only {
   position: absolute;
   width: 1px;
@@ -4862,6 +4888,453 @@ a.adm-stat:hover { border-color: var(--primary-light); }
   stroke-linejoin: round;
 }
 
+.sd-main .sr-only {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  overflow: hidden;
+  clip: rect(0 0 0 0);
+  white-space: nowrap;
+}
+
+.sd-main .auth-btn svg { width: 18px; height: 18px; }
+
+.sd-wrap {
+  max-width: 1180px;
+  margin: 0 auto;
+  display: grid;
+  grid-template-columns: minmax(0, 1fr);
+  gap: 24px;
+}
+
+/* --- Gate (guest / buyer) --- */
+.sd-gate {
+  max-width: 500px;
+  margin: 40px auto;
+  padding: 40px 28px;
+  text-align: center;
+  background: #fff;
+  border: 1px solid var(--sd-line);
+  border-radius: 24px;
+  box-shadow: 0 20px 50px rgba(15, 23, 42, 0.08);
+}
+
+.sd-gate-icon {
+  width: 72px;
+  height: 72px;
+  margin: 0 auto 18px;
+  display: grid;
+  place-items: center;
+  color: #fff;
+  background: linear-gradient(135deg, var(--primary), var(--secondary));
+  border-radius: 50%;
+}
+
+.sd-gate-icon svg { width: 32px; height: 32px; }
+.sd-gate h1 { margin: 0 0 8px; font-size: 26px; }
+.sd-gate p { margin: 0 0 24px; color: var(--sd-muted); line-height: 1.6; }
+
+.sd-gate-actions {
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: center;
+  gap: 12px;
+}
+
+/* --- Top bar --- */
+.sd-top {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: flex-end;
+  justify-content: space-between;
+  gap: 16px;
+}
+
+.sd-kicker {
+  margin: 0 0 4px;
+  font-size: 13px;
+  font-weight: 600;
+  letter-spacing: 0.4px;
+  text-transform: uppercase;
+  color: var(--primary);
+}
+
+.sd-top h1 {
+  margin: 0;
+  font-size: 30px;
+  line-height: 1.2;
+}
+
+.sd-top-actions {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 12px;
+}
+
+/* --- Payout banner --- */
+.sd-banner {
+  display: flex;
+  align-items: center;
+  gap: 14px;
+  padding: 14px 18px;
+  color: #92400E;
+  background: #FFFBEB;
+  border: 1px solid #FDE68A;
+  border-radius: 14px;
+}
+
+.sd-banner svg { flex: 0 0 22px; width: 22px; height: 22px; }
+.sd-banner p { margin: 0; font-size: 14px; line-height: 1.5; }
+
+.sd-banner-btn {
+  margin-left: auto;
+  padding: 8px 16px;
+  font: inherit;
+  font-size: 14px;
+  font-weight: 600;
+  color: #fff;
+  background: #D97706;
+  border: 0;
+  border-radius: 10px;
+  cursor: pointer;
+  white-space: nowrap;
+}
+
+.sd-banner-btn:hover { background: #B45309; }
+
+/* --- Stat tiles --- */
+.sd-stats {
+  display: grid;
+  grid-template-columns: repeat(4, minmax(0, 1fr));
+  gap: 16px;
+}
+
+.sd-stat {
+  display: grid;
+  gap: 6px;
+  padding: 20px 22px;
+  background: #fff;
+  border: 1px solid var(--sd-line);
+  border-radius: 18px;
+  box-shadow: 0 10px 30px rgba(15, 23, 42, 0.05);
+}
+
+.sd-stat-label {
+  font-size: 13px;
+  font-weight: 600;
+  color: var(--sd-muted);
+}
+
+.sd-stat strong {
+  font-size: 32px;
+  line-height: 1.1;
+  font-weight: 700;
+  font-variant-numeric: tabular-nums;
+}
+
+.sd-stat-note {
+  font-size: 12.5px;
+  color: #64748B;
+  overflow-wrap: anywhere;
+}
+
+.sd-stat-money {
+  color: #fff;
+  border-color: transparent;
+  background:
+    radial-gradient(circle at 100% 0%, rgba(168, 85, 247, 0.55), transparent 60%),
+    linear-gradient(135deg, #1E1B4B, var(--dark));
+}
+
+.sd-stat-money .sd-stat-label,
+.sd-stat-money .sd-stat-note { color: #CBD5E1; }
+
+/* --- Cards --- */
+.sd-card {
+  padding: 24px;
+  background: #fff;
+  border: 1px solid var(--sd-line);
+  border-radius: 20px;
+  box-shadow: 0 10px 30px rgba(15, 23, 42, 0.05);
+  min-width: 0;
+}
+
+.sd-card h2 {
+  margin: 0;
+  font-size: 20px;
+}
+
+.sd-card-head {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  justify-content: space-between;
+  gap: 14px;
+  margin-bottom: 18px;
+}
+
+.sd-tabs {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 6px;
+  padding: 4px;
+  background: #F1F5F9;
+  border-radius: 12px;
+}
+
+.sd-tab {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  padding: 8px 14px;
+  font: inherit;
+  font-size: 13.5px;
+  font-weight: 600;
+  color: var(--sd-muted);
+  background: transparent;
+  border: 0;
+  border-radius: 9px;
+  cursor: pointer;
+}
+
+.sd-tab span {
+  min-width: 20px;
+  padding: 1px 6px;
+  font-size: 11.5px;
+  text-align: center;
+  background: #E2E8F0;
+  border-radius: 999px;
+}
+
+.sd-tab.is-active {
+  color: var(--primary);
+  background: #fff;
+  box-shadow: 0 2px 8px rgba(15, 23, 42, 0.08);
+}
+
+.sd-tab.is-active span { color: #fff; background: var(--primary); }
+
+/* --- Table --- */
+.sd-table-wrap { position: relative; overflow-x: auto; }
+
+.sd-table {
+  width: 100%;
+  min-width: 720px;
+  border-collapse: collapse;
+  font-size: 14px;
+}
+
+.sd-table th {
+  padding: 10px 12px;
+  font-size: 12px;
+  font-weight: 600;
+  text-align: left;
+  text-transform: uppercase;
+  letter-spacing: 0.4px;
+  color: #64748B;
+  border-bottom: 1px solid var(--sd-line);
+}
+
+.sd-table td {
+  padding: 14px 12px;
+  vertical-align: middle;
+  border-bottom: 1px solid #F1F5F9;
+}
+
+.sd-table tbody tr:hover { background: #FAFAFF; }
+
+.sd-book {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+}
+
+.sd-cover {
+  flex: 0 0 40px;
+  width: 40px;
+  height: 54px;
+  display: grid;
+  place-items: center;
+  font-size: 18px;
+  font-weight: 700;
+  color: #fff;
+  object-fit: cover;
+  border-radius: 6px;
+  box-shadow: inset -4px 0 0 rgba(0, 0, 0, 0.15);
+}
+
+.sd-book strong {
+  display: block;
+  font-weight: 600;
+  line-height: 1.35;
+}
+
+.sd-book small {
+  display: block;
+  margin-top: 2px;
+  font-size: 12.5px;
+  color: #64748B;
+}
+
+.sd-price { font-weight: 600; white-space: nowrap; }
+.sd-muted { color: #64748B; white-space: nowrap; }
+
+.sd-status {
+  display: inline-block;
+  padding: 4px 10px;
+  font-size: 12px;
+  font-weight: 600;
+  white-space: nowrap;
+  border-radius: 999px;
+}
+
+.sd-status.is-live { color: #166534; background: #DCFCE7; }
+.sd-status.is-pending { color: #92400E; background: #FEF3C7; }
+.sd-status.is-sold { color: #4C1D95; background: #EDE9FE; }
+.sd-status.is-removed { color: #991B1B; background: #FEE2E2; }
+
+.sd-actions {
+  display: flex;
+  justify-content: flex-end;
+  gap: 6px;
+}
+
+.sd-act {
+  padding: 7px 12px;
+  font: inherit;
+  font-size: 13px;
+  font-weight: 600;
+  color: var(--sd-ink);
+  background: #F1F5F9;
+  border: 0;
+  border-radius: 9px;
+  cursor: pointer;
+  white-space: nowrap;
+}
+
+.sd-act:hover { background: #E2E8F0; }
+.sd-act.is-danger { color: #B91C1C; background: #FEF2F2; }
+.sd-act.is-danger:hover { background: #FEE2E2; }
+
+/* --- Empty states --- */
+.sd-empty {
+  display: grid;
+  justify-items: center;
+  gap: 8px;
+  padding: 28px 12px 12px;
+  text-align: center;
+}
+
+.sd-empty h3 { margin: 6px 0 0; font-size: 18px; }
+
+.sd-empty p {
+  margin: 0 0 10px;
+  max-width: 340px;
+  font-size: 14px;
+  line-height: 1.6;
+  color: var(--sd-muted);
+}
+
+.sd-empty-small { padding: 18px 8px 6px; }
+.sd-empty-small svg { width: 38px; height: 38px; color: #C4B5FD; }
+
+.sd-empty-books {
+  display: flex;
+  align-items: flex-end;
+  gap: 5px;
+  height: 64px;
+}
+
+.sd-empty-books span {
+  width: 18px;
+  border-radius: 3px;
+  background: linear-gradient(180deg, var(--secondary), var(--primary));
+}
+
+.sd-empty-books span:nth-child(1) { height: 50px; }
+.sd-empty-books span:nth-child(2) { height: 62px; background: linear-gradient(180deg, #F472B6, #DB2777); }
+.sd-empty-books span:nth-child(3) { height: 44px; background: linear-gradient(180deg, #FDE68A, #F59E0B); }
+
+.sd-none {
+  margin: 0;
+  padding: 28px 0;
+  text-align: center;
+  color: var(--sd-muted);
+}
+
+/* --- Bottom row --- */
+.sd-grid {
+  display: grid;
+  grid-template-columns: minmax(0, 1.4fr) minmax(0, 1fr);
+  gap: 24px;
+}
+
+.sd-tips ul {
+  margin: 14px 0 20px;
+  padding: 0;
+  list-style: none;
+  display: grid;
+  gap: 12px;
+  font-size: 14px;
+  line-height: 1.55;
+  color: var(--sd-muted);
+}
+
+.sd-tips li {
+  padding-left: 26px;
+  background: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='%236C38FF' stroke-width='3' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpath d='M5 12l5 5L20 7'/%3E%3C/svg%3E") 0 4px / 16px no-repeat;
+}
+
+.sd-tips strong { color: var(--sd-ink); }
+
+/* --- Confirm box --- */
+.sd-confirm {
+  position: fixed;
+  inset: 0;
+  z-index: 1900;
+  display: grid;
+  place-items: center;
+  padding: 16px;
+  background: rgba(15, 23, 42, 0.6);
+}
+
+.sd-confirm-box {
+  width: 100%;
+  max-width: 420px;
+  padding: 26px;
+  background: #fff;
+  border-radius: 20px;
+  box-shadow: 0 30px 80px rgba(15, 23, 42, 0.35);
+}
+
+.sd-confirm-box h3 { margin: 0 0 8px; font-size: 19px; line-height: 1.35; }
+.sd-confirm-box p { margin: 0 0 22px; font-size: 14px; line-height: 1.6; color: var(--sd-muted); }
+
+.sd-confirm-actions {
+  display: flex;
+  justify-content: flex-end;
+  gap: 10px;
+}
+
+/* --- Responsive --- */
+@media (max-width: 980px) {
+  .sd-stats { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+  .sd-grid { grid-template-columns: 1fr; }
+}
+
+@media (max-width: 560px) {
+  .sd-main { padding: 24px 16px 56px; }
+  .sd-top h1 { font-size: 24px; }
+  .sd-top-actions { width: 100%; }
+  .sd-top-actions .auth-btn { flex: 1; }
+  .sd-stats { gap: 12px; }
+  .sd-stat { padding: 16px; }
+  .sd-stat strong { font-size: 26px; }
+  .sd-card { padding: 18px 16px; }
+  .sd-banner { flex-wrap: wrap; }
+  .sd-banner-btn { margin-left: 36px; }
+}
+/* ========== SELLER DASHBOARD CSS END ========== */
 .chat-empty {
   margin: auto;
   max-width: 240px;

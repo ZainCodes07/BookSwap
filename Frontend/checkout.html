@@ -1,0 +1,222 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>BookSwap - Checkout</title>
+  <link rel="stylesheet" href="CSS/global.css">
+</head>
+<body>
+
+  <nav class="site-nav">
+    <div class="nav-container">
+      <a href="index.html" class="nav-logo">
+        <span class="bs-logo-mark">BS</span>
+        <span class="nav-logo-text">
+          <span class="nav-logo-name">Book<span>Swap</span></span>
+          <span class="nav-tagline">READ · SWAP · GROW</span>
+        </span>
+      </a>
+      <ul class="nav-links">
+        <li><a href="index.html">Home</a></li>
+        <li><a href="category.html">Categories</a></li>
+        <li><a href="search.html">Search</a></li>
+        <li><a href="about.html">About</a></li>
+        <li><a href="contact.html">Contact</a></li>
+      </ul>
+      <div class="nav-actions">
+        <a href="cart-drawer.html" class="nav-icon-btn" aria-label="Cart">
+          <svg class="icon" viewBox="0 0 24 24"><circle cx="9" cy="21" r="1"/><circle cx="20" cy="21" r="1"/><path d="M1 1h4l2.7 13.4a2 2 0 002 1.6h9.7a2 2 0 002-1.6L23 6H6"/></svg>
+          <span class="nav-badge" id="navCartBadge">0</span>
+        </a>
+        <a href="profile.html" class="nav-avatar" aria-label="Profile">A</a>
+      </div>
+      <button class="nav-toggle" type="button" aria-label="Menu"><span></span><span></span><span></span></button>
+    </div>
+    <svg class="nav-wave" viewBox="0 0 1440 28" preserveAspectRatio="none"><path d="M0,16 C360,32 1080,0 1440,16 L1440,0 L0,0 Z"/></svg>
+  </nav>
+
+  <main class="co-page">
+
+    <header class="co-header">
+      <h1>Checkout</h1>
+      <p>Review your order and choose how you would like to pay.</p>
+    </header>
+
+    <div class="co-steps" aria-label="Checkout progress">
+      <div class="co-step is-done"><span class="co-step-dot">1</span><span>Cart</span></div>
+      <div class="co-step-line is-done"></div>
+      <div class="co-step is-current" id="coStep2"><span class="co-step-dot">2</span><span>Details</span></div>
+      <div class="co-step-line" id="coLine2"></div>
+      <div class="co-step" id="coStep3"><span class="co-step-dot">3</span><span>Done</span></div>
+    </div>
+
+    <form class="co-wrap" id="coForm" novalidate>
+
+      <div>
+
+        <section class="co-card">
+          <h2 class="co-card-title">
+            <span class="co-card-icon"><svg viewBox="0 0 24 24"><circle cx="12" cy="8" r="4"/><path d="M4 21c0-4 4-6 8-6s8 2 8 6"/></svg></span>
+            Your details
+          </h2>
+
+          <div class="co-field">
+            <label class="co-label" for="coName">Full name</label>
+            <input class="co-input" id="coName" name="name" type="text" autocomplete="name" placeholder="Your full name" aria-required="true" aria-describedby="coNameErr">
+            <span class="co-error" id="coNameErr"></span>
+          </div>
+
+          <div class="co-row">
+            <div class="co-field">
+              <label class="co-label" for="coPhone">Phone number</label>
+              <input class="co-input" id="coPhone" name="phone" type="tel" autocomplete="tel" placeholder="03XX XXXXXXX" aria-required="true" aria-describedby="coPhoneErr">
+              <span class="co-error" id="coPhoneErr"></span>
+            </div>
+            <div class="co-field">
+              <label class="co-label" for="coEmail">Email (optional)</label>
+              <input class="co-input" id="coEmail" name="email" type="email" autocomplete="email" placeholder="you@example.com" aria-describedby="coEmailErr">
+              <span class="co-error" id="coEmailErr"></span>
+            </div>
+          </div>
+        </section>
+
+        <section class="co-card">
+          <h2 class="co-card-title">
+            <span class="co-card-icon"><svg viewBox="0 0 24 24"><path d="M12 21s-7-6.2-7-11a7 7 0 1114 0c0 4.8-7 11-7 11z"/><circle cx="12" cy="10" r="2.5"/></svg></span>
+            Meetup point
+          </h2>
+
+          <div class="co-field">
+            <label class="co-label" for="coMeetup">Where will you collect the books?</label>
+            <select class="co-select" id="coMeetup" name="meetup" aria-required="true" aria-describedby="coMeetupErr">
+              <option value="">Select a meetup point</option>
+              <option value="Main Gate">Main Gate</option>
+              <option value="Library">Library</option>
+              <option value="Cafeteria">Cafeteria</option>
+              <option value="CS Department">CS Department</option>
+              <option value="Other">Other (arrange in chat)</option>
+            </select>
+            <span class="co-error" id="coMeetupErr"></span>
+          </div>
+
+          <div class="co-field">
+            <label class="co-label" for="coNotes">Note for the seller (optional)</label>
+            <textarea class="co-textarea" id="coNotes" name="notes" placeholder="Preferred time, class schedule, etc." maxlength="300"></textarea>
+          </div>
+        </section>
+
+        <section class="co-card">
+          <h2 class="co-card-title">
+            <span class="co-card-icon"><svg viewBox="0 0 24 24"><rect x="2" y="5" width="20" height="14" rx="3"/><path d="M2 10h20"/></svg></span>
+            Payment method
+          </h2>
+
+          <div class="co-pay-list" role="radiogroup" aria-label="Payment method">
+            <label class="co-pay">
+              <input type="radio" name="payment" value="cash" checked>
+              <span class="co-pay-body">
+                <span class="co-pay-radio"></span>
+                <span class="co-pay-text">
+                  <span class="co-pay-name">Cash on meetup</span>
+                  <span class="co-pay-desc">Pay the seller in person when you collect the book</span>
+                </span>
+              </span>
+            </label>
+
+            <label class="co-pay">
+              <input type="radio" name="payment" value="wallet">
+              <span class="co-pay-body">
+                <span class="co-pay-radio"></span>
+                <span class="co-pay-text">
+                  <span class="co-pay-name">Mobile wallet</span>
+                  <span class="co-pay-desc">EasyPaisa or JazzCash</span>
+                </span>
+              </span>
+            </label>
+
+            <label class="co-pay">
+              <input type="radio" name="payment" value="bank">
+              <span class="co-pay-body">
+                <span class="co-pay-radio"></span>
+                <span class="co-pay-text">
+                  <span class="co-pay-name">Bank transfer</span>
+                  <span class="co-pay-desc">Transfer to the seller's account</span>
+                </span>
+              </span>
+            </label>
+          </div>
+
+          <div class="co-pay-extra" id="coExtraWallet">
+            <div class="co-field">
+              <label class="co-label" for="coWallet">Wallet number</label>
+              <input class="co-input" id="coWallet" name="wallet" type="tel" placeholder="03XX XXXXXXX" aria-describedby="coWalletErr">
+              <span class="co-error" id="coWalletErr"></span>
+            </div>
+          </div>
+
+          <div class="co-pay-extra" id="coExtraBank">
+            <div class="co-field">
+              <label class="co-label" for="coBankName">Your account title</label>
+              <input class="co-input" id="coBankName" name="bankName" type="text" placeholder="Name on your bank account" aria-describedby="coBankNameErr">
+              <span class="co-error" id="coBankNameErr"></span>
+            </div>
+          </div>
+        </section>
+
+      </div>
+
+      <aside class="co-summary" aria-label="Order summary">
+        <h2>Order summary</h2>
+        <div id="coItems"></div>
+
+        <div class="co-totals">
+          <div class="co-total-row"><span>Subtotal</span><span id="coSubtotal">Rs. 0</span></div>
+          <div class="co-total-row"><span>Service fee</span><span id="coFee">Rs. 0</span></div>
+          <div class="co-total-row is-grand"><span>Total</span><span id="coTotal">Rs. 0</span></div>
+        </div>
+
+        <button class="co-place-btn" id="coPlace" type="submit">Place Order</button>
+        <span class="co-error" id="coFormError" role="alert"></span>
+        <p class="co-safe-note">Your details are only shared with the seller to arrange the handover.</p>
+      </aside>
+
+    </form>
+
+    <div id="coResult"></div>
+
+  </main>
+
+  <footer class="site-footer">
+    <svg class="footer-wave" viewBox="0 0 1440 70" preserveAspectRatio="none"><path class="footer-wave-dark" d="M0,20 C400,60 1040,0 1440,30 L1440,70 L0,70 Z"/></svg>
+    <div class="footer-container">
+      <div class="footer-grid">
+        <div class="footer-brand">
+          <a href="index.html" class="footer-logo">
+            <span class="bs-logo-mark">BS</span>
+            <span class="footer-logo-text">
+              <span class="footer-logo-name">Book<span>Swap</span></span>
+              <span class="footer-tagline">READ · SWAP · GROW</span>
+            </span>
+          </a>
+          <p class="footer-about">BookSwap is a community platform for book lovers. Buy, sell and swap books with people who love reading just like you.</p>
+        </div>
+        <div>
+          <h4 class="footer-title">Explore</h4>
+          <ul class="footer-list">
+            <li><a href="category.html">Categories</a></li>
+            <li><a href="search.html">Search</a></li>
+            <li><a href="about.html">About</a></li>
+            <li><a href="contact.html">Contact</a></li>
+          </ul>
+        </div>
+      </div>
+      <div class="footer-bottom">
+        <p>&copy; 2026 BookSwap. All rights reserved.</p>
+      </div>
+    </div>
+  </footer>
+
+  <script src="JS/payment.js"></script>
+</body>
+</html>

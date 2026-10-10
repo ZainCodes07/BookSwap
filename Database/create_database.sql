@@ -1,0 +1,2 @@
+CREATE DATABASE BookSwap;
+GO

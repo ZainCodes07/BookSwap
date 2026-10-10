@@ -1,0 +1,71 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta name="robots" content="noindex">
+  <title>Manage Listings - BookSwap Admin</title>
+  <link rel="stylesheet" href="../css/global.css">
+</head>
+<body class="admin" data-page="listings">
+
+  <div class="adm-layout">
+
+    <!-- ===== SIDEBAR (same on all 4 admin pages) ===== -->
+    <aside class="adm-side">
+      <a href="admin-dashboard.html" class="adm-brand">
+        <img src="../images/logo.png" alt="" width="36" height="36">
+        <span>Book<span>Swap</span> <small>Admin</small></span>
+      </a>
+      <nav aria-label="Admin">
+        <ul class="adm-nav">
+          <li><a href="admin-dashboard.html"><svg class="icon" viewBox="0 0 24 24" aria-hidden="true"><rect x="3" y="3" width="7" height="9" rx="1"/><rect x="14" y="3" width="7" height="5" rx="1"/><rect x="14" y="12" width="7" height="9" rx="1"/><rect x="3" y="16" width="7" height="5" rx="1"/></svg><span>Dashboard</span></a></li>
+          <li><a href="manage-users.html"><svg class="icon" viewBox="0 0 24 24" aria-hidden="true"><path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M23 21v-2a4 4 0 0 0-3-3.87"/><path d="M16 3.13a4 4 0 0 1 0 7.75"/></svg><span>Users</span></a></li>
+          <li><a href="manage-listings.html" aria-current="page"><svg class="icon" viewBox="0 0 24 24" aria-hidden="true"><path d="M2 3h6a4 4 0 0 1 4 4v14a3 3 0 0 0-3-3H2z"/><path d="M22 3h-6a4 4 0 0 0-4 4v14a3 3 0 0 1 3-3h7z"/></svg><span>Listings</span></a></li>
+          <li><a href="pending-payouts.html"><svg class="icon" viewBox="0 0 24 24" aria-hidden="true"><rect x="2" y="5" width="20" height="14" rx="2"/><line x1="2" y1="10" x2="22" y2="10"/></svg><span>Payouts</span></a></li>
+        </ul>
+      </nav>
+      <a href="../index.html" class="adm-back">Back to website</a>
+    </aside>
+
+    <!-- ===== MAIN AREA ===== -->
+    <main class="adm-main">
+      <header class="adm-top">
+        <h1>Manage Listings</h1>
+        <div class="adm-user">
+          <span class="adm-avatar" aria-hidden="true">A</span>
+          <span>Admin</span>
+        </div>
+      </header>
+
+      <div class="adm-toolbar">
+        <label class="adm-search">
+          <svg class="icon" viewBox="0 0 24 24" aria-hidden="true"><circle cx="11" cy="11" r="8"/><line x1="21" y1="21" x2="16.65" y2="16.65"/></svg>
+          <input type="search" id="listingSearch" placeholder="Search by book or seller" aria-label="Search listings">
+        </label>
+        <div class="adm-tabs" id="listingTabs" role="group" aria-label="Filter listings">
+          <button type="button" class="adm-tab active" data-filter="pending" aria-pressed="true">Waiting for review</button>
+          <button type="button" class="adm-tab" data-filter="live" aria-pressed="false">Live</button>
+          <button type="button" class="adm-tab" data-filter="removed" aria-pressed="false">Removed</button>
+        </div>
+      </div>
+
+      <section class="adm-panel">
+        <div class="adm-table-wrap">
+          <table class="adm-table">
+            <thead><tr><th scope="col">Book</th><th scope="col">Course</th><th scope="col">Seller</th><th scope="col">Condition</th><th scope="col" class="num">Price</th><th scope="col">Listed</th><th scope="col"><span class="sr-only">Actions</span></th></tr></thead>
+            <tbody id="listingRows"></tbody>
+          </table>
+        </div>
+      </section>
+
+    </main>
+
+  </div>
+
+  <!-- Small popup message -->
+  <div class="adm-toast" id="admToast" role="status" aria-live="polite"></div>
+
+  <script src="../js/admin.js"></script>
+</body>
+</html>

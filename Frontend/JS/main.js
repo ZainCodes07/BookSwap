@@ -325,7 +325,116 @@
 
 
   /* ========== 6. CONTACT PAGE STARTED ========== */
-  // (contact.html form logic will be added here in the contact page branch)
+  // Checks the contact form and shows a "Message sent" box.
+  // NOTE FOR BACKEND: there is no server yet. Later, send the data
+  // with fetch('/api/contact', { method: 'POST', body: JSON.stringify(data) })
+  // and call showSent() when the server answers OK.
+  function initContactForm() {
+    var form = $('contactForm');
+    if (!form) return;
+
+    var fields = {
+      name:    $('cName'),
+      email:   $('cEmail'),
+      phone:   $('cPhone'),
+      topic:   $('cTopic'),
+      message: $('cMessage')
+    };
+    var counter = $('cMessageCount');
+    var sentBox = $('contactSent');
+
+    // Returns an error message, or '' if the field is fine
+    function check(key) {
+      var value = fields[key].value.trim();
+      if (key === 'name') {
+        if (!value) return 'Enter your name.';
+        if (value.length < 2) return 'Name must be at least 2 letters.';
+      }
+      if (key === 'email') {
+        if (!value) return 'Enter your email so we can reply.';
+        if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(value)) return 'Enter a valid email, like ali@gmail.com.';
+      }
+      if (key === 'phone') {
+        if (!value) return 'Enter your phone number.';
+        // Pakistani mobile: 03XXXXXXXXX or +923XXXXXXXXX (spaces and dashes allowed)
+        if (!/^(\+92|0)3\d{9}$/.test(value.replace(/[\s-]/g, ''))) return 'Enter a valid number, like 03001234567.';
+      }
+      if (key === 'topic' && !value) return 'Choose a topic.';
+      if (key === 'message') {
+        if (!value) return 'Write your message.';
+        if (value.length < 20) return 'Add a bit more detail (at least 20 characters).';
+      }
+      return '';
+    }
+
+    function showError(key, msg) {
+      var input = fields[key];
+      $(input.id + 'Err').textContent = msg;
+      input.setAttribute('aria-invalid', msg ? 'true' : 'false');
+    }
+
+    // Check a field when the user leaves it, and clear the error while they fix it
+    Object.keys(fields).forEach(function (key) {
+      fields[key].addEventListener('blur', function () {
+        if (fields[key].value.trim()) showError(key, check(key));
+      });
+      fields[key].addEventListener('input', function () {
+        if (fields[key].getAttribute('aria-invalid') === 'true') showError(key, check(key));
+      });
+    });
+
+    // Live character count for the message
+    fields.message.addEventListener('input', function () {
+      counter.textContent = fields.message.value.length + ' / 1000';
+    });
+
+    function showSent(name, email) {
+      $('sentName').textContent = name.split(' ')[0];
+      $('sentEmail').textContent = email;
+      form.hidden = true;
+      sentBox.hidden = false;
+      sentBox.focus();
+    }
+
+    form.addEventListener('submit', function (e) {
+      e.preventDefault();
+
+      var firstBad = null;
+      Object.keys(fields).forEach(function (key) {
+        var msg = check(key);
+        showError(key, msg);
+        if (msg && !firstBad) firstBad = fields[key];
+      });
+      if (firstBad) { firstBad.focus(); return; }
+
+      var data = {
+        name: fields.name.value.trim(),
+        email: fields.email.value.trim(),
+        phone: fields.phone.value.replace(/[\s-]/g, ''),
+        topic: fields.topic.value,
+        message: fields.message.value.trim()
+      };
+
+      // Fake a short wait so the button shows "Sending..." (remove when backend is ready)
+      var btn = $('contactSubmit');
+      btn.disabled = true;
+      btn.textContent = 'Sending...';
+      setTimeout(function () {
+        btn.disabled = false;
+        btn.textContent = 'Send message';
+        showSent(data.name, data.email);
+      }, 700);
+    });
+
+    $('contactAgain').addEventListener('click', function () {
+      form.reset();
+      counter.textContent = '0 / 1000';
+      Object.keys(fields).forEach(function (key) { showError(key, ''); });
+      sentBox.hidden = true;
+      form.hidden = false;
+      fields.name.focus();
+    });
+  }
   /* ========== CONTACT PAGE END ========== */
 
 
@@ -336,6 +445,7 @@
     initFilterTabs();
     initCardButtons();
     initFooterWave();
+    initContactForm();
   }
 
   if (document.readyState === 'loading') {

@@ -277,6 +277,8 @@
     if (view === 'payout') preparePayout();
 
     modal.querySelector('.auth-main').scrollTop = 0;
+    modal.scrollTop = 0;
+    dialog.scrollTop = 0;
 
     var active = modal.querySelector('.auth-view[data-view="' + view + '"]');
     var first = active.querySelector('input:not([type="radio"]):not([type="checkbox"]), .auth-role, input[type="radio"], .auth-btn');
@@ -821,7 +823,7 @@
     updateProfile: function (fields) {
       var user = currentUser();
       if (!user) return null;
-      ['name', 'phone'].forEach(function (k) { if (fields[k] !== undefined) user[k] = fields[k]; });
+      ['name', 'phone', 'address', 'city'].forEach(function (k) { if (fields[k] !== undefined) user[k] = fields[k]; });
       saveUser(user);                     // BACKEND: PUT /api/users/me
       announceChange();
       return publicCopy(user);
@@ -837,4 +839,91 @@
   };
 
   window.BookSwapAuth = api;
+
+  /* ======================================================================
+     13. PROFILE PAGE  (runs only on profile.html  ->  <body data-page="profile">)
+     ====================================================================== */
+  if (document.body.getAttribute('data-page') === 'profile') {
+    var $ = function (id) { return document.getElementById(id); };
+    var pfForm = $('pfForm');
+
+    function fillProfile() {
+      var user = currentUser();
+      $('pfGuest').hidden = !!user;
+      $('pfUser').hidden = !user;
+      if (!user) return;
+
+      var isSeller = user.role === 'seller';
+      $('pfAvatar').textContent = user.name.trim().charAt(0).toUpperCase();
+      $('pfName').textContent = user.name;
+      $('pfEmail').textContent = user.email;
+      $('pfRole').textContent = isSeller ? 'Seller' : 'Buyer';
+      $('pfRole').classList.toggle('is-seller', isSeller);
+      $('pfSince').textContent = 'Member since ' +
+        new Date(user.joined || Date.now()).toLocaleDateString('en-GB', { month: 'long', year: 'numeric' });
+
+      // Form
+      pfForm.name.value = user.name || '';
+      pfForm.email.value = user.email || '';
+      pfForm.phone.value = user.phone || '';
+      pfForm.address.value = user.address || '';
+      pfForm.city.value = user.city || '';
+
+      // Buyer sees "Switch to Seller". Seller sees seller tools (no switch back - a seller can also buy).
+      $('pfBuyerBox').hidden = isSeller;
+      $('pfSellerBox').hidden = !isSeller;
+
+      if (isSeller) {
+        $('pfPayoutLine').textContent = user.payout ? maskPayout(user.payout) : 'Not added yet';
+        $('pfPayoutLine').classList.toggle('is-empty', !user.payout);
+        $('pfPayoutWarn').hidden = !!user.payout;
+        $('pfPayoutBtn').textContent = user.payout ? 'Change payout account' : 'Add payout account';
+      }
+    }
+
+    pfForm.addEventListener('submit', function (e) {
+      e.preventDefault();
+      clearErrors(pfForm);
+      var name = pfForm.name.value.trim().replace(/\s+/g, ' ');
+      var phone = cleanPhone(pfForm.phone.value);
+      var address = pfForm.address.value.trim().replace(/\s+/g, ' ');
+      var city = pfForm.city.value.trim().replace(/\s+/g, ' ');
+
+      if (name.length < 3) setError(pfForm.name, 'Enter your full name.');
+      else if (!/^[A-Za-z][A-Za-z .'-]+$/.test(name)) setError(pfForm.name, 'Use letters only.');
+      if (!phone) setError(pfForm.phone, 'Enter your phone number.');
+      else if (!PHONE_RE.test(phone)) setError(pfForm.phone, 'Use a mobile number like 0300 1234567.');
+      if (address && address.length < 5) setError(pfForm.address, 'Address looks too short.');
+      if (city && !/^[A-Za-z][A-Za-z .'-]+$/.test(city)) setError(pfForm.city, 'Use letters only.');
+      if (pfForm.querySelector('.has-error')) return focusFirstError(pfForm);
+
+      var btn = $('pfSave');
+      setBusy(btn, true);
+      // BACKEND: PUT /api/users/me  { name, phone, address, city }
+      wait(400).then(function () {
+        setBusy(btn, false);
+        api.updateProfile({ name: name, phone: phone, address: address, city: city });
+        toast('Your details are saved');
+      });
+    });
+
+    pfForm.addEventListener('input', function (e) {
+      if (e.target.closest('.has-error')) setError(e.target, '');
+    });
+
+    $('pfSwitch').addEventListener('click', function () { api.becomeSeller(); });
+    $('pfPayoutBtn').addEventListener('click', function () { api.editPayout(); });
+    $('pfSignOut').addEventListener('click', function () { api.logout(); });
+
+    document.addEventListener('auth:changed', fillProfile);
+    fillProfile();
+
+    // Guest opened the profile page directly -> show the sign in popup
+    if (!currentUser()) ready.then(function () { open('login', { reason: 'Sign in to see your profile.' }); });
+
+    // Came from the navbar heart (profile.html#wishlist) -> scroll to the wishlist
+    if (window.location.hash === '#wishlist' && currentUser()) {
+      setTimeout(function () { $('wishlist').scrollIntoView({ behavior: 'smooth', block: 'start' }); }, 300);
+    }
+  }
 })();

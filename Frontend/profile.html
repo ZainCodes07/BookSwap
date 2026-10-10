@@ -1,0 +1,180 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>My Profile - BookSwap</title>
+  <link rel="stylesheet" href="css/global.css">
+</head>
+<body class="profile" data-page="profile">
+
+  <!-- ===== NAVIGATION (loaded by include.js) ===== -->
+  <div data-include="nav"></div>
+
+  <main class="pf-main">
+
+    <!-- ==========================================================
+         GUEST VIEW  (shown when nobody is signed in)
+         ========================================================== -->
+    <section class="pf-guest" id="pfGuest" hidden>
+      <div class="pf-guest-icon" aria-hidden="true">
+        <svg viewBox="0 0 24 24"><path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"/><circle cx="12" cy="7" r="4"/></svg>
+      </div>
+      <h1>Sign In To See Your Profile</h1>
+      <p>Your details, wishlist and seller tools all live here.</p>
+      <div class="pf-guest-actions">
+        <button type="button" class="auth-btn auth-btn-primary" data-auth-open="login">Sign in</button>
+        <button type="button" class="auth-btn auth-btn-outline" data-auth-open="role">Create an account</button>
+      </div>
+    </section>
+
+    <!-- ==========================================================
+         SIGNED-IN VIEW
+         ========================================================== -->
+    <div class="pf-wrap" id="pfUser" hidden>
+
+      <!-- Header card -->
+      <section class="pf-head">
+        <div class="pf-avatar" id="pfAvatar" aria-hidden="true">A</div>
+        <div class="pf-head-text">
+          <h1 id="pfName">Your name</h1>
+          <p id="pfEmail">you@example.com</p>
+          <div class="pf-badges">
+            <span class="pf-badge" id="pfRole">Buyer</span>
+            <span class="pf-since" id="pfSince">Member since 2026</span>
+          </div>
+        </div>
+        <button type="button" class="pf-signout" id="pfSignOut">
+          <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4"/><path d="m16 17 5-5-5-5"/><path d="M21 12H9"/></svg>
+          Sign out
+        </button>
+      </section>
+
+      <div class="pf-grid">
+
+        <!-- ===== My details ===== -->
+        <section class="pf-card" aria-labelledby="pfDetailsTitle">
+          <h2 id="pfDetailsTitle">My Details</h2>
+          <p class="pf-card-sub">Sellers and buyers see your name. Your phone and address are only shared after you agree on a deal.</p>
+
+          <form class="auth-form" id="pfForm" novalidate>
+            <div class="auth-field">
+              <label for="pfFieldName">Full name</label>
+              <div class="auth-input">
+                <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"/><circle cx="12" cy="7" r="4"/></svg>
+                <input type="text" id="pfFieldName" name="name" autocomplete="name" aria-describedby="pfFieldName-err">
+              </div>
+              <p class="auth-error" id="pfFieldName-err"></p>
+            </div>
+
+            <div class="auth-grid-2">
+              <div class="auth-field">
+                <label for="pfFieldEmail">Email</label>
+                <div class="auth-input">
+                  <svg viewBox="0 0 24 24" aria-hidden="true"><rect x="3" y="5" width="18" height="14" rx="2"/><path d="m3 7 9 6 9-6"/></svg>
+                  <input type="email" id="pfFieldEmail" name="email" readonly aria-describedby="pfFieldEmail-hint">
+                </div>
+                <p class="auth-hint" id="pfFieldEmail-hint">Email can't be changed.</p>
+              </div>
+
+              <div class="auth-field">
+                <label for="pfFieldPhone">Phone number</label>
+                <div class="auth-input">
+                  <svg viewBox="0 0 24 24" aria-hidden="true"><rect x="6" y="2" width="12" height="20" rx="2"/><path d="M11 18h2"/></svg>
+                  <input type="tel" id="pfFieldPhone" name="phone" autocomplete="tel" inputmode="tel" placeholder="03XX XXXXXXX" aria-describedby="pfFieldPhone-err">
+                </div>
+                <p class="auth-error" id="pfFieldPhone-err"></p>
+              </div>
+            </div>
+
+            <div class="auth-field">
+              <label for="pfFieldAddress">Address <span class="pf-optional">(optional)</span></label>
+              <div class="auth-input">
+                <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M21 10c0 7-9 13-9 13S3 17 3 10a9 9 0 0 1 18 0z"/><circle cx="12" cy="10" r="3"/></svg>
+                <input type="text" id="pfFieldAddress" name="address" autocomplete="street-address" placeholder="House, street, area" aria-describedby="pfFieldAddress-err">
+              </div>
+              <p class="auth-error" id="pfFieldAddress-err"></p>
+            </div>
+
+            <div class="auth-field">
+              <label for="pfFieldCity">City <span class="pf-optional">(optional)</span></label>
+              <div class="auth-input">
+                <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M3 21h18"/><path d="M5 21V7l7-4 7 4v14"/><path d="M9 21v-4h6v4"/></svg>
+                <input type="text" id="pfFieldCity" name="city" autocomplete="address-level2" placeholder="e.g. Karachi" aria-describedby="pfFieldCity-err">
+              </div>
+              <p class="auth-error" id="pfFieldCity-err"></p>
+            </div>
+
+            <div class="pf-form-actions">
+              <button type="submit" class="auth-btn auth-btn-primary" id="pfSave">Save changes</button>
+            </div>
+          </form>
+        </section>
+
+        <!-- ===== Account type (Buyer -> Switch to Seller / Seller tools) ===== -->
+        <div class="pf-side">
+
+          <!-- Shown to BUYERS only -->
+          <section class="pf-card pf-upgrade" id="pfBuyerBox" hidden aria-labelledby="pfUpgradeTitle">
+            <span class="pf-upgrade-tag">Buyer account</span>
+            <h2 id="pfUpgradeTitle">Want To Sell Your Old Books?</h2>
+            <p>Switch to a seller account. You can still buy books like before.</p>
+            <ul class="pf-ticks">
+              <li>List books from last semester</li>
+              <li>Get paid to Easypaisa, JazzCash or bank</li>
+              <li>Everything a buyer can do</li>
+            </ul>
+            <button type="button" class="auth-btn auth-btn-primary auth-btn-block" id="pfSwitch">Switch to Seller</button>
+          </section>
+
+          <!-- Shown to SELLERS only -->
+          <section class="pf-card" id="pfSellerBox" hidden aria-labelledby="pfSellerTitle">
+            <span class="pf-upgrade-tag pf-tag-seller">Seller account</span>
+            <h2 id="pfSellerTitle">Seller Tools</h2>
+            <p class="pf-card-sub">You can buy and sell books with this account.</p>
+
+            <div class="pf-links">
+              <a href="Seller/seller-dashboard.html" class="pf-link">
+                <svg viewBox="0 0 24 24" aria-hidden="true"><rect x="3" y="3" width="7" height="9" rx="1"/><rect x="14" y="3" width="7" height="5" rx="1"/><rect x="14" y="12" width="7" height="9" rx="1"/><rect x="3" y="16" width="7" height="5" rx="1"/></svg>
+                Seller dashboard
+              </a>
+              <a href="Seller/add-listing.html" class="pf-link">
+                <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M12 5v14M5 12h14"/></svg>
+                List a book
+              </a>
+              <a href="Seller/my-shop.html" class="pf-link">
+                <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M3 9l1.5-5h15L21 9"/><path d="M3 9h18v2a3 3 0 0 1-6 0 3 3 0 0 1-6 0 3 3 0 0 1-6 0z"/><path d="M5 13v8h14v-8"/></svg>
+                My shop
+              </a>
+            </div>
+
+            <div class="pf-payout" id="pfPayout">
+              <h3>Payout account</h3>
+              <p class="pf-payout-line" id="pfPayoutLine">Not added yet</p>
+              <p class="pf-payout-warn" id="pfPayoutWarn" hidden>Add a payout account before your first sale so we can send you the money.</p>
+              <button type="button" class="auth-btn auth-btn-outline auth-btn-block" id="pfPayoutBtn">Add payout account</button>
+            </div>
+          </section>
+
+          <!-- ===== Wishlist ===== -->
+          <section class="pf-card" id="wishlist" aria-labelledby="pfWishTitle">
+            <h2 id="pfWishTitle">My Wishlist</h2>
+            <div class="pf-empty">
+              <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M20.84 4.61a5.5 5.5 0 0 0-7.78 0L12 5.67l-1.06-1.06a5.5 5.5 0 0 0-7.78 7.78l1.06 1.06L12 21.23l7.78-7.78 1.06-1.06a5.5 5.5 0 0 0 0-7.78z"/></svg>
+              <p>No saved books yet. Tap the heart on any book to save it here.</p>
+              <a href="index.html" class="auth-link">Browse books</a>
+            </div>
+            <!-- BACKEND: GET /api/users/me/wishlist  -> render saved books here -->
+          </section>
+        </div>
+      </div>
+    </div>
+  </main>
+
+  <!-- ===== FOOTER (loaded by include.js) ===== -->
+  <div data-include="footer"></div>
+
+  <script src="js/include.js"></script>
+  <script src="js/auth.js"></script>
+</body>
+</html>

@@ -7,7 +7,7 @@
 (function (window) {
   'use strict';
 
-  var API_BASE = 'http://localhost:5000/api';
+  var API_BASE = 'https://book-swap-mocha.vercel.app/api';
 
   var TOKEN_KEY = 'bookswap_token';
   var USER_KEY = 'bookswap_user';

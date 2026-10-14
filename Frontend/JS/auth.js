@@ -85,6 +85,23 @@
   }
 
   function currentUser() {
+    if (window.BookSwapAPI) {
+      var u = window.BookSwapAPI.getCurrentUser();
+      if (u) {
+        return {
+          id: u.UserID,
+          UserID: u.UserID,
+          name: u.FullName,
+          FullName: u.FullName,
+          email: u.Email,
+          Email: u.Email,
+          role: (u.Role || 'buyer').toLowerCase(),
+          Role: u.Role,
+          phone: u.Phone,
+          address: u.Address
+        };
+      }
+    }
     var email = sessionEmail();
     return email ? findUser(email) : null;
   }
@@ -359,7 +376,28 @@
     if (form.querySelector('.has-error')) return focusFirstError(form);
 
     setBusy(btn, true);
-    // BACKEND: POST /api/auth/login  { email, password }  -> { user, token }
+
+    if (window.BookSwapAPI) {
+      window.BookSwapAPI.auth.login(email, pw, form.remember.checked)
+        .then(function (res) {
+          setBusy(btn, false);
+          announceChange();
+          var u = res.user;
+          toast('Welcome back, ' + firstName(u.FullName || u.name) + '!');
+          if (state.pending || state.next) return continuePending();
+          close();
+          if (state.pageMode) window.location.href = ROOT + 'index.html';
+        })
+        .catch(function (err) {
+          setBusy(btn, false);
+          showAlert(form, err.message || "Invalid email or password.");
+          form.password.value = '';
+          form.password.focus();
+        });
+      return;
+    }
+
+    // Fallback if API not available
     Promise.all([hashPassword(pw), wait(500)]).then(function (r) {
       setBusy(btn, false);
       var user = findUser(email);
@@ -402,7 +440,6 @@
 
     if (!email) setError(form.email, 'Enter your email.');
     else if (!EMAIL_RE.test(email)) setError(form.email, 'This email does not look right.');
-    else if (findUser(email)) setError(form.email, 'This email already has an account. Sign in instead.');
 
     if (!phone) setError(form.phone, 'Enter your phone number.');
     else if (!PHONE_RE.test(phone)) setError(form.phone, 'Use a mobile number like 0300 1234567.');
@@ -418,7 +455,37 @@
     if (form.querySelector('.has-error')) return focusFirstError(form);
 
     setBusy(btn, true);
-    // BACKEND: POST /api/auth/register  { name, email, phone, password, role }
+
+    var roleCapitalized = state.role === 'seller' ? 'Seller' : 'Buyer';
+    var payload = {
+      FullName: name,
+      Email: email,
+      Password: pw,
+      Role: roleCapitalized,
+      Phone: phone,
+      Address: null
+    };
+
+    if (window.BookSwapAPI) {
+      window.BookSwapAPI.auth.register(payload, true)
+        .then(function (res) {
+          setBusy(btn, false);
+          announceChange();
+          if (state.role === 'seller') {
+            state.payoutMode = 'signup';
+            show('payout');
+          } else {
+            showDone('buyer');
+          }
+        })
+        .catch(function (err) {
+          setBusy(btn, false);
+          showAlert(form, err.message || "Registration failed. Try again.");
+        });
+      return;
+    }
+
+    // Fallback if API not available
     Promise.all([hashPassword(pw), wait(600)]).then(function (r) {
       setBusy(btn, false);
       var user = {
@@ -667,27 +734,59 @@
      10. NAVBAR: show the user's first letter, open popup when signed out
      ====================================================================== */
   function paintNav() {
-    paintNavButton();
-    var avatar = document.querySelector('.nav-avatar');
-    if (!avatar) return;
     var user = currentUser();
-    var badge = avatar.querySelector('.auth-initial');
+    var signInBtn = document.getElementById('navSignInBtn') || document.querySelector('.nav-signin-btn');
+    var profileWrap = document.getElementById('navUserMenuWrap');
+    var profileBtn = document.getElementById('navProfileBtn') || document.querySelector('.nav-avatar');
+    var userInitial = document.getElementById('navUserInitial') || (profileBtn && profileBtn.querySelector('.auth-initial'));
+
     if (user) {
-      if (!badge) {
-        badge = document.createElement('span');
-        badge.className = 'auth-initial';
-        badge.setAttribute('aria-hidden', 'true');
-        avatar.appendChild(badge);
+      if (signInBtn) signInBtn.style.display = 'none';
+      if (profileWrap) profileWrap.style.display = 'inline-flex';
+      if (profileBtn) {
+        profileBtn.style.display = 'flex';
+        var firstLetter = (user.FullName || user.name || 'U').trim().charAt(0).toUpperCase();
+        if (userInitial) userInitial.textContent = firstLetter;
+        else profileBtn.textContent = firstLetter;
+        profileBtn.setAttribute('aria-label', 'My profile (' + (user.FullName || user.name) + ')');
+
+        if ((user.Role === 'Admin' || user.role === 'admin') && !document.getElementById('navAdminBadge')) {
+          var adminLink = document.createElement('a');
+          adminLink.id = 'navAdminBadge';
+          adminLink.href = ROOT + 'Adimn/admin-dashboard.html';
+          adminLink.className = 'nav-admin-link';
+          adminLink.textContent = 'Admin';
+          profileBtn.parentNode.insertBefore(adminLink, profileBtn);
+        }
       }
-      badge.textContent = user.name.trim().charAt(0).toUpperCase();
-      avatar.classList.add('is-signed-in');
-      avatar.classList.remove('is-guest');
-      avatar.setAttribute('aria-label', 'My profile (' + user.name + ')');
     } else {
-      if (badge) badge.remove();
-      avatar.classList.remove('is-signed-in');
-      avatar.classList.add('is-guest');
-      avatar.setAttribute('aria-label', 'Sign in');
+      if (signInBtn) signInBtn.style.display = 'inline-flex';
+      if (profileWrap) profileWrap.style.display = 'none';
+      if (profileBtn) profileBtn.style.display = 'none';
+      var adm = document.getElementById('navAdminBadge');
+      if (adm) adm.remove();
+    }
+
+    var cartBadge = document.getElementById('cartCount') || document.getElementById('navCartBadge');
+    if (cartBadge) {
+      if (user && window.BookSwapAPI) {
+        window.BookSwapAPI.cart.getByUser(user.UserID || user.id).then(function (res) {
+          var items = res.cartItems || [];
+          cartBadge.textContent = items.length;
+        }).catch(function () {
+          try {
+            var raw = JSON.parse(localStorage.getItem('bookswap_cart') || '[]');
+            cartBadge.textContent = raw.length;
+          } catch (e) {}
+        });
+      } else {
+        try {
+          var raw = JSON.parse(localStorage.getItem('bookswap_cart') || '[]');
+          cartBadge.textContent = raw.length;
+        } catch (e) {
+          cartBadge.textContent = '0';
+        }
+      }
     }
   }
 
@@ -699,56 +798,39 @@
     };
   }
 
-  // Guests can browse freely. These clicks need an account:
-  //   - profile icon, wishlist, "Sign in" button in the navbar
-  //   - anything with data-auth-required   (add to cart, chat, buy...)
-  //   - anything with data-seller-required (sell a book, my shop...)
+  // Global click gate: If guest clicks any interactive element, prompt login
   document.addEventListener('click', function (e) {
-    var el = e.target.closest('[data-auth-open], [data-auth-required], [data-seller-required], .nav-avatar, a[href*="profile.html"]');
-    if (!el || (modal && modal.contains(el))) return;
+    if (modal && modal.contains(e.target)) return;
 
-    if (el.hasAttribute('data-auth-open')) {
+    var el = e.target.closest('[data-auth-open], [data-auth-required], [data-seller-required], .nav-avatar, a[href*="profile.html"]');
+
+    if (e.target.closest('#navSignInBtn, [data-auth-open], .nav-signin-btn')) {
       e.preventDefault();
-      return open(el.getAttribute('data-auth-open'));
+      return open('login');
     }
 
     var user = currentUser();
 
-    if (el.hasAttribute('data-seller-required')) {
-      if (user && user.role === 'seller') return;        // allowed, carry on
-      e.preventDefault();
-      e.stopImmediatePropagation();                      // stop the button's own code
-      if (user) return api.becomeSeller({ pending: replay(el) });   // buyer -> offer Switch to Seller
-      return open('role', {
-        reason: el.getAttribute('data-seller-required') || 'Create a seller account to sell your books.',
-        role: 'seller',
-        pending: replay(el)
-      });
+    if (user) {
+      if (el && el.hasAttribute('data-seller-required') && user.role !== 'seller') {
+        e.preventDefault();
+        e.stopImmediatePropagation();
+        return api.becomeSeller({ pending: replay(el) });
+      }
+      return; // allow normal clicks for logged in users
     }
 
-    if (user) return;                                     // signed in, nothing to do
-    e.preventDefault();
-    e.stopImmediatePropagation();                        // stop the button's own code
-    var reason = el.getAttribute('data-auth-required') ||
-      (/wishlist/.test(el.getAttribute('href') || '') ? 'Sign in to see your wishlist.' : '');
-    open('login', { reason: reason, pending: replay(el) });
-  }, true);   // "true" = run before the button's own click code
-
-  // Navbar: guests see a "Sign in" button next to the profile icon (like Amazon)
-  function paintNavButton() {
-    var actions = document.querySelector('.nav-actions');
-    if (!actions) return;
-    var btn = actions.querySelector('.auth-nav-signin');
-    if (currentUser()) { if (btn) btn.remove(); return; }
-    if (btn) return;
-    btn = document.createElement('button');
-    btn.type = 'button';
-    btn.className = 'auth-nav-signin';
-    btn.setAttribute('data-auth-open', 'login');
-    btn.innerHTML = '<span class="auth-nav-hello">Hello, guest</span><span class="auth-nav-cta">Sign in / Sign up</span>';
-    var avatar = actions.querySelector('.nav-avatar');
-    actions.insertBefore(btn, avatar || null);
-  }
+    // Guest clicked an interactive element anywhere on page
+    var interactive = e.target.closest('a, button, input, select, textarea, .book-card, .subject-tile, .wish-btn, .add-btn, .tab, .hero-chips button, .shelf-books a, [role="button"]');
+    if (interactive) {
+      e.preventDefault();
+      e.stopImmediatePropagation();
+      open('login', {
+        reason: 'Please sign in or create an account to browse and use BookSwap.',
+        pending: replay(interactive)
+      });
+    }
+  }, true);
 
   document.addEventListener('components:loaded', paintNav);
 
@@ -830,7 +912,8 @@
     },
 
     logout: function () {
-      endSession();                       // BACKEND: POST /api/auth/logout
+      if (window.BookSwapAPI) window.BookSwapAPI.clearAuth();
+      endSession();
       announceChange();
       toast('You have been signed out');
     },

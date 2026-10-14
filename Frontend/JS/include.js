@@ -25,9 +25,9 @@
   /* ---------- Load one component ---------- */
   function loadComponent(el) {
     var name = el.getAttribute('data-include');
-    var url = ROOT + name + '.html';
+    var url = ROOT + name + '.html?v=' + Date.now();
 
-    return fetch(url)
+    return fetch(url, { cache: 'no-cache' })
       .then(function (res) {
         if (!res.ok) throw new Error(res.status + ' ' + res.statusText);
         return res.text();

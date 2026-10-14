@@ -148,7 +148,9 @@
     var shelf = $('shelfBooks');
     if (!shelf) return;
 
-    var top = books.slice().sort(function (a, b) { return b.sold - a.sold; });
+    // Ensure the bookshelf always has at least 7 books so it never looks empty
+    var combined = (books && books.length >= 7) ? books : (books || []).concat(BOOKS.slice((books || []).length));
+    var top = combined.slice(0, 7);
     var standing = top.slice(0, 5);
     var lying    = top.slice(5, 7);
     var heights  = [94, 84, 100, 88, 96];   // % heights so spines look natural
@@ -179,11 +181,9 @@
     if (!grid) return;
 
     grid.innerHTML = SUBJECTS.map(function (s) {
-      var count = books.filter(function (b) { return b.subject === s.key; }).length;
       return '<a class="subject-tile" href="category.html?subject=' + s.key + '">' +
           '<span class="subject-icon" aria-hidden="true">' + esc(s.icon) + '</span>' +
           '<span class="subject-name">' + esc(s.name) + '</span>' +
-          '<span class="subject-count">' + count + (count === 1 ? ' book' : ' books') + '</span>' +
         '</a>';
     }).join('');
   }
@@ -282,22 +282,89 @@
     });
   }
 
+  function flyToCartAnimation(sourceEl, onComplete) {
+    var cartBtn = document.getElementById('cartBtn');
+    if (!cartBtn || !sourceEl) {
+      if (onComplete) onComplete();
+      return;
+    }
+
+    var startRect = sourceEl.getBoundingClientRect();
+    var endRect = cartBtn.getBoundingClientRect();
+
+    var clone = sourceEl.cloneNode(true);
+    clone.className = 'cart-fly-clone';
+    clone.style.left = startRect.left + 'px';
+    clone.style.top = startRect.top + 'px';
+    clone.style.width = startRect.width + 'px';
+    clone.style.height = startRect.height + 'px';
+    clone.style.opacity = '1';
+
+    document.body.appendChild(clone);
+    clone.getBoundingClientRect(); // reflow
+
+    var targetX = endRect.left + endRect.width / 2 - 15;
+    var targetY = endRect.top + endRect.height / 2 - 15;
+
+    clone.style.left = targetX + 'px';
+    clone.style.top = targetY + 'px';
+    clone.style.width = '30px';
+    clone.style.height = '30px';
+    clone.style.opacity = '0.2';
+    clone.style.transform = 'scale(0.2) rotate(360deg)';
+
+    setTimeout(function () {
+      if (clone.parentNode) clone.parentNode.removeChild(clone);
+      cartBtn.classList.remove('cart-hit');
+      void cartBtn.offsetWidth;
+      cartBtn.classList.add('cart-hit');
+
+      var badge = document.getElementById('cartCount') || document.getElementById('navCartBadge');
+      if (badge) {
+        var count = parseInt(badge.textContent, 10) || 0;
+        badge.textContent = count + 1;
+      }
+
+      if (onComplete) onComplete();
+    }, 750);
+  }
+
   // Add to cart + wishlist (one listener for all cards)
-  // Frontend only for now: updates the cart badge in the navbar.
-  // Member 5 (cart.js) will connect this to the real cart later.
   function initCardButtons() {
     document.addEventListener('click', function (e) {
       var addBtn = e.target.closest('[data-add]');
       if (addBtn) {
-        var badge = $('cartCount');
-        if (badge) {
-          badge.textContent = Number(badge.textContent || 0) + 1;
-          badge.classList.remove('bump');
-          void badge.offsetWidth;            // restart the animation
-          badge.classList.add('bump');
-        }
-        addBtn.classList.add('added');
-        showToast('Added to cart');
+        var card = addBtn.closest('.book-card');
+        var cover = card ? card.querySelector('.book-cover') : addBtn;
+        var bookId = addBtn.getAttribute('data-add');
+        var user = window.BookSwapAuth ? window.BookSwapAuth.currentUser() : null;
+
+        flyToCartAnimation(cover, function () {
+          showToast('Added to cart');
+          addBtn.classList.add('added');
+
+          try {
+            var cart = JSON.parse(localStorage.getItem('bookswap_cart') || '[]');
+            var found = cart.filter(function (c) { return String(c.id || c.BookID) === String(bookId); })[0];
+            if (found) {
+              found.qty = (found.qty || 1) + 1;
+            } else {
+              var bookObj = (window._currentBooksList || BOOKS).filter(function (b) { return String(b.id || b.BookID) === String(bookId); })[0];
+              cart.push({
+                id: bookId,
+                BookID: bookId,
+                title: bookObj ? (bookObj.title || bookObj.Title) : 'Book #' + bookId,
+                price: bookObj ? Number(bookObj.price || bookObj.Price || 0) : 0,
+                qty: 1
+              });
+            }
+            localStorage.setItem('bookswap_cart', JSON.stringify(cart));
+          } catch (err) {}
+
+          if (user && window.BookSwapAPI) {
+            window.BookSwapAPI.cart.add(user.UserID || user.id, bookId).catch(function () {});
+          }
+        });
         return;
       }
 
@@ -440,7 +507,44 @@
 
   /* ========== 7. RUN ========== */
   function run() {
-    renderHome(BOOKS);
+    if (window.BookSwapAPI) {
+      window.BookSwapAPI.listings.getAll()
+        .then(function (res) {
+          var apiBooks = res.books;
+          if (Array.isArray(apiBooks) && apiBooks.length > 0) {
+            var palette = ['#0F172A', '#6C38FF', '#F472B6', '#14B8A6', '#A855F7', '#BE185D', '#0E7490'];
+            var mapped = apiBooks.map(function (b, idx) {
+              return {
+                id: b.BookID,
+                BookID: b.BookID,
+                title: b.Title,
+                author: b.Author,
+                subject: 'programming',
+                price: Number(b.Price || 0),
+                original: Math.round(Number(b.Price || 0) * 1.3),
+                condition: b.BookCondition || 'Good',
+                swap: b.ListingType === 'Swap',
+                seller: 'Student Seller',
+                semester: 4,
+                sold: 15,
+                listedDaysAgo: 1,
+                cover: palette[idx % palette.length],
+                ink: '#FFFFFF'
+              };
+            });
+            window._currentBooksList = mapped;
+            renderHome(mapped);
+          } else {
+            renderHome(BOOKS);
+          }
+        })
+        .catch(function () {
+          renderHome(BOOKS);
+        });
+    } else {
+      renderHome(BOOKS);
+    }
+
     initHeroSearch();
     initFilterTabs();
     initCardButtons();

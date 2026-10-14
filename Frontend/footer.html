@@ -1,3 +1,4 @@
+﻿<!-- </body> -->
 <!-- ===== FOOTER COMPONENT ===== -->
 <footer class="site-footer">
 
@@ -85,21 +86,29 @@
         </ul>
       </div>
 
-      <!-- Newsletter -->
+      <!-- Get Notified (VIP Alerts) -->
       <div class="footer-col footer-newsletter">
-        <h4 class="footer-title">Newsletter</h4>
-        <p class="footer-news-text">Get updates on new books, features and community events.</p>
-        <form class="footer-news-form" id="newsletterForm">
-          <input type="email" placeholder="Enter your email" aria-label="Email address" required>
-          <button type="submit" aria-label="Subscribe">
-            <svg class="icon" viewBox="0 0 24 24"><line x1="5" y1="12" x2="19" y2="12"/><polyline points="12 5 19 12 12 19"/></svg>
-          </button>
-        </form>
-        <label class="footer-check">
-          <input type="checkbox" checked>
-          <span>Subscribe to the newsletter</span>
-        </label>
-        <p class="footer-news-msg" id="newsletterMsg" role="status"></p>
+        <div class="footer-notify-card">
+          <div class="notify-badge"><span class="notify-dot"></span> Get Notified</div>
+          <h4 class="footer-notify-title">Never Miss a Semester Deal</h4>
+          <p class="footer-notify-desc">Get instant campus alerts whenever your department drops cheap textbooks or rare semester guides.</p>
+          <form class="footer-notify-form" id="newsletterForm">
+            <div class="notify-input-wrap">
+              <svg class="notify-icon" viewBox="0 0 24 24"><path d="M4 4h16c1.1 0 2 .9 2 2v12c0 1.1-.9 2-2 2H4c-1.1 0-2-.9-2-2V6c0-1.1.9-2 2-2z"/><polyline points="22,6 12,13 2,6"/></svg>
+              <input type="email" placeholder="Enter campus email..." aria-label="Email address" required>
+            </div>
+            <button type="submit" class="notify-submit-btn">
+              <span>Notify Me</span>
+              <svg class="icon" viewBox="0 0 24 24"><line x1="5" y1="12" x2="19" y2="12"/><polyline points="12 5 19 12 12 19"/></svg>
+            </button>
+          </form>
+          <div class="notify-perks">
+            <span class="notify-perk"><svg viewBox="0 0 20 20" fill="currentColor"><path fill-rule="evenodd" d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z" clip-rule="evenodd"/></svg> Campus Alerts</span>
+            <span class="notify-perk"><svg viewBox="0 0 20 20" fill="currentColor"><path fill-rule="evenodd" d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z" clip-rule="evenodd"/></svg> 0% Spam</span>
+            <span class="notify-perk"><svg viewBox="0 0 20 20" fill="currentColor"><path fill-rule="evenodd" d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z" clip-rule="evenodd"/></svg> Student Perks</span>
+          </div>
+          <p class="footer-news-msg" id="newsletterMsg" role="status"></p>
+        </div>
       </div>
 
     </div>

@@ -31,12 +31,38 @@
 
           <!-- Quick subject chips (filled by main.js) -->
           <div class="hero-chips" id="heroChips" aria-label="Popular subjects"></div>
-
-          <p class="hero-note"><strong id="heroBookCount">0</strong> books listed by students right now</p>
         </div>
 
         <!-- Bookshelf of best sellers (filled by main.js) -->
         <div class="hero-shelf" aria-label="Top picks from CS students">
+          <!-- Background ambient glow aura -->
+          <div class="hero-glow-aura" aria-hidden="true"></div>
+
+          <!-- Floating Creative Badges -->
+          <div class="hero-float-card float-card-left" aria-hidden="true">
+            <span class="float-card-icon">⚡</span>
+            <div class="float-card-text">
+              <strong>100% Verified</strong>
+              <small>Student to Student</small>
+            </div>
+          </div>
+
+          <div class="hero-float-card float-card-right" aria-hidden="true">
+            <span class="float-card-icon">🔄</span>
+            <div class="float-card-text">
+              <strong>Instant Swap</strong>
+              <small>Trade Old Books</small>
+            </div>
+          </div>
+
+          <div class="hero-float-card float-card-badge" aria-hidden="true">
+            <span class="float-card-icon">🔥</span>
+            <div class="float-card-text">
+              <strong>Save Up to 70%</strong>
+              <small>Zero Markup</small>
+            </div>
+          </div>
+
           <div class="shelf-area">
             <div class="shelf-books" id="shelfBooks"></div>
 
@@ -153,6 +179,8 @@
   <div data-include="footer"></div>
 
   <script src="js/include.js"></script>
+  <script src="JS/api.js"></script>
+  <script src="js/auth.js"></script>
   <script src="js/main.js"></script>
 </body>
 </html>

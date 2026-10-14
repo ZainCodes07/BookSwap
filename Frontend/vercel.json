@@ -1,0 +1,9 @@
+{
+  "cleanUrls": true,
+  "rewrites": [
+    { "source": "/css/:path*", "destination": "/CSS/:path*" },
+    { "source": "/js/:path*", "destination": "/JS/:path*" },
+    { "source": "/images/:path*", "destination": "/Images/:path*" },
+    { "source": "/partial/:path*", "destination": "/Partial/:path*" }
+  ]
+}

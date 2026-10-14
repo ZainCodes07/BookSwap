@@ -18,7 +18,11 @@ if (process.env.DB_SERVER) {
     };
 } else {
     // Local Windows SQLEXPRESS fallback
-    sql = require("mssql/msnodesqlv8");
+    try {
+        sql = require("mssql/msnodesqlv8");
+    } catch (e) {
+        sql = require("mssql");
+    }
     config = {
         server: "DESKTOP-1NHQSUD\\SQLEXPRESS01",
         database: "BookSwap",

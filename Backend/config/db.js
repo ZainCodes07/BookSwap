@@ -4,7 +4,7 @@ let sql;
 let config;
 
 if (process.env.DB_SERVER) {
-    // Cloud database (Render / Production / SmarterASP)
+    // Cloud database (SmarterASP / Cloud MSSQL)
     sql = require("mssql");
     config = {
         server: process.env.DB_SERVER,
@@ -29,11 +29,19 @@ if (process.env.DB_SERVER) {
     };
 }
 
+let isConnected = false;
+
 async function connectDB() {
+    if (isConnected) return;
     try {
         await sql.connect(config);
+        isConnected = true;
         console.log("SQL Server connected successfully!");
     } catch (error) {
+        if (error.code === 'EALREADYCONNECTED' || (error.message && error.message.includes('already connected'))) {
+            isConnected = true;
+            return;
+        }
         console.error("Database connection failed:", error);
     }
 }

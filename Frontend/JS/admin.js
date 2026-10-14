@@ -240,6 +240,7 @@
               (u.blocked
                 ? '<button type="button" class="adm-btn adm-btn-sm adm-btn-ghost" data-unblock="' + u.id + '">Unblock</button>'
                 : '<button type="button" class="adm-btn adm-btn-sm adm-btn-danger-ghost" data-block="' + u.id + '">Block</button>') +
+              ' <button type="button" class="adm-btn adm-btn-sm adm-btn-danger-ghost" data-delete-user="' + u.id + '" style="color:#EF4444;border-color:rgba(239,68,68,0.3)">Delete</button>' +
             '</td>' +
           '</tr>';
       }).join('') : emptyRow(7, 'No users match your search.');
@@ -251,6 +252,20 @@
     $('userRows').addEventListener('click', function (e) {
       var blockBtn = e.target.closest('[data-block]');
       var unblockBtn = e.target.closest('[data-unblock]');
+      var deleteUserBtn = e.target.closest('[data-delete-user]');
+
+      if (deleteUserBtn) {
+        var delU = findUser(deleteUserBtn.getAttribute('data-delete-user'));
+        confirmBox('Delete ' + delU.name + '?', 'This will permanently remove this user from the system.', 'Delete User', true, function () {
+          if (window.BookSwapAPI && delU.id) {
+            window.BookSwapAPI.admin.deleteUser(delU.id).catch(function () {});
+          }
+          USERS = USERS.filter(function (x) { return String(x.id) !== String(delU.id); });
+          toast(delU.name + ' deleted.');
+          render();
+        });
+        return;
+      }
 
       if (blockBtn) {
         var u = findUser(blockBtn.getAttribute('data-block'));
@@ -359,7 +374,10 @@
           rejecting ? 'Reject listing' : 'Remove listing',
           true,
           function () {
-            item.status = 'removed';   // BACKEND: POST /api/admin/listings/:id/remove
+            item.status = 'removed';
+            if (window.BookSwapAPI && item.id) {
+              window.BookSwapAPI.admin.deleteListing(item.id).catch(function () {});
+            }
             toast('"' + item.title + '" was ' + (rejecting ? 'rejected.' : 'removed.'));
             render();
           }
@@ -426,7 +444,53 @@
 
   /* ========== 7. RUN ========== */
   function run() {
-    // On phones the menu scrolls sideways: make sure the current page's link is visible
+    var user = (window.BookSwapAuth && window.BookSwapAuth.currentUser()) || (window.BookSwapAPI && window.BookSwapAPI.getCurrentUser());
+    if (user && user.Role !== 'Admin' && user.role !== 'admin') {
+      alert("Access restricted: Only Admin accounts can access the Admin Dashboard.");
+      window.location.href = "../index.html";
+      return;
+    }
+
+    if (window.BookSwapAPI) {
+      Promise.all([
+        window.BookSwapAPI.admin.getUsers().catch(function () { return { users: [] }; }),
+        window.BookSwapAPI.admin.getListings().catch(function () { return { listings: [] }; })
+      ]).then(function (results) {
+        if (results[0] && Array.isArray(results[0].users) && results[0].users.length) {
+          USERS = results[0].users.map(function (u) {
+            return {
+              id: u.UserID,
+              name: u.FullName,
+              email: u.Email,
+              semester: 4,
+              listings: 1,
+              joined: (u.CreatedAt || new Date().toISOString()).slice(0, 10),
+              blocked: false
+            };
+          });
+        }
+        if (results[1] && Array.isArray(results[1].listings) && results[1].listings.length) {
+          LISTINGS = results[1].listings.map(function (l) {
+            return {
+              id: l.BookID,
+              title: l.Title,
+              course: 'programming',
+              seller: 'Seller #' + l.SellerID,
+              condition: l.BookCondition,
+              price: Number(l.Price || 0),
+              listed: (l.CreatedAt || new Date().toISOString()).slice(0, 10),
+              status: 'live'
+            };
+          });
+        }
+        executePage();
+      });
+    } else {
+      executePage();
+    }
+  }
+
+  function executePage() {
     var current = document.querySelector('.adm-nav [aria-current="page"]');
     if (current && window.innerWidth <= 820) {
       current.parentElement.parentElement.scrollLeft = current.parentElement.offsetLeft - 16;

@@ -1,32 +1,13 @@
-/* BOOK DETAILS PAGE + IN-APP CHAT
-   Open with ?id=3 (example: book-details.html?id=3).
-   Add &chat=1 to open the chat panel automatically.
-
-   BOOKS is placeholder data shaped like a real API response.
-   Backend-ready spots (replace with fetch() when the API exists):
-   - getBookById()
-   - loadMessages()
-   - saveMessage()  */
+/* ==========================================================================
+   BOOKSWAP - book-details.js
+   Loads book details from Backend API (GET /api/listings/:id)
+   Integrated with Backend Chat API and Fly-to-Cart animation
+   ========================================================================== */
 
 (function () {
   "use strict";
 
-  var BOOKS = {
-    1:  { id: 1,  sellerId: 1,  seller: "Ahmed R.",   title: "Introduction to Programming",  price: 850,  subject: "Programming Fundamentals", degree: "Software Engineering",    semester: "Sem 1", condition: "Good",     rating: 4, reviews: 23, description: "Slightly used, no missing pages, a few pencil underlines in Ch.3." },
-    2:  { id: 2,  sellerId: 2,  seller: "Sara K.",    title: "Calculus & Analytic Geometry", price: 600,  subject: "Mathematics",              degree: "Software Engineering",    semester: "Sem 1", condition: "Like New", rating: 5, reviews: 11, description: "Barely used, no markings inside." },
-    3:  { id: 3,  sellerId: 3,  seller: "Bilal H.",   title: "Intro to Machine Learning",    price: 1200, subject: "Machine Learning",         degree: "Artificial Intelligence", semester: "Sem 5", condition: "Fair",     rating: 4, reviews: 8,  description: "Well used but complete, some highlighter marks in the first chapters." },
-    4:  { id: 4,  sellerId: 4,  seller: "Hina M.",    title: "Applied Physics",              price: 550,  subject: "Physics",                  degree: "Software Engineering",    semester: "Sem 2", condition: "Good",     rating: 4, reviews: 6,  description: "All chapters intact, light pencil notes in margins." },
-    5:  { id: 5,  sellerId: 5,  seller: "Usman T.",   title: "Data Structures & Algorithms", price: 900,  subject: "Data Structures",          degree: "Computer Science",        semester: "Sem 3", condition: "Like New", rating: 5, reviews: 15, description: "Almost new, used for one semester only." },
-    6:  { id: 6,  sellerId: 6,  seller: "Zara A.",    title: "Linear Algebra",               price: 500,  subject: "Mathematics",              degree: "Artificial Intelligence", semester: "Sem 2", condition: "Good",     rating: 4, reviews: 9,  description: "Clean copy with solved examples marked in a few chapters." },
-    7:  { id: 7,  sellerId: 7,  seller: "Daniyal S.", title: "Operating Systems Concepts",   price: 750,  subject: "Operating Systems",        degree: "Computer Science",        semester: "Sem 4", condition: "Fair",     rating: 3, reviews: 5,  description: "Older edition but still relevant. Spine slightly loose." },
-    8:  { id: 8,  sellerId: 8,  seller: "Maryam F.",  title: "Database Systems",             price: 700,  subject: "Databases",                degree: "Computer Science",        semester: "Sem 4", condition: "Good",     rating: 4, reviews: 12, description: "Complete book with clean pages." },
-    9:  { id: 9,  sellerId: 9,  seller: "Areeba N.",  title: "English Composition",          price: 400,  subject: "English",                  degree: "Software Engineering",    semester: "Sem 1", condition: "Good",     rating: 4, reviews: 4,  description: "Useful for report writing. Light usage." },
-    10: { id: 10, sellerId: 10, seller: "Hamza Q.",   title: "Python Programming",           price: 650,  subject: "Python",                   degree: "Artificial Intelligence", semester: "Sem 2", condition: "Like New", rating: 5, reviews: 14, description: "Exercises included, none filled in." },
-    11: { id: 11, sellerId: 11, seller: "Fatima L.",  title: "Probability & Statistics",     price: 580,  subject: "Statistics",               degree: "Artificial Intelligence", semester: "Sem 3", condition: "Good",     rating: 4, reviews: 7,  description: "Complete with practice problem sets." }
-  };
-
   var CHAT_ICON = '<svg viewBox="0 0 24 24"><path d="M21 12a8 8 0 01-11.6 7.1L3 21l1.9-5.4A8 8 0 1121 12z"/></svg>';
-  var CHAT_KEY = "bookswap_chat_";
   var CART_KEY = "bookswap_cart";
 
   var wrap = document.getElementById("bdWrap");
@@ -41,112 +22,150 @@
   var currentBook = null;
   var lastTrigger = null;
 
-
-  /* ================= DATA LAYER (placeholder) ================= */
-
-  function getBookById(id) {
-    // future: return fetch("/api/books/" + id).then(function (r) { return r.json(); });
-    return BOOKS[id] || null;
-  }
-
-  function loadMessages(bookId) {
-    // future: return fetch("/api/books/" + bookId + "/messages").then(function (r) { return r.json(); });
-    try {
-      var data = JSON.parse(localStorage.getItem(CHAT_KEY + bookId) || "[]");
-      return Array.isArray(data) ? data : [];
-    } catch (err) {
-      return [];
-    }
-  }
-
-  function saveMessage(bookId, text) {
-    // future: return fetch("/api/books/" + bookId + "/messages", { method: "POST", body: JSON.stringify({ text: text }) });
-    var messages = loadMessages(bookId);
-    var message = { from: "me", text: text, ts: Date.now() };
-    messages.push(message);
-    try {
-      localStorage.setItem(CHAT_KEY + bookId, JSON.stringify(messages));
-    } catch (err) {
-      /* storage blocked: message still shows for this visit */
-    }
-    return message;
-  }
-
-
   /* ================= HELPERS ================= */
 
   function esc(value) {
     var div = document.createElement("div");
-    div.textContent = String(value);
+    div.textContent = String(value == null ? "" : value);
     return div.innerHTML;
   }
 
   function stars(n) {
+    n = Math.min(5, Math.max(1, Math.round(n || 4)));
     return "★★★★★".slice(0, n) + "☆☆☆☆☆".slice(0, 5 - n);
   }
 
-  function readCart() {
-    try {
-      var cart = JSON.parse(localStorage.getItem(CART_KEY) || "[]");
-      return Array.isArray(cart) ? cart : [];
-    } catch (err) {
-      return [];
-    }
-  }
-
-  function updateCartBadge() {
-    var total = readCart().reduce(function (sum, item) { return sum + item.qty; }, 0);
-    var badge = document.getElementById("navCartBadge");
-    if (badge) badge.textContent = total;
-  }
-
-  function addToCart(book) {
-    var cart = readCart();
-    var existing = cart.filter(function (item) { return item.id === book.id; })[0];
-
-    if (existing) {
-      existing.qty += 1;
-    } else {
-      cart.push({ id: book.id, title: book.title, price: book.price, qty: 1 });
-    }
-
-    try {
-      localStorage.setItem(CART_KEY, JSON.stringify(cart));
-    } catch (err) {
-      /* storage blocked */
-    }
-    updateCartBadge();
-  }
-
-
-  /* ================= CHAT PANEL ================= */
-
   function formatTime(ts) {
+    if (!ts) return "";
     return new Date(ts).toLocaleTimeString([], { hour: "numeric", minute: "2-digit" });
   }
 
-  function renderChat() {
-    if (!currentBook) return;
+  /* ================= FLY TO CART ANIMATION ================= */
 
-    var messages = loadMessages(currentBook.id);
+  function flyToCart(sourceEl, onComplete) {
+    var cartBtn = document.getElementById("cartBtn");
+    if (!cartBtn || !sourceEl) {
+      if (onComplete) onComplete();
+      return;
+    }
+
+    var startRect = sourceEl.getBoundingClientRect();
+    var endRect = cartBtn.getBoundingClientRect();
+
+    var clone = sourceEl.cloneNode(true);
+    clone.className = "cart-fly-clone";
+    clone.style.left = startRect.left + "px";
+    clone.style.top = startRect.top + "px";
+    clone.style.width = startRect.width + "px";
+    clone.style.height = startRect.height + "px";
+    clone.style.opacity = "1";
+
+    document.body.appendChild(clone);
+
+    // Force layout reflow
+    clone.getBoundingClientRect();
+
+    // Animate to cart position
+    var targetX = endRect.left + endRect.width / 2 - 15;
+    var targetY = endRect.top + endRect.height / 2 - 15;
+
+    clone.style.left = targetX + "px";
+    clone.style.top = targetY + "px";
+    clone.style.width = "30px";
+    clone.style.height = "30px";
+    clone.style.opacity = "0.2";
+    clone.style.transform = "scale(0.2) rotate(360deg)";
+
+    setTimeout(function () {
+      if (clone.parentNode) clone.parentNode.removeChild(clone);
+      cartBtn.classList.remove("cart-hit");
+      void cartBtn.offsetWidth; // reflow
+      cartBtn.classList.add("cart-hit");
+
+      var badge = document.getElementById("cartCount") || document.getElementById("navCartBadge");
+      if (badge) {
+        var count = parseInt(badge.textContent, 10) || 0;
+        badge.textContent = count + 1;
+      }
+
+      if (onComplete) onComplete();
+    }, 750);
+  }
+
+  /* ================= CART OPERATIONS ================= */
+
+  function handleAddToCart(book, sourceEl) {
+    var user = window.BookSwapAuth ? window.BookSwapAuth.currentUser() : null;
+
+    flyToCart(sourceEl, function () {
+      // Sync with localStorage
+      try {
+        var cart = JSON.parse(localStorage.getItem(CART_KEY) || "[]");
+        var bookId = book.BookID || book.id;
+        var existing = cart.filter(function (c) { return (c.BookID || c.id) === bookId; })[0];
+        if (existing) {
+          existing.qty = (existing.qty || 1) + 1;
+        } else {
+          cart.push({
+            id: bookId,
+            BookID: bookId,
+            title: book.Title || book.title,
+            price: Number(book.Price || book.price || 0),
+            qty: 1
+          });
+        }
+        localStorage.setItem(CART_KEY, JSON.stringify(cart));
+      } catch (e) {}
+
+      // If user is logged in, sync with Backend API
+      if (user && window.BookSwapAPI) {
+        window.BookSwapAPI.cart.add(user.UserID || user.id, book.BookID || book.id)
+          .catch(function (err) {
+            console.warn("[Cart API Sync]", err.message);
+          });
+      }
+    });
+  }
+
+  /* ================= CHAT ================= */
+
+  function loadMessages(sellerId) {
+    var user = window.BookSwapAuth ? window.BookSwapAuth.currentUser() : null;
+    if (!user || !window.BookSwapAPI) return Promise.resolve([]);
+
+    return window.BookSwapAPI.chat.getConversation(user.UserID || user.id, sellerId)
+      .then(function (res) {
+        return res.messages || [];
+      })
+      .catch(function () {
+        return [];
+      });
+  }
+
+  function renderChat(messages) {
+    if (!currentBook) return;
     chatMessages.innerHTML = "";
 
-    if (messages.length === 0) {
+    var user = window.BookSwapAuth ? window.BookSwapAuth.currentUser() : null;
+    var currentUserId = user ? (user.UserID || user.id) : null;
+
+    if (!messages || messages.length === 0) {
       var emptyNote = document.createElement("p");
       emptyNote.className = "bd-chat-empty";
-      emptyNote.textContent = "No messages yet. Say hello to " + currentBook.seller + "!";
+      emptyNote.textContent = "No messages yet. Say hello to " + (currentBook.sellerName || "Seller") + "!";
       chatMessages.appendChild(emptyNote);
       return;
     }
 
     messages.forEach(function (m) {
+      var isMe = m.SenderID === currentUserId || m.from === "me";
       var bubble = document.createElement("div");
-      bubble.className = "bd-msg " + (m.from === "me" ? "bd-msg-me" : "bd-msg-them");
-      bubble.textContent = m.text;
+      bubble.className = "bd-msg " + (isMe ? "bd-msg-me" : "bd-msg-them");
+      bubble.textContent = m.MessageText || m.text;
 
       var time = document.createElement("span");
       time.className = "bd-msg-time";
-      time.textContent = formatTime(m.ts);
+      time.textContent = formatTime(m.CreatedAt || m.ts);
       bubble.appendChild(time);
 
       chatMessages.appendChild(bubble);
@@ -157,13 +176,22 @@
 
   function openChat(trigger) {
     if (!currentBook) return;
+
+    var Auth = window.BookSwapAuth;
+    if (!Auth || !Auth.isLoggedIn()) {
+      if (Auth) Auth.open('login', { reason: 'Sign in to message the seller.' });
+      return;
+    }
+
     lastTrigger = trigger || null;
-    chatName.textContent = currentBook.seller;
-    chatBook.textContent = "About: " + currentBook.title;
-    renderChat();
+    chatName.textContent = currentBook.sellerName || "Seller";
+    chatBook.textContent = "About: " + (currentBook.Title || currentBook.title);
+
     chatEl.classList.add("is-open");
     chatEl.setAttribute("aria-hidden", "false");
     chatInput.focus();
+
+    loadMessages(currentBook.SellerID || currentBook.sellerId || 1).then(renderChat);
   }
 
   function closeChat() {
@@ -183,70 +211,99 @@
     var text = chatInput.value.trim();
     if (!text || !currentBook) return;
 
-    saveMessage(currentBook.id, text);
-    chatInput.value = "";
-    renderChat();
+    var user = window.BookSwapAuth ? window.BookSwapAuth.currentUser() : null;
+    if (!user) return;
+
+    var senderId = user.UserID || user.id;
+    var receiverId = currentBook.SellerID || currentBook.sellerId || 1;
+    var bookId = currentBook.BookID || currentBook.id;
+
+    if (window.BookSwapAPI) {
+      window.BookSwapAPI.chat.send(senderId, receiverId, bookId, text)
+        .then(function () {
+          chatInput.value = "";
+          loadMessages(receiverId).then(renderChat);
+        })
+        .catch(function (err) {
+          alert("Could not send message: " + err.message);
+        });
+    }
   });
 
-
-  /* ================= PAGE RENDER ================= */
+  /* ================= RENDER BOOK ================= */
 
   function render(book) {
+    var title = book.Title || book.title || "Untitled Book";
+    var author = book.Author || book.author || "Unknown Author";
+    var price = Number(book.Price || book.price || 0);
+    var condition = book.BookCondition || book.condition || "Good";
+    var listingType = book.ListingType || (book.swap ? "Swap" : "Sale");
+    var description = book.Description || book.description || "No description provided.";
+    var sellerName = book.sellerName || "Student Seller";
+
     wrap.innerHTML =
-      '<div class="bd-cover">' +
-        '<span class="bd-badge">' + esc(book.condition.toUpperCase()) + '</span>' +
-        '<span class="bd-label">' + esc(book.subject) + '</span>' +
+      '<div class="bd-cover" id="bdCoverBox" style="background: linear-gradient(135deg, #6C38FF, #3B2470); color: #fff; display: flex; flex-direction: column; justify-content: center; align-items: center; padding: 40px; border-radius: 16px; position: relative; min-height: 380px;">' +
+        '<span class="bd-badge" style="position: absolute; top: 16px; left: 16px;">' + esc(condition.toUpperCase()) + '</span>' +
+        '<span class="bd-label" style="position: absolute; top: 16px; right: 16px; background: rgba(255,255,255,0.2); padding: 4px 10px; border-radius: 999px; font-size: 12px;">' + esc(listingType) + '</span>' +
+        '<div style="text-align: center;">' +
+          '<h2 style="font-size: 24px; margin-bottom: 8px; color: #fff;">' + esc(title) + '</h2>' +
+          '<p style="font-size: 16px; color: #E0E7FF;">' + esc(author) + '</p>' +
+        '</div>' +
         '<button class="bd-chat-fab" type="button" data-open-chat aria-label="Chat with seller">' + CHAT_ICON + '</button>' +
       '</div>' +
       '<div class="bd-info">' +
-        '<h1 class="bd-title">' + esc(book.title) + '</h1>' +
-        '<div class="bd-stars">' + stars(book.rating) + ' <span>(' + esc(book.reviews) + ' reviews)</span></div>' +
-        '<div class="bd-price">Rs. ' + esc(book.price) + '</div>' +
-        '<div class="bd-seller"><span class="bd-seller-avatar"></span>Sold by ' + esc(book.seller) + ' · ' + esc(book.degree) + ' · ' + esc(book.semester) + '</div>' +
-        '<p class="bd-desc">' + esc(book.description) + '</p>' +
-        '<div class="bd-tags"><span>' + esc(book.subject) + '</span><span>' + esc(book.condition) + '</span></div>' +
-        '<button class="bd-btn bd-btn-primary" id="bdAddToCart" type="button">Add to Cart - Rs. ' + esc(book.price) + '</button>' +
-        '<button class="bd-btn bd-btn-ghost" type="button" data-open-chat>Message Seller</button>' +
+        '<h1 class="bd-title">' + esc(title) + '</h1>' +
+        '<div class="bd-stars">' + stars(4) + ' <span>(Verified Student Listing)</span></div>' +
+        '<div class="bd-price">Rs. ' + esc(price.toLocaleString("en-PK")) + '</div>' +
+        '<div class="bd-seller"><span class="bd-seller-avatar"></span>' + esc(sellerName) + ' &middot; ' + esc(listingType) + '</div>' +
+        '<p class="bd-desc">' + esc(description) + '</p>' +
+        '<div class="bd-tags"><span>' + esc(condition) + '</span><span>' + esc(listingType) + '</span></div>' +
+        '<div style="display: flex; gap: 12px; margin-top: 24px; flex-wrap: wrap;">' +
+          '<button class="btn btn-primary" id="bdAddToCart" type="button" style="padding: 12px 24px; font-size: 16px; border-radius: 8px;">Add to Cart - Rs. ' + esc(price) + '</button>' +
+          '<button class="btn btn-outline" id="bdChatBtn" type="button" data-open-chat style="padding: 12px 24px; font-size: 16px; border-radius: 8px;">Chat with Seller</button>' +
+        '</div>' +
       '</div>';
+
+    var coverBox = document.getElementById("bdCoverBox");
+    var addToCartBtn = document.getElementById("bdAddToCart");
+
+    addToCartBtn.addEventListener("click", function () {
+      handleAddToCart(book, coverBox);
+      var originalText = addToCartBtn.textContent;
+      addToCartBtn.textContent = "Added to Cart ✓";
+      setTimeout(function () { addToCartBtn.textContent = originalText; }, 1400);
+    });
 
     var openers = wrap.querySelectorAll("[data-open-chat]");
     Array.prototype.forEach.call(openers, function (btn) {
       btn.addEventListener("click", function () { openChat(btn); });
     });
-
-    var cartBtn = document.getElementById("bdAddToCart");
-    cartBtn.addEventListener("click", function () {
-      addToCart(book);
-      var original = cartBtn.textContent;
-      cartBtn.textContent = "Added to cart ✓";
-      setTimeout(function () { cartBtn.textContent = original; }, 1500);
-    });
   }
 
-
-  /* ================= INIT ================= */
+  /* ================= INITIAL LOAD ================= */
 
   var params = new URLSearchParams(window.location.search);
-  var id = parseInt(params.get("id"), 10) || 1;
-  var book = getBookById(id);
+  var bookId = parseInt(params.get("id"), 10) || 1;
 
-  if (!book) {
-    wrap.innerHTML = '<p class="bd-notfound">Sorry, this book listing could not be found.</p>';
-  } else {
-    currentBook = book;
-    document.title = book.title + " - BookSwap";
-    render(book);
-    if (params.get("chat") === "1") openChat(null);
+  if (window.BookSwapAPI) {
+    window.BookSwapAPI.listings.getById(bookId)
+      .then(function (res) {
+        var book = res.book;
+        if (!book) throw new Error("Book not found");
+        currentBook = book;
+        document.title = (book.Title || "Book") + " - BookSwap";
+        render(book);
+        if (params.get("chat") === "1") openChat(null);
+      })
+      .catch(function (err) {
+        console.warn("[Book Details Fetch Error]", err.message);
+        wrap.innerHTML =
+          '<div style="text-align: center; padding: 60px 20px;">' +
+            '<h2>Book Listing #' + bookId + '</h2>' +
+            '<p style="color: #64748B; margin: 12px 0 24px;">' + esc(err.message || "Book listing not found in database.") + '</p>' +
+            '<a href="index.html" class="btn btn-primary">Browse All Books</a>' +
+          '</div>';
+      });
   }
 
-  /* navbar: mobile menu button */
-  var nav = document.querySelector(".site-nav");
-  var navToggle = document.querySelector(".nav-toggle");
-  if (nav && navToggle) {
-    navToggle.addEventListener("click", function () {
-      nav.classList.toggle("open");
-    });
-  }
-
-  updateCartBadge();
 })();

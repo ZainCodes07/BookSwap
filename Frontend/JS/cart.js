@@ -131,9 +131,14 @@
   }
 
   function removeItem(id) {
-    var cart = readCart().filter(function (c) { return String(c.id) !== id; });
+    var cart = readCart().filter(function (c) { return String(c.id) !== String(id); });
     writeCart(cart);
     render();
+
+    var user = window.BookSwapAuth ? window.BookSwapAuth.currentUser() : null;
+    if (user && window.BookSwapAPI) {
+      window.BookSwapAPI.cart.removeBook(user.UserID || user.id, id).catch(function () {});
+    }
   }
 
   itemsEl.addEventListener("click", function (e) {

@@ -67,11 +67,37 @@
     return readAll().filter(function (l) { return l.id === id; })[0] || null;
   }
 
-  function save(listing) {                       // BACKEND: POST / PUT /api/listings
+  function save(listing) {
+    var user = Auth.currentUser();
     var list = readAll();
     var i = list.findIndex(function (l) { return l.id === listing.id; });
     if (i === -1) list.push(listing); else list[i] = listing;
-    if (!writeAll(list)) throw new Error('Browser storage is full');
+    writeAll(list);
+
+    if (window.BookSwapAPI && user) {
+      var backendPayload = {
+        SellerID: user.UserID || user.id || 1,
+        CategoryID: 1,
+        CourseID: null,
+        Title: listing.title || listing.Title,
+        Author: listing.author || listing.Author || "Unknown",
+        Description: listing.description || listing.Description || null,
+        Price: Number(listing.price || listing.Price || 0),
+        BookCondition: listing.condition || listing.BookCondition || "Good",
+        ListingType: listing.swap ? "Swap" : "Sale"
+      };
+
+      if (listing.BookID) {
+        window.BookSwapAPI.listings.update(listing.BookID, Object.assign({}, backendPayload, { Status: 'Available' }))
+          .catch(function (e) { console.warn('Listing update API error:', e.message); });
+      } else {
+        window.BookSwapAPI.listings.create(backendPayload)
+          .then(function (res) {
+            if (res.book && res.book.BookID) listing.BookID = res.book.BookID;
+          })
+          .catch(function (e) { console.warn('Listing create API error:', e.message); });
+      }
+    }
     return listing;
   }
 
@@ -82,8 +108,11 @@
     return save(l);
   }
 
-  function remove(id) {                          // BACKEND: DELETE /api/listings/:id
+  function remove(id) {
     writeAll(readAll().filter(function (l) { return l.id !== id; }));
+    if (window.BookSwapAPI) {
+      window.BookSwapAPI.listings.delete(id).catch(function () {});
+    }
   }
 
   function price(n) {

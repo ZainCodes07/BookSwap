@@ -93,11 +93,15 @@
     var link = 'book-details.html?id=' + book.id;
     var conditionClass = 'cond-' + book.condition.toLowerCase().replace(' ', '-');
 
+    var coverContent = (book.photo || book.ImageUrl)
+      ? '<img src="' + esc(book.photo || book.ImageUrl) + '" alt="' + esc(book.title) + '" style="width: 100%; height: 100%; object-fit: cover; position: absolute; top: 0; left: 0; border-radius: 8px;">'
+      : '<span class="cover-title">' + esc(book.title) + '</span>' +
+        '<span class="cover-author">' + esc(book.author) + '</span>';
+
     return '' +
       '<article class="book-card">' +
-        '<a href="' + link + '" class="book-cover" style="--cover:' + book.cover + ';--ink:' + book.ink + '" aria-label="' + esc(book.title) + '">' +
-          '<span class="cover-title">' + esc(book.title) + '</span>' +
-          '<span class="cover-author">' + esc(book.author) + '</span>' +
+        '<a href="' + link + '" class="book-cover" style="--cover:' + book.cover + ';--ink:' + book.ink + '; position: relative; overflow: hidden;" aria-label="' + esc(book.title) + '">' +
+          coverContent +
           '<span class="cover-off">-' + discount(book) + '%</span>' +
         '</a>' +
         '<button type="button" class="wish-btn" data-wish="' + book.id + '" aria-label="Save ' + esc(book.title) + ' to wishlist" aria-pressed="false">' +
@@ -355,7 +359,8 @@
                 BookID: bookId,
                 title: bookObj ? (bookObj.title || bookObj.Title) : 'Book #' + bookId,
                 price: bookObj ? Number(bookObj.price || bookObj.Price || 0) : 0,
-                qty: 1
+                qty: 1,
+                photo: bookObj ? (bookObj.photo || bookObj.ImageUrl) : null
               });
             }
             localStorage.setItem('bookswap_cart', JSON.stringify(cart));
@@ -519,7 +524,7 @@
                 BookID: b.BookID,
                 title: b.Title,
                 author: b.Author,
-                subject: 'programming',
+                subject: b.CourseName || 'programming',
                 price: Number(b.Price || 0),
                 original: Math.round(Number(b.Price || 0) * 1.3),
                 condition: b.BookCondition || 'Good',
@@ -529,7 +534,9 @@
                 sold: 15,
                 listedDaysAgo: 1,
                 cover: palette[idx % palette.length],
-                ink: '#FFFFFF'
+                ink: '#FFFFFF',
+                photo: b.ImageUrl || null,
+                ImageUrl: b.ImageUrl || null
               };
             });
             window._currentBooksList = mapped;

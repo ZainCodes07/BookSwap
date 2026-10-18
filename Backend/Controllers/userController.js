@@ -69,6 +69,7 @@ const updateUser = async (req, res) => {
 
         const {
             FullName,
+            Role,
             Phone,
             Address
         } = req.body;
@@ -89,6 +90,7 @@ const updateUser = async (req, res) => {
 
         const updatedUser = await User.updateUser(userId, {
             FullName,
+            Role,
             Phone,
             Address
         });

@@ -39,7 +39,8 @@
           id: item.id,
           title: item.title,
           price: Number(item.price),
-          qty: Math.min(MAX_QTY, Math.floor(Number(item.qty)))
+          qty: Math.min(MAX_QTY, Math.floor(Number(item.qty))),
+          photo: item.photo || null
         };
       });
     } catch (err) {
@@ -71,9 +72,10 @@
   function itemHtml(item) {
     var id = esc(item.id);
     var title = esc(item.title);
+    var thumbStyle = item.photo ? ' style="background-image: url(\'' + esc(item.photo) + '\'); background-size: cover; background-position: center; border-radius: 6px;"' : '';
 
     return '<div class="cart-item">' +
-      '<span class="cart-thumb"></span>' +
+      '<span class="cart-thumb"' + thumbStyle + '></span>' +
       '<div class="cart-item-info">' +
         '<h3 class="cart-item-title">' + title + '</h3>' +
         '<span class="cart-item-price">' + money(item.price * item.qty) + '</span>' +

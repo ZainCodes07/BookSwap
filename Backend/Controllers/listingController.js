@@ -92,7 +92,9 @@ const createListing = async (req, res) => {
             Description,
             Price,
             BookCondition,
-            ListingType
+            ListingType,
+            ImageUrl,
+            CourseName
         } = req.body;
 
         if (
@@ -117,7 +119,9 @@ const createListing = async (req, res) => {
             Description,
             Price,
             BookCondition,
-            ListingType
+            ListingType,
+            ImageUrl,
+            CourseName
         });
 
         res.status(201).json({
@@ -163,7 +167,9 @@ const updateListing = async (req, res) => {
             Price,
             BookCondition,
             ListingType,
-            Status
+            Status,
+            ImageUrl,
+            CourseName
         } = req.body;
 
         if (
@@ -190,7 +196,9 @@ const updateListing = async (req, res) => {
                 Price,
                 BookCondition,
                 ListingType,
-                Status
+                Status,
+                ImageUrl,
+                CourseName
             }
         );
 

@@ -611,7 +611,30 @@
     var mode = state.payoutMode;
 
     if (data) user.payout = data;
-    if (mode === 'upgrade') user.role = 'seller';   // BACKEND: POST /api/users/me/become-seller
+    if (mode === 'upgrade') {
+      user.role = 'seller';
+      user.Role = 'Seller';
+      if (window.BookSwapAPI) {
+        var rawUser = window.BookSwapAPI.getCurrentUser() || {};
+        rawUser.Role = 'Seller';
+        rawUser.role = 'seller';
+        window.BookSwapAPI.setCurrentUser(rawUser);
+
+        var uid = user.id || user.UserID || rawUser.UserID;
+        if (uid) {
+          window.BookSwapAPI.users.update(uid, {
+            FullName: user.name || user.FullName || rawUser.FullName || 'User',
+            Role: 'Seller'
+          }).then(function (res) {
+            if (res && res.user) {
+              window.BookSwapAPI.setCurrentUser(res.user);
+            }
+          }).catch(function (e) {
+            console.warn('[Become Seller API Error]', e.message);
+          });
+        }
+      }
+    }
     saveUser(user);
     announceChange();
 

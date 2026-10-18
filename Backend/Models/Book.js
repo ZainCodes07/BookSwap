@@ -63,36 +63,72 @@ const Book = {
         request.input("Price", sql.Decimal(10, 2), book.Price || null);
         request.input("BookCondition", sql.NVarChar(50), book.BookCondition);
         request.input("ListingType", sql.NVarChar(20), book.ListingType);
+        request.input("ImageUrl", sql.NVarChar(sql.MAX), book.ImageUrl || null);
+        request.input("CourseName", sql.NVarChar(100), book.CourseName || null);
 
-        const result = await request.query(`
-            INSERT INTO Books
-            (
-                SellerID,
-                CategoryID,
-                CourseID,
-                Title,
-                Author,
-                Description,
-                Price,
-                BookCondition,
-                ListingType
-            )
-            OUTPUT INSERTED.*
-            VALUES
-            (
-                @SellerID,
-                @CategoryID,
-                @CourseID,
-                @Title,
-                @Author,
-                @Description,
-                @Price,
-                @BookCondition,
-                @ListingType
-            )
-        `);
-
-        return result.recordset[0];
+        try {
+            const result = await request.query(`
+                INSERT INTO Books
+                (
+                    SellerID,
+                    CategoryID,
+                    CourseID,
+                    Title,
+                    Author,
+                    Description,
+                    Price,
+                    BookCondition,
+                    ListingType,
+                    ImageUrl,
+                    CourseName
+                )
+                OUTPUT INSERTED.*
+                VALUES
+                (
+                    @SellerID,
+                    @CategoryID,
+                    @CourseID,
+                    @Title,
+                    @Author,
+                    @Description,
+                    @Price,
+                    @BookCondition,
+                    @ListingType,
+                    @ImageUrl,
+                    @CourseName
+                )
+            `);
+            return result.recordset[0];
+        } catch (colErr) {
+            const fallbackResult = await request.query(`
+                INSERT INTO Books
+                (
+                    SellerID,
+                    CategoryID,
+                    CourseID,
+                    Title,
+                    Author,
+                    Description,
+                    Price,
+                    BookCondition,
+                    ListingType
+                )
+                OUTPUT INSERTED.*
+                VALUES
+                (
+                    @SellerID,
+                    @CategoryID,
+                    @CourseID,
+                    @Title,
+                    @Author,
+                    @Description,
+                    @Price,
+                    @BookCondition,
+                    @ListingType
+                )
+            `);
+            return fallbackResult.recordset[0];
+        }
     },
 
     // Update book
@@ -110,25 +146,47 @@ const Book = {
         request.input("Price", sql.Decimal(10, 2), book.Price || null);
         request.input("BookCondition", sql.NVarChar(50), book.BookCondition);
         request.input("ListingType", sql.NVarChar(20), book.ListingType);
-        request.input("Status", sql.NVarChar(20), book.Status);
+        request.input("Status", sql.NVarChar(20), book.Status || 'Available');
+        request.input("ImageUrl", sql.NVarChar(sql.MAX), book.ImageUrl || null);
+        request.input("CourseName", sql.NVarChar(100), book.CourseName || null);
 
-        const result = await request.query(`
-            UPDATE Books
-            SET
-                CategoryID = @CategoryID,
-                CourseID = @CourseID,
-                Title = @Title,
-                Author = @Author,
-                Description = @Description,
-                Price = @Price,
-                BookCondition = @BookCondition,
-                ListingType = @ListingType,
-                Status = @Status
-            OUTPUT INSERTED.*
-            WHERE BookID = @BookID
-        `);
-
-        return result.recordset[0];
+        try {
+            const result = await request.query(`
+                UPDATE Books
+                SET
+                    CategoryID = @CategoryID,
+                    CourseID = @CourseID,
+                    Title = @Title,
+                    Author = @Author,
+                    Description = @Description,
+                    Price = @Price,
+                    BookCondition = @BookCondition,
+                    ListingType = @ListingType,
+                    Status = @Status,
+                    ImageUrl = COALESCE(@ImageUrl, ImageUrl),
+                    CourseName = COALESCE(@CourseName, CourseName)
+                OUTPUT INSERTED.*
+                WHERE BookID = @BookID
+            `);
+            return result.recordset[0];
+        } catch (colErr) {
+            const fallbackResult = await request.query(`
+                UPDATE Books
+                SET
+                    CategoryID = @CategoryID,
+                    CourseID = @CourseID,
+                    Title = @Title,
+                    Author = @Author,
+                    Description = @Description,
+                    Price = @Price,
+                    BookCondition = @BookCondition,
+                    ListingType = @ListingType,
+                    Status = @Status
+                OUTPUT INSERTED.*
+                WHERE BookID = @BookID
+            `);
+            return fallbackResult.recordset[0];
+        }
     },
 
     // Delete book

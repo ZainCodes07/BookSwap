@@ -41,6 +41,18 @@ async function connectDB() {
         await sql.connect(config);
         isConnected = true;
         console.log("SQL Server connected successfully!");
+
+        // Auto-migrate schema for ImageUrl and CourseName if missing
+        try {
+            await sql.query(`
+                IF NOT EXISTS (SELECT * FROM sys.columns WHERE object_id = OBJECT_ID('Books') AND name = 'ImageUrl')
+                    ALTER TABLE Books ADD ImageUrl NVARCHAR(MAX) NULL;
+                IF NOT EXISTS (SELECT * FROM sys.columns WHERE object_id = OBJECT_ID('Books') AND name = 'CourseName')
+                    ALTER TABLE Books ADD CourseName NVARCHAR(100) NULL;
+            `);
+        } catch (migErr) {
+            console.warn("Schema migration notice:", migErr.message);
+        }
     } catch (error) {
         if (error.code === 'EALREADYCONNECTED' || (error.message && error.message.includes('already connected'))) {
             isConnected = true;

@@ -782,12 +782,15 @@
           profileBtn.parentNode.insertBefore(adminLink, profileBtn);
         }
       }
+      setupNotifications(user);
     } else {
       if (signInBtn) signInBtn.style.display = 'inline-flex';
       if (profileWrap) profileWrap.style.display = 'none';
       if (profileBtn) profileBtn.style.display = 'none';
       var adm = document.getElementById('navAdminBadge');
       if (adm) adm.remove();
+      var notifWrap = document.getElementById('navNotifWrap');
+      if (notifWrap) notifWrap.style.display = 'none';
     }
 
     var cartBadge = document.getElementById('cartCount') || document.getElementById('navCartBadge');
@@ -811,6 +814,185 @@
         }
       }
     }
+  }
+
+  function setupNotifications(user) {
+    var notifWrap = document.getElementById('navNotifWrap');
+    var notifBtn = document.getElementById('navNotifBtn');
+    var notifBadge = document.getElementById('navNotifBadge');
+    var notifDropdown = document.getElementById('navNotifDropdown');
+    var notifList = document.getElementById('navNotifList');
+    var notifClear = document.getElementById('navNotifClear');
+
+    if (!notifWrap || !notifBtn || !notifDropdown) return;
+
+    if (!user) {
+      notifWrap.style.display = 'none';
+      return;
+    }
+
+    notifWrap.style.display = 'inline-flex';
+
+    var uid = user.UserID || user.id;
+
+    if (!notifBtn._hasListener) {
+      notifBtn._hasListener = true;
+      notifBtn.addEventListener('click', function (e) {
+        e.stopPropagation();
+        var isOpen = notifDropdown.style.display === 'block';
+        notifDropdown.style.display = isOpen ? 'none' : 'block';
+        notifBtn.setAttribute('aria-expanded', !isOpen);
+      });
+
+      document.addEventListener('click', function (e) {
+        if (!notifWrap.contains(e.target)) {
+          notifDropdown.style.display = 'none';
+          notifBtn.setAttribute('aria-expanded', 'false');
+        }
+      });
+
+      if (notifClear) {
+        notifClear.addEventListener('click', function (e) {
+          e.stopPropagation();
+          if (notifBadge) notifBadge.style.display = 'none';
+          var unreadItems = notifList ? notifList.querySelectorAll('.is-unread') : [];
+          unreadItems.forEach(function (it) { it.classList.remove('is-unread'); });
+          try {
+            localStorage.setItem('bs_notifs_read_' + uid, Date.now().toString());
+          } catch (e) {}
+        });
+      }
+    }
+
+    if (!window.BookSwapAPI || !uid) return;
+
+    var readCutoff = 0;
+    try {
+      readCutoff = parseInt(localStorage.getItem('bs_notifs_read_' + uid) || '0', 10);
+    } catch (e) {}
+
+    var notifs = [];
+    var unreadCount = 0;
+
+    var p1 = window.BookSwapAPI.chat.getByUser(uid)
+      .then(function (res) {
+        var msgs = (res && res.messages) || [];
+        msgs.forEach(function (m) {
+          if (m.ReceiverID === uid) {
+            var sentTime = new Date(m.SentAt).getTime();
+            var isUnread = (!m.IsRead && sentTime > readCutoff);
+            if (isUnread) unreadCount++;
+
+            notifs.push({
+              id: 'msg_' + m.MessageID,
+              type: 'message',
+              title: (m.SenderName || 'Student') + ' sent you a message',
+              desc: 'Re: ' + (m.BookTitle || 'Book') + ' - "' + m.MessageText + '"',
+              link: ROOT + 'chat.html?book=' + (m.BookID || '') + '&user=' + m.SenderID,
+              time: m.SentAt,
+              isUnread: isUnread
+            });
+          }
+        });
+      })
+      .catch(function () {});
+
+    var p2 = (user.role === 'seller' || user.Role === 'Seller')
+      ? window.BookSwapAPI.listings.getBySeller(uid)
+          .then(function (res) {
+            var books = (res && res.books) || [];
+            books.forEach(function (b) {
+              var st = (b.Status || 'Pending').toLowerCase();
+              var bTime = new Date(b.CreatedAt || Date.now()).getTime();
+              var isRecent = (Date.now() - bTime) < (7 * 24 * 3600 * 1000);
+
+              if (st === 'pending') {
+                notifs.push({
+                  id: 'rev_' + b.BookID,
+                  type: 'review',
+                  title: 'Listing Under Review',
+                  desc: '"' + b.Title + '" has been submitted and is waiting for admin review.',
+                  link: ROOT + 'Seller/seller-dashboard.html',
+                  time: b.CreatedAt,
+                  isUnread: bTime > readCutoff
+                });
+                if (bTime > readCutoff) unreadCount++;
+              } else if (st === 'available' || st === 'live') {
+                if (isRecent) {
+                  notifs.push({
+                    id: 'appr_' + b.BookID,
+                    type: 'approved',
+                    title: 'Listing Approved & Live!',
+                    desc: '"' + b.Title + '" is now live and visible to all students.',
+                    link: ROOT + 'book-details.html?id=' + b.BookID,
+                    time: b.CreatedAt,
+                    isUnread: bTime > readCutoff
+                  });
+                  if (bTime > readCutoff) unreadCount++;
+                }
+              }
+            });
+          })
+          .catch(function () {})
+      : Promise.resolve();
+
+    Promise.all([p1, p2]).then(function () {
+      notifs.sort(function (a, b) {
+        return new Date(b.time || 0) - new Date(a.time || 0);
+      });
+
+      if (notifBadge) {
+        if (unreadCount > 0) {
+          notifBadge.textContent = unreadCount > 9 ? '9+' : unreadCount;
+          notifBadge.style.display = 'flex';
+        } else {
+          notifBadge.style.display = 'none';
+        }
+      }
+
+      if (!notifList) return;
+
+      if (!notifs.length) {
+        notifList.innerHTML = '<div class="nav-notif-empty">No notifications yet</div>';
+        return;
+      }
+
+      function esc(s) {
+        var d = document.createElement('div');
+        d.textContent = s || '';
+        return d.innerHTML;
+      }
+
+      function formatRelTime(dateStr) {
+        if (!dateStr) return '';
+        var sec = Math.floor((Date.now() - new Date(dateStr).getTime()) / 1000);
+        if (sec < 60) return 'Just now';
+        var min = Math.floor(sec / 60);
+        if (min < 60) return min + 'm ago';
+        var hr = Math.floor(min / 60);
+        if (hr < 24) return hr + 'h ago';
+        var d = Math.floor(hr / 24);
+        return d + 'd ago';
+      }
+
+      var ICONS = {
+        message: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"/></svg>',
+        review: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/></svg>',
+        approved: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M22 11.08V12a10 10 0 1 1-5.93-9.14"/><polyline points="22 4 12 14.01 9 11.01"/></svg>'
+      };
+
+      notifList.innerHTML = notifs.slice(0, 15).map(function (n) {
+        var iconHtml = ICONS[n.type] || ICONS.message;
+        return '<a href="' + n.link + '" class="nav-notif-item' + (n.isUnread ? ' is-unread' : '') + '">' +
+          '<div class="nav-notif-icon">' + iconHtml + '</div>' +
+          '<div class="nav-notif-content">' +
+            '<div class="nav-notif-title">' + esc(n.title) + '</div>' +
+            '<div class="nav-notif-desc">' + esc(n.desc) + '</div>' +
+            '<div class="nav-notif-time">' + esc(formatRelTime(n.time)) + '</div>' +
+          '</div>' +
+        '</a>';
+      }).join('');
+    });
   }
 
   // Runs a guarded click again after the guest signs in

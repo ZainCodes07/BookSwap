@@ -1,9 +1,9 @@
-/* CHAT PAGE (in-app messaging)
-   Conversations are the chats started from book-details.html (saved per book
-   under "bookswap_chat_<bookId>"). Open a chat directly with chat.html?book=3
-
-   Backend-ready spots (replace with fetch() when the API exists):
-   loadMessages(), saveMessage(), getConversations() */
+/* ==========================================================================
+   BOOKSWAP - chat.js
+   In-app messaging between Buyers and Sellers
+   Fully integrated with Backend Chat API (GET /api/chat/user/:id, POST /api/chat)
+   Includes privacy safeguards (names and books only; no phone numbers or personal emails)
+   ========================================================================== */
 
 (function () {
   "use strict";
@@ -11,85 +11,16 @@
   var CHAT_KEY = "bookswap_chat_";
   var CART_KEY = "bookswap_cart";
 
-  /* placeholder lookup: the backend will send seller + book info itself */
-  var BOOKS = {
-    1:  { seller: "Ahmed R.",   title: "Introduction to Programming" },
-    2:  { seller: "Sara K.",    title: "Calculus & Analytic Geometry" },
-    3:  { seller: "Bilal H.",   title: "Intro to Machine Learning" },
-    4:  { seller: "Hina M.",    title: "Applied Physics" },
-    5:  { seller: "Usman T.",   title: "Data Structures & Algorithms" },
-    6:  { seller: "Zara A.",    title: "Linear Algebra" },
-    7:  { seller: "Daniyal S.", title: "Operating Systems Concepts" },
-    8:  { seller: "Maryam F.",  title: "Database Systems" },
-    9:  { seller: "Areeba N.",  title: "English Composition" },
-    10: { seller: "Hamza Q.",   title: "Python Programming" },
-    11: { seller: "Fatima L.",  title: "Probability & Statistics" }
-  };
-
-
-  /* ================= DATA LAYER (placeholder) ================= */
-
-  function loadMessages(bookId) {
-    // future: return fetch("/api/books/" + bookId + "/messages").then(function (r) { return r.json(); });
-    try {
-      var data = JSON.parse(localStorage.getItem(CHAT_KEY + bookId) || "[]");
-      return Array.isArray(data) ? data : [];
-    } catch (err) {
-      return [];
-    }
-  }
-
-  function saveMessage(bookId, text) {
-    // future: return fetch("/api/books/" + bookId + "/messages", { method: "POST", body: JSON.stringify({ text: text }) });
-    var messages = loadMessages(bookId);
-    messages.push({ from: "me", text: text, ts: Date.now() });
-    try {
-      localStorage.setItem(CHAT_KEY + bookId, JSON.stringify(messages));
-    } catch (err) {
-      /* storage blocked */
-    }
-  }
-
-  function getConversations() {
-    // future: return fetch("/api/conversations").then(function (r) { return r.json(); });
-    var list = [];
-    try {
-      for (var i = 0; i < localStorage.length; i++) {
-        var key = localStorage.key(i);
-        if (!key || key.indexOf(CHAT_KEY) !== 0) continue;
-
-        var id = parseInt(key.slice(CHAT_KEY.length), 10);
-        var info = BOOKS[id];
-        if (!info) continue;
-
-        var messages = loadMessages(id);
-        if (messages.length === 0) continue;
-
-        list.push({
-          bookId: id,
-          seller: info.seller,
-          title: info.title,
-          last: messages[messages.length - 1]
-        });
-      }
-    } catch (err) {
-      /* ignore storage errors */
-    }
-
-    list.sort(function (a, b) { return b.last.ts - a.last.ts; });
-    return list;
-  }
-
-
-  /* ================= UI ================= */
-
   var shell = document.getElementById("chatShell");
   var listEl = document.getElementById("chatList");
   var threadEl = document.getElementById("chatThread");
 
-  var activeId = null;
-  var draftId = null; /* a chat opened from a book page that has no messages yet */
+  var activeConv = null;
+  var conversations = [];
+  var user = window.BookSwapAuth ? window.BookSwapAuth.currentUser() : null;
+  var currentUid = user ? (user.UserID || user.id) : null;
 
+  /* Helper functions */
   function el(tag, className, text) {
     var node = document.createElement(tag);
     if (className) node.className = className;
@@ -98,26 +29,11 @@
   }
 
   function fmtTime(ts) {
+    if (!ts) return "";
     var d = new Date(ts);
     var time = d.toLocaleTimeString([], { hour: "numeric", minute: "2-digit" });
     if (d.toDateString() === new Date().toDateString()) return time;
     return d.toLocaleDateString([], { day: "numeric", month: "short" }) + ", " + time;
-  }
-
-  function currentList() {
-    var convs = getConversations();
-    if (draftId && BOOKS[draftId]) {
-      var exists = convs.some(function (c) { return c.bookId === draftId; });
-      if (!exists) {
-        convs.unshift({
-          bookId: draftId,
-          seller: BOOKS[draftId].seller,
-          title: BOOKS[draftId].title,
-          last: null
-        });
-      }
-    }
-    return convs;
   }
 
   function showEmptyThread(hasConversations) {
@@ -127,7 +43,7 @@
     if (hasConversations) {
       box.textContent = "Select a conversation to start chatting.";
     } else {
-      box.appendChild(document.createTextNode("No conversations yet. Open a book and tap \u201CMessage Seller\u201D to start one. "));
+      box.appendChild(document.createTextNode("No conversations yet. Open a book and tap \u201CChat with Seller\u201D to start one. "));
       var link = el("a", "", "Browse books");
       link.href = "category.html";
       box.appendChild(link);
@@ -136,64 +52,62 @@
   }
 
   function renderList() {
-    var convs = currentList();
     listEl.innerHTML = "";
 
-    if (convs.length === 0) {
+    if (!conversations.length) {
       var empty = el("p", "chat-empty");
       empty.appendChild(document.createTextNode("No conversations yet. "));
       var link = el("a", "", "Browse books");
       link.href = "category.html";
       empty.appendChild(link);
       listEl.appendChild(empty);
-      return convs;
+      return;
     }
 
-    convs.forEach(function (conv) {
-      var item = el("button", "chat-item" + (conv.bookId === activeId ? " is-active" : ""));
+    conversations.forEach(function (conv) {
+      var isActive = activeConv && activeConv.id === conv.id;
+      var item = el("button", "chat-item" + (isActive ? " is-active" : ""));
       item.type = "button";
 
       var meta = el("span", "chat-item-meta");
-      meta.appendChild(el("span", "chat-item-name", conv.seller));
-      meta.appendChild(el("span", "chat-item-preview", conv.last ? conv.last.text : "No messages yet"));
+      // Privacy safeguard: only other student's name
+      meta.appendChild(el("span", "chat-item-name", conv.name || "Student"));
+      meta.appendChild(el("span", "chat-item-preview", conv.lastText ? conv.lastText : ("Re: " + (conv.title || "Book"))));
 
       item.appendChild(el("span", "chat-avatar"));
       item.appendChild(meta);
 
-      item.addEventListener("click", function () { openConversation(conv.bookId); });
+      item.addEventListener("click", function () { openConversation(conv); });
       listEl.appendChild(item);
     });
-
-    return convs;
   }
 
-  function renderMessages() {
+  function renderMessages(conv) {
     var box = document.getElementById("chatMessages");
-    if (!box || !activeId) return;
+    if (!box || !conv) return;
 
-    var messages = loadMessages(activeId);
     box.innerHTML = "";
 
-    if (messages.length === 0) {
-      box.appendChild(el("p", "chat-empty", "No messages yet. Say hello to " + BOOKS[activeId].seller + "!"));
+    if (!conv.messages || conv.messages.length === 0) {
+      box.appendChild(el("p", "chat-empty", "No messages yet. Say hello to " + (conv.name || "seller") + "!"));
       return;
     }
 
-    messages.forEach(function (m) {
-      var bubble = el("div", "chat-msg " + (m.from === "me" ? "chat-msg-me" : "chat-msg-them"), m.text);
-      bubble.appendChild(el("span", "chat-msg-time", fmtTime(m.ts)));
+    conv.messages.forEach(function (m) {
+      var isMe = currentUid ? (m.SenderID === currentUid) : (m.from === "me");
+      var bubble = el("div", "chat-msg " + (isMe ? "chat-msg-me" : "chat-msg-them"), m.MessageText || m.text);
+      bubble.appendChild(el("span", "chat-msg-time", fmtTime(m.SentAt || m.ts)));
       box.appendChild(bubble);
     });
 
     box.scrollTop = box.scrollHeight;
   }
 
-  function openConversation(bookId) {
-    var info = BOOKS[bookId];
-    if (!info) return;
+  function openConversation(conv) {
+    if (!conv) return;
+    activeConv = conv;
 
-    activeId = bookId;
-
+    // Header displays Name and Book Title ONLY (Anti-circumvention / Commission protection)
     threadEl.innerHTML =
       '<div class="chat-thread-head">' +
         '<button class="chat-back" id="chatBack" type="button" aria-label="Back to conversations">&larr;</button>' +
@@ -208,8 +122,8 @@
         '</button>' +
       '</form>';
 
-    document.getElementById("chatName").textContent = info.seller;
-    document.getElementById("chatSub").textContent = "About: " + info.title;
+    document.getElementById("chatName").textContent = conv.name || "Student";
+    document.getElementById("chatSub").textContent = "About: " + (conv.title || "Book");
 
     document.getElementById("chatBack").addEventListener("click", function () {
       shell.classList.remove("is-thread-open");
@@ -221,48 +135,194 @@
       var text = input.value.trim();
       if (!text) return;
 
-      saveMessage(activeId, text);
       input.value = "";
-      renderMessages();
+
+      var newMsg = {
+        SenderID: currentUid,
+        ReceiverID: conv.otherId,
+        BookID: conv.bookId,
+        MessageText: text,
+        SentAt: new Date().toISOString(),
+        from: "me",
+        text: text,
+        ts: Date.now()
+      };
+
+      conv.messages.push(newMsg);
+      conv.lastText = text;
+      conv.lastTs = Date.now();
+
+      renderMessages(conv);
       renderList();
+
+      // Send to Backend API
+      if (window.BookSwapAPI && currentUid && conv.otherId) {
+        window.BookSwapAPI.chat.send(currentUid, conv.otherId, conv.bookId || null, text)
+          .catch(function (err) {
+            console.warn("[Send Message API Error]", err.message);
+          });
+      }
+
+      // Also persist to localStorage for instant backup
+      try {
+        var localKey = CHAT_KEY + (conv.bookId || conv.otherId);
+        var existing = JSON.parse(localStorage.getItem(localKey) || "[]");
+        existing.push(newMsg);
+        localStorage.setItem(localKey, JSON.stringify(existing));
+      } catch (err) {}
+
       input.focus();
     });
 
-    renderMessages();
+    renderMessages(conv);
     renderList();
     shell.classList.add("is-thread-open");
 
     if (window.matchMedia("(min-width: 761px)").matches) {
-      document.getElementById("chatInput").focus();
+      var chatIn = document.getElementById("chatInput");
+      if (chatIn) chatIn.focus();
     }
   }
 
+  /* ================= LOAD CONVERSATIONS ================= */
+
+  function loadBackendChat(cb) {
+    if (!window.BookSwapAPI || !currentUid) {
+      if (cb) cb();
+      return;
+    }
+
+    window.BookSwapAPI.chat.getByUser(currentUid)
+      .then(function (res) {
+        var msgs = (res && res.messages) || [];
+        var threadMap = {};
+
+        msgs.forEach(function (m) {
+          var otherId = (m.SenderID === currentUid) ? m.ReceiverID : m.SenderID;
+          var otherName = (m.SenderID === currentUid) ? (m.ReceiverName || "Student") : (m.SenderName || "Student");
+          var bookId = m.BookID || 0;
+          var key = otherId + "_" + bookId;
+
+          if (!threadMap[key]) {
+            threadMap[key] = {
+              id: key,
+              otherId: otherId,
+              bookId: bookId,
+              name: otherName,
+              title: m.BookTitle || "Book Inquiry",
+              messages: [],
+              lastText: "",
+              lastTs: 0
+            };
+          }
+
+          threadMap[key].messages.push(m);
+        });
+
+        conversations = Object.keys(threadMap).map(function (k) {
+          var t = threadMap[k];
+          t.messages.sort(function (a, b) {
+            return new Date(a.SentAt || 0) - new Date(b.SentAt || 0);
+          });
+          var last = t.messages[t.messages.length - 1];
+          t.lastText = last ? last.MessageText : "";
+          t.lastTs = last ? new Date(last.SentAt || 0).getTime() : 0;
+          return t;
+        });
+
+        conversations.sort(function (a, b) { return b.lastTs - a.lastTs; });
+
+        if (cb) cb();
+      })
+      .catch(function (err) {
+        console.warn("[Chat Load Error]", err.message);
+        if (cb) cb();
+      });
+  }
+
+  function handleDraftFromParams() {
+    var params = new URLSearchParams(window.location.search);
+    var bookParam = parseInt(params.get("book"), 10);
+    var userParam = parseInt(params.get("user"), 10);
+
+    if (!bookParam && !userParam) return;
+
+    var existing = conversations.find(function (c) {
+      if (bookParam && userParam) return c.bookId === bookParam && c.otherId === userParam;
+      if (bookParam) return c.bookId === bookParam;
+      if (userParam) return c.otherId === userParam;
+      return false;
+    });
+
+    if (existing) {
+      openConversation(existing);
+      return;
+    }
+
+    // Create a new draft thread
+    var draft = {
+      id: "draft_" + (userParam || "0") + "_" + (bookParam || "0"),
+      otherId: userParam || 1,
+      bookId: bookParam || 0,
+      name: "Seller / Student",
+      title: "Book Listing",
+      messages: [],
+      lastText: "",
+      lastTs: Date.now()
+    };
+
+    if (window.BookSwapAPI && bookParam) {
+      window.BookSwapAPI.listings.getById(bookParam)
+        .then(function (res) {
+          if (res && res.book) {
+            draft.title = res.book.Title || "Book Listing";
+            if (res.book.SellerID) draft.otherId = res.book.SellerID;
+          }
+          conversations.unshift(draft);
+          renderList();
+          openConversation(draft);
+        })
+        .catch(function () {
+          conversations.unshift(draft);
+          renderList();
+          openConversation(draft);
+        });
+    } else {
+      conversations.unshift(draft);
+      renderList();
+      openConversation(draft);
+    }
+  }
 
   /* ================= INIT ================= */
 
-  var params = new URLSearchParams(window.location.search);
-  var bookParam = parseInt(params.get("book"), 10);
-  if (bookParam && BOOKS[bookParam]) draftId = bookParam;
+  loadBackendChat(function () {
+    renderList();
 
-  var convs = renderList();
-
-  if (draftId) {
-    openConversation(draftId);
-  } else if (convs.length > 0 && window.matchMedia("(min-width: 761px)").matches) {
-    openConversation(convs[0].bookId);
-  } else {
-    showEmptyThread(convs.length > 0);
-  }
-
-  /* keep in sync if another tab sends a message */
-  window.addEventListener("storage", function (e) {
-    if (e.key && e.key.indexOf(CHAT_KEY) === 0) {
-      renderList();
-      renderMessages();
+    var params = new URLSearchParams(window.location.search);
+    if (params.get("book") || params.get("user")) {
+      handleDraftFromParams();
+    } else if (conversations.length > 0 && window.matchMedia("(min-width: 761px)").matches) {
+      openConversation(conversations[0]);
+    } else {
+      showEmptyThread(conversations.length > 0);
     }
   });
 
-  /* navbar: mobile menu button */
+  /* Keep in sync if another tab updates */
+  window.addEventListener("storage", function (e) {
+    if (e.key && e.key.indexOf(CHAT_KEY) === 0) {
+      loadBackendChat(function () {
+        renderList();
+        if (activeConv) {
+          var updated = conversations.find(function (c) { return c.id === activeConv.id; });
+          if (updated) renderMessages(updated);
+        }
+      });
+    }
+  });
+
+  /* Navbar mobile menu button */
   var nav = document.querySelector(".site-nav");
   var navToggle = document.querySelector(".nav-toggle");
   if (nav && navToggle) {
@@ -271,13 +331,11 @@
     });
   }
 
-  /* navbar: cart count */
+  /* Navbar cart count */
   try {
     var cart = JSON.parse(localStorage.getItem(CART_KEY) || "[]");
     var total = cart.reduce(function (sum, item) { return sum + item.qty; }, 0);
-    var badge = document.getElementById("navCartBadge");
+    var badge = document.getElementById("navCartBadge") || document.getElementById("cartCount");
     if (badge) badge.textContent = total;
-  } catch (err) {
-    /* ignore storage errors */
-  }
+  } catch (err) {}
 })();

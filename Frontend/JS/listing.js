@@ -59,8 +59,9 @@
   function mine() {
     var user = Auth.currentUser();
     if (!user) return [];
-    return readAll().filter(function (l) { return l.sellerEmail === user.email; })
-      .sort(function (a, b) { return b.createdAt.localeCompare(a.createdAt); });
+    return readAll().filter(function (l) {
+      return l.sellerEmail === user.email && l.status !== 'removed' && l.status !== 'deleted';
+    }).sort(function (a, b) { return b.createdAt.localeCompare(a.createdAt); });
   }
 
   function get(id) {
@@ -122,11 +123,18 @@
 
   function remove(id) {
     var item = get(id);
-    var bookId = item && item.BookID ? item.BookID : id;
-    writeAll(readAll().filter(function (l) { return l.id !== id; }));
-    if (window.BookSwapAPI) {
-      window.BookSwapAPI.listings.delete(bookId).catch(function () {});
+    var bookId = item && item.BookID ? item.BookID : (typeof id === 'number' ? id : parseInt(String(id).replace(/\D/g, ''), 10));
+    writeAll(readAll().filter(function (l) {
+      if (l.id === id) return false;
+      if (bookId && l.BookID && Number(l.BookID) === Number(bookId)) return false;
+      return true;
+    }));
+    if (window.BookSwapAPI && bookId) {
+      return window.BookSwapAPI.listings.delete(bookId).catch(function (err) {
+        console.warn('Listing delete API error:', err);
+      });
     }
+    return Promise.resolve();
   }
 
   function price(n) {
@@ -293,14 +301,29 @@
       window.BookSwapAPI.listings.getBySeller(uid)
         .then(function (res) {
           var apiBooks = (res && res.books) || [];
-          if (Array.isArray(apiBooks) && apiBooks.length) {
+          if (Array.isArray(apiBooks)) {
             var localList = readAll();
+            var apiBookIds = new Set(apiBooks.map(function (b) { return Number(b.BookID); }));
+
+            // Clean up: purge removed/deleted listings for this seller, and purge any local listing whose BookID is no longer on the server
+            localList = localList.filter(function (l) {
+              if (l.sellerEmail !== user.email) return true;
+              if (l.status === 'removed' || l.status === 'deleted') return false;
+              if (l.BookID && !apiBookIds.has(Number(l.BookID))) return false;
+              return true;
+            });
+
             apiBooks.forEach(function (b) {
+              var bSt = (b.Status || 'Pending').toLowerCase();
+              if (bSt === 'removed' || bSt === 'deleted') {
+                localList = localList.filter(function (l) { return l.BookID !== b.BookID; });
+                return;
+              }
+              var mappedSt = (bSt === 'available' || bSt === 'live') ? 'live' : 'pending';
+
               var found = localList.find(function (l) {
                 return l.BookID === b.BookID || (l.title && b.Title && l.title.trim().toLowerCase() === b.Title.trim().toLowerCase());
               });
-              var bSt = (b.Status || 'Pending').toLowerCase();
-              var mappedSt = (bSt === 'available' || bSt === 'live') ? 'live' : (bSt === 'removed' ? 'removed' : 'pending');
 
               if (found) {
                 found.BookID = b.BookID;
@@ -387,6 +410,7 @@
       renderSwaps();
       renderBadges(user, list, sold);
       renderShare(user);
+      renderBuyerMessages(user);
 
       var shown = filter === 'all' ? list : list.filter(function (l) { return l.status === filter; });
       var body = $('sdRows');
@@ -452,11 +476,77 @@
         confirmBox('Delete "' + l.title + '"?', 'This removes the listing for good. You cannot undo this.', 'Delete')
           .then(function (yes) {
             if (!yes) return;
-            remove(l.id);
-            Auth.toast('Listing deleted');
-            renderDashboard();
+            remove(l.id).then(function () {
+              Auth.toast('Listing deleted');
+              renderDashboard();
+            }).catch(function () {
+              Auth.toast('Listing deleted');
+              renderDashboard();
+            });
           });
       }
+    }
+
+    /* ---------- Buyer messages inbox (SOW: chat inquiries) ---------- */
+    function renderBuyerMessages(user) {
+      var box = $('sdBuyerMessagesList');
+      if (!box || !window.BookSwapAPI) return;
+      var uid = user.UserID || user.id;
+      if (!uid) return;
+
+      window.BookSwapAPI.chat.getByUser(uid)
+        .then(function (res) {
+          var msgs = (res && res.messages) || [];
+          var buyerThreads = {};
+
+          msgs.forEach(function (m) {
+            var otherId = (m.SenderID === uid) ? m.ReceiverID : m.SenderID;
+            var otherName = (m.SenderID === uid) ? (m.ReceiverName || 'Buyer') : (m.SenderName || 'Buyer');
+            var key = otherId + '_' + (m.BookID || '0');
+
+            if (!buyerThreads[key]) {
+              buyerThreads[key] = {
+                otherId: otherId,
+                name: otherName,
+                bookId: m.BookID,
+                bookTitle: m.BookTitle || 'Book Inquiry',
+                lastMessage: m.MessageText,
+                sentAt: m.SentAt,
+                unread: (m.ReceiverID === uid && !m.IsRead)
+              };
+            }
+          });
+
+          var threads = Object.keys(buyerThreads).map(function (k) { return buyerThreads[k]; });
+          threads.sort(function (a, b) {
+            return new Date(b.sentAt || 0) - new Date(a.sentAt || 0);
+          });
+
+          if (!threads.length) {
+            box.innerHTML = '<div class="sd-empty sd-empty-small"><p>No buyer messages yet. When students inquire about your books, their messages will appear here.</p></div>';
+            return;
+          }
+
+          box.innerHTML = threads.map(function (t) {
+            var timeStr = timeAgo(t.sentAt);
+            var chatUrl = ROOT + 'chat.html?book=' + (t.bookId || '') + '&user=' + t.otherId;
+            return '<div class="sd-msg-row' + (t.unread ? ' is-unread' : '') + '">' +
+              '<div class="sd-msg-info">' +
+                '<span class="sd-msg-name">' + escapeHtml(t.name) + '</span>' +
+                '<span class="sd-msg-book">Re: ' + escapeHtml(t.bookTitle) + '</span>' +
+                '<p class="sd-msg-snippet">' + escapeHtml(t.lastMessage) + '</p>' +
+              '</div>' +
+              '<div class="sd-msg-actions">' +
+                '<span class="sd-msg-time">' + escapeHtml(timeStr) + '</span>' +
+                '<a href="' + chatUrl + '" class="auth-btn auth-btn-sm auth-btn-primary">Reply in Chat</a>' +
+              '</div>' +
+            '</div>';
+          }).join('');
+        })
+        .catch(function (err) {
+          console.warn('[Buyer Messages Fetch]', err.message);
+          box.innerHTML = '<div class="sd-empty sd-empty-small"><p>Could not load messages at this moment.</p></div>';
+        });
     }
 
 

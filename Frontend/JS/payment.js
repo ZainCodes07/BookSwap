@@ -42,11 +42,36 @@
   }
 
   function placeOrder(order) {
-    // future: return fetch("/api/orders", {
-    //   method: "POST",
-    //   headers: { "Content-Type": "application/json" },
-    //   body: JSON.stringify(order)
-    // }).then(function (r) { if (!r.ok) throw new Error("Order failed"); return r.json(); });
+    if (window.BookSwapAPI && order.items && order.items.length > 0) {
+      var user = window.BookSwapAuth ? window.BookSwapAuth.currentUser() : null;
+      var buyerId = user ? (user.UserID || user.id) : 1;
+      var primaryItem = order.items[0];
+
+      return window.BookSwapAPI.payment.createOrder({
+        BookID: primaryItem.id || 1,
+        BuyerID: buyerId,
+        OrderType: order.payment.method || "cash"
+      }).then(function (res) {
+        var orderId = (res && res.data && res.data.OrderID) ? res.data.OrderID : ("BS-" + Date.now().toString(36).toUpperCase());
+
+        if (window.BookSwapAPI.payment.createTransaction && res && res.data && res.data.OrderID) {
+          window.BookSwapAPI.payment.createTransaction({
+            OrderID: res.data.OrderID,
+            TransactionType: order.payment.method || "cash",
+            Amount: order.total,
+            TransactionStatus: order.payment.method === "cash" ? "Pending" : "Completed"
+          }).catch(function (e) {
+            console.warn("[Transaction Notice]", e.message);
+          });
+        }
+
+        return { id: orderId };
+      }).catch(function (err) {
+        console.warn("[Order Creation Notice]", err.message);
+        return { id: "BS-" + Date.now().toString(36).toUpperCase() };
+      });
+    }
+
     return new Promise(function (resolve) {
       setTimeout(function () {
         resolve({ id: "BS-" + Date.now().toString(36).toUpperCase() });

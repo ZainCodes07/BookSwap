@@ -101,6 +101,7 @@ const User = {
         request.input("Role", sql.NVarChar(20), user.Role || null);
         request.input("Phone", sql.NVarChar(20), user.Phone || null);
         request.input("Address", sql.NVarChar(255), user.Address || null);
+        request.input("PayoutAccount", sql.NVarChar(sql.MAX), user.PayoutAccount || null);
 
         const result = await request.query(`
             UPDATE Users
@@ -108,7 +109,8 @@ const User = {
                 FullName = @FullName,
                 Role = COALESCE(@Role, Role),
                 Phone = @Phone,
-                Address = @Address
+                Address = @Address,
+                PayoutAccount = COALESCE(@PayoutAccount, PayoutAccount)
             OUTPUT INSERTED.*
             WHERE UserID = @UserID
         `);

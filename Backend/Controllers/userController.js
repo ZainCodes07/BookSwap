@@ -71,7 +71,8 @@ const updateUser = async (req, res) => {
             FullName,
             Role,
             Phone,
-            Address
+            Address,
+            PayoutAccount
         } = req.body;
 
         if (!FullName) {
@@ -92,7 +93,8 @@ const updateUser = async (req, res) => {
             FullName,
             Role,
             Phone,
-            Address
+            Address,
+            PayoutAccount
         });
 
         // Don't send password hash

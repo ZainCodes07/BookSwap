@@ -121,7 +121,8 @@ const createListing = async (req, res) => {
             BookCondition,
             ListingType,
             ImageUrl,
-            CourseName
+            CourseName,
+            Status: req.body.Status || 'Pending'
         });
 
         res.status(201).json({
@@ -172,33 +173,20 @@ const updateListing = async (req, res) => {
             CourseName
         } = req.body;
 
-        if (
-            !CategoryID ||
-            !Title ||
-            !Author ||
-            !BookCondition ||
-            !ListingType ||
-            !Status
-        ) {
-            return res.status(400).json({
-                message: "CategoryID, Title, Author, BookCondition, ListingType and Status are required"
-            });
-        }
-
         const updatedBook = await Book.updateBook(
             bookId,
             {
-                CategoryID,
-                CourseID,
-                Title,
-                Author,
-                Description,
-                Price,
-                BookCondition,
-                ListingType,
-                Status,
-                ImageUrl,
-                CourseName
+                CategoryID: CategoryID || existingBook.CategoryID,
+                CourseID: CourseID !== undefined ? CourseID : existingBook.CourseID,
+                Title: Title || existingBook.Title,
+                Author: Author || existingBook.Author,
+                Description: Description !== undefined ? Description : existingBook.Description,
+                Price: Price !== undefined ? Price : existingBook.Price,
+                BookCondition: BookCondition || existingBook.BookCondition,
+                ListingType: ListingType || existingBook.ListingType,
+                Status: Status || existingBook.Status,
+                ImageUrl: ImageUrl !== undefined ? ImageUrl : existingBook.ImageUrl,
+                CourseName: CourseName !== undefined ? CourseName : existingBook.CourseName
             }
         );
 

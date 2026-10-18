@@ -86,7 +86,13 @@
   if (window.BookSwapAPI) {
     window.BookSwapAPI.listings.getAll()
       .then(function (res) {
-        allBooks = (res && res.books && res.books.length > 0) ? res.books : DEMO_SEARCH_BOOKS;
+        var valid = (res && res.books && res.books.length > 0)
+          ? res.books.filter(function (b) {
+              var s = (b.Status || 'available').toLowerCase();
+              return s === 'available' || s === 'live';
+            })
+          : [];
+        allBooks = valid.length > 0 ? valid : DEMO_SEARCH_BOOKS;
         render();
       })
       .catch(function (err) {

@@ -515,7 +515,11 @@
     if (window.BookSwapAPI) {
       window.BookSwapAPI.listings.getAll()
         .then(function (res) {
-          var apiBooks = res.books;
+          var rawBooks = res.books || [];
+          var apiBooks = rawBooks.filter(function (b) {
+            var s = (b.Status || 'available').toLowerCase();
+            return s === 'available' || s === 'live';
+          });
           if (Array.isArray(apiBooks) && apiBooks.length > 0) {
             var palette = ['#0F172A', '#6C38FF', '#F472B6', '#14B8A6', '#A855F7', '#BE185D', '#0E7490'];
             var mapped = apiBooks.map(function (b, idx) {

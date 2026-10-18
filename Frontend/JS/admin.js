@@ -382,7 +382,7 @@
           function () {
             item.status = 'removed';
             if (window.BookSwapAPI && item.id) {
-              window.BookSwapAPI.admin.deleteListing(item.id).catch(function () {});
+              window.BookSwapAPI.listings.update(item.id, { Status: 'Removed' }).catch(function () {});
             }
             toast('"' + item.title + '" was ' + (rejecting ? 'rejected.' : 'removed.'));
             render();
@@ -477,6 +477,16 @@
         }
         if (results[1] && Array.isArray(results[1].listings) && results[1].listings.length) {
           LISTINGS = results[1].listings.map(function (l) {
+            var st = (l.Status || 'Pending').toLowerCase();
+            var mappedStatus = 'pending';
+            if (st === 'available' || st === 'live') {
+              mappedStatus = 'live';
+            } else if (st === 'removed' || st === 'rejected') {
+              mappedStatus = 'removed';
+            } else {
+              mappedStatus = 'pending';
+            }
+
             return {
               id: l.BookID,
               title: l.Title,
@@ -485,7 +495,7 @@
               condition: l.BookCondition,
               price: Number(l.Price || 0),
               listed: (l.CreatedAt || new Date().toISOString()).slice(0, 10),
-              status: (l.Status === 'pending' || l.Status === 'Pending') ? 'pending' : 'live'
+              status: mappedStatus
             };
           });
         }

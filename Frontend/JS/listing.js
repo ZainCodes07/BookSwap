@@ -86,11 +86,12 @@
         BookCondition: listing.condition || listing.BookCondition || "Good",
         ListingType: listing.swap ? "Swap" : "Sale",
         ImageUrl: listing.photo || (listing.photos && listing.photos[0]) || null,
-        CourseName: listing.course || null
+        CourseName: listing.course || null,
+        Status: listing.BookID ? (listing.status === 'live' ? 'Available' : 'Pending') : 'Pending'
       };
 
       if (listing.BookID) {
-        window.BookSwapAPI.listings.update(listing.BookID, Object.assign({}, backendPayload, { Status: 'Available' }))
+        window.BookSwapAPI.listings.update(listing.BookID, backendPayload)
           .catch(function (e) { console.warn('Listing update API error:', e.message); });
       } else {
         window.BookSwapAPI.listings.create(backendPayload)
@@ -101,7 +102,7 @@
               var idx = curList.findIndex(function (l) { return l.id === listing.id; });
               if (idx !== -1) {
                 curList[idx].BookID = res.book.BookID;
-                curList[idx].status = 'live';
+                curList[idx].status = 'pending';
                 writeAll(curList);
               }
             }
@@ -298,9 +299,12 @@
               var found = localList.find(function (l) {
                 return l.BookID === b.BookID || (l.title && b.Title && l.title.trim().toLowerCase() === b.Title.trim().toLowerCase());
               });
+              var bSt = (b.Status || 'Pending').toLowerCase();
+              var mappedSt = (bSt === 'available' || bSt === 'live') ? 'live' : (bSt === 'removed' ? 'removed' : 'pending');
+
               if (found) {
                 found.BookID = b.BookID;
-                found.status = 'live';
+                found.status = mappedSt;
                 found.title = b.Title;
                 found.price = Number(b.Price || 0);
                 if (b.ImageUrl) found.photo = b.ImageUrl;
@@ -311,7 +315,7 @@
                   BookID: b.BookID,
                   sellerEmail: user.email,
                   sellerName: user.name || user.FullName,
-                  status: 'live',
+                  status: mappedSt,
                   title: b.Title,
                   author: b.Author,
                   course: b.CourseName || 'Other',
@@ -939,7 +943,7 @@
           id: 'l' + Date.now(),
           sellerEmail: user.email,
           sellerName: user.name,
-          status: 'live',
+          status: 'pending',
           views: 0,
           createdAt: new Date().toISOString(),
           soldAt: ''
@@ -968,12 +972,12 @@
     function showDone(wasEdit) {
       el('alFormWrap').hidden = true;
       el('alDone').hidden = false;
-      el('alDoneTitle').textContent = wasEdit ? 'Saved' : 'Listed!';
+      el('alDoneTitle').textContent = wasEdit ? 'Saved' : 'In review';
       el('alDoneText').innerHTML = wasEdit
-        ? 'Your listing is updated. Buyers see it right away.'
-        : 'Your listing is live on BookSwap. Buyers can see it right away.';
-      el('alHeading').textContent = wasEdit ? 'All Set' : 'Your Book is Live!';
-      el('alSub').textContent = wasEdit ? 'Edits are live.' : 'Ready for students to browse and buy.';
+        ? 'Your listing is updated.'
+        : "Quick check from admin, then it's live. Find it under <strong>Waiting for review</strong>.";
+      el('alHeading').textContent = wasEdit ? 'All Set' : 'In Review';
+      el('alSub').textContent = wasEdit ? 'Edits are saved.' : 'Admin will review and approve your listing shortly.';
       window.scrollTo({ top: 0, behavior: 'smooth' });
     }
 

@@ -63,6 +63,7 @@ const Book = {
         request.input("Price", sql.Decimal(10, 2), book.Price || null);
         request.input("BookCondition", sql.NVarChar(50), book.BookCondition);
         request.input("ListingType", sql.NVarChar(20), book.ListingType);
+        request.input("Status", sql.NVarChar(20), book.Status || 'Pending');
         request.input("ImageUrl", sql.NVarChar(sql.MAX), book.ImageUrl || null);
         request.input("CourseName", sql.NVarChar(100), book.CourseName || null);
 
@@ -79,6 +80,7 @@ const Book = {
                     Price,
                     BookCondition,
                     ListingType,
+                    Status,
                     ImageUrl,
                     CourseName
                 )
@@ -94,6 +96,7 @@ const Book = {
                     @Price,
                     @BookCondition,
                     @ListingType,
+                    @Status,
                     @ImageUrl,
                     @CourseName
                 )
@@ -111,7 +114,8 @@ const Book = {
                     Description,
                     Price,
                     BookCondition,
-                    ListingType
+                    ListingType,
+                    Status
                 )
                 OUTPUT INSERTED.*
                 VALUES
@@ -124,7 +128,8 @@ const Book = {
                     @Description,
                     @Price,
                     @BookCondition,
-                    @ListingType
+                    @ListingType,
+                    @Status
                 )
             `);
             return fallbackResult.recordset[0];
@@ -146,7 +151,7 @@ const Book = {
         request.input("Price", sql.Decimal(10, 2), book.Price || null);
         request.input("BookCondition", sql.NVarChar(50), book.BookCondition);
         request.input("ListingType", sql.NVarChar(20), book.ListingType);
-        request.input("Status", sql.NVarChar(20), book.Status || 'Available');
+        request.input("Status", sql.NVarChar(20), book.Status || null);
         request.input("ImageUrl", sql.NVarChar(sql.MAX), book.ImageUrl || null);
         request.input("CourseName", sql.NVarChar(100), book.CourseName || null);
 
@@ -162,7 +167,7 @@ const Book = {
                     Price = @Price,
                     BookCondition = @BookCondition,
                     ListingType = @ListingType,
-                    Status = @Status,
+                    Status = COALESCE(@Status, Status),
                     ImageUrl = COALESCE(@ImageUrl, ImageUrl),
                     CourseName = COALESCE(@CourseName, CourseName)
                 OUTPUT INSERTED.*
@@ -181,7 +186,7 @@ const Book = {
                     Price = @Price,
                     BookCondition = @BookCondition,
                     ListingType = @ListingType,
-                    Status = @Status
+                    Status = COALESCE(@Status, Status)
                 OUTPUT INSERTED.*
                 WHERE BookID = @BookID
             `);
@@ -197,12 +202,19 @@ const Book = {
 
         request.input("BookID", sql.Int, bookId);
 
-        const result = await request.query(`
-            DELETE FROM Books
-            WHERE BookID = @BookID
-        `);
-
-        return result.rowsAffected[0];
+        try {
+            await request.query(`
+                DELETE FROM Cart WHERE BookID = @BookID;
+                DELETE FROM Messages WHERE BookID = @BookID;
+                DELETE FROM Books WHERE BookID = @BookID;
+            `);
+            return 1;
+        } catch (fkErr) {
+            const res = await request.query(`
+                UPDATE Books SET Status = 'Removed' WHERE BookID = @BookID;
+            `);
+            return res.rowsAffected[0];
+        }
     },
 
     // Search books

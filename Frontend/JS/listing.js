@@ -530,7 +530,9 @@
           box.innerHTML = threads.map(function (t) {
             var timeStr = timeAgo(t.sentAt);
             var chatUrl = ROOT + 'chat.html?book=' + (t.bookId || '') + '&user=' + t.otherId;
+            var avatarSvg = window.BookSwapAvatars ? window.BookSwapAvatars.getAvatarSvg(t.name, '42') : '';
             return '<div class="sd-msg-row' + (t.unread ? ' is-unread' : '') + '">' +
+              '<span class="sd-msg-avatar">' + avatarSvg + '</span>' +
               '<div class="sd-msg-info">' +
                 '<span class="sd-msg-name">' + escapeHtml(t.name) + '</span>' +
                 '<span class="sd-msg-book">Re: ' + escapeHtml(t.bookTitle) + '</span>' +

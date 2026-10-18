@@ -1,7 +1,7 @@
 const Message = require("../Models/Message");
 const User = require("../Models/User");
 const Book = require("../Models/Book");
-const { sendChatMessageNotification } = require("../utils/emailService");
+const { sendChatMessageNotification, shouldSendEmailNotification } = require("../utils/emailService");
 
 // Get all messages
 const getAllMessages = async (req, res) => {
@@ -107,6 +107,21 @@ const createMessage = async (req, res) => {
         // Asynchronously trigger email notification to the recipient (non-blocking)
         setImmediate(async () => {
             try {
+                // Determine if this is the first message in this book inquiry/conversation
+                let previousCount = 0;
+                try {
+                    previousCount = await Message.getPreviousMessageCount(SenderID, ReceiverID, BookID);
+                } catch (cErr) {
+                    previousCount = 0;
+                }
+                const isFirstMessage = previousCount <= 1; // 1 because current message was just saved
+
+                // Anti-Spam Frequency Throttling:
+                // First message always alerts. Follow-ups within 15 minutes are throttled to prevent spam.
+                if (!shouldSendEmailNotification(SenderID, ReceiverID, BookID, isFirstMessage)) {
+                    return; // Throttled!
+                }
+
                 const receiver = await User.getUserById(ReceiverID);
                 const sender = await User.getUserById(SenderID);
                 let bookTitle = "Book Listing";
@@ -126,7 +141,8 @@ const createMessage = async (req, res) => {
                         bookTitle: bookTitle,
                         bookId: BookID,
                         senderId: SenderID,
-                        messageText: MessageText
+                        messageText: MessageText,
+                        isFirstMessage: isFirstMessage
                     });
                 }
             } catch (notifyErr) {

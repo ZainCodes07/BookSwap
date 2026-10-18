@@ -55,6 +55,32 @@ const Message = {
         return result.recordset;
     },
 
+    // Count previous messages between two users (for conversation/inquiry detection)
+    getPreviousMessageCount: async (senderId, receiverId, bookId) => {
+        await connectDB();
+
+        const request = new sql.Request();
+        request.input("SenderID", sql.Int, senderId);
+        request.input("ReceiverID", sql.Int, receiverId);
+
+        let query = `
+            SELECT COUNT(*) AS total
+            FROM Messages
+            WHERE (
+                (SenderID = @SenderID AND ReceiverID = @ReceiverID)
+                OR
+                (SenderID = @ReceiverID AND ReceiverID = @SenderID)
+            )
+        `;
+
+        if (bookId) {
+            request.input("BookID", sql.Int, bookId);
+            query += ` AND BookID = @BookID`;
+        }
+
+        const result = await request.query(query);
+        return (result.recordset[0] && result.recordset[0].total) || 0;
+    },
 
     // Create new message
     createMessage: async (message) => {

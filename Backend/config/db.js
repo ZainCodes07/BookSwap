@@ -49,6 +49,8 @@ async function connectDB() {
                     ALTER TABLE Books ADD ImageUrl NVARCHAR(MAX) NULL;
                 IF NOT EXISTS (SELECT * FROM sys.columns WHERE object_id = OBJECT_ID('Books') AND name = 'CourseName')
                     ALTER TABLE Books ADD CourseName NVARCHAR(100) NULL;
+                IF NOT EXISTS (SELECT * FROM sys.columns WHERE object_id = OBJECT_ID('Users') AND name = 'PayoutAccount')
+                    ALTER TABLE Users ADD PayoutAccount NVARCHAR(MAX) NULL;
             `);
         } catch (migErr) {
             console.warn("Schema migration notice:", migErr.message);

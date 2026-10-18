@@ -610,7 +610,18 @@
     if (!user) return show('login');
     var mode = state.payoutMode;
 
-    if (data) user.payout = data;
+    if (data) {
+      user.payout = data;
+      if (window.BookSwapAPI) {
+        var uid = user.id || user.UserID;
+        if (uid) {
+          window.BookSwapAPI.users.update(uid, {
+            FullName: user.name || user.FullName || 'User',
+            PayoutAccount: JSON.stringify(data)
+          }).catch(function () {});
+        }
+      }
+    }
     if (mode === 'upgrade') {
       user.role = 'seller';
       user.Role = 'Seller';
@@ -624,7 +635,8 @@
         if (uid) {
           window.BookSwapAPI.users.update(uid, {
             FullName: user.name || user.FullName || rawUser.FullName || 'User',
-            Role: 'Seller'
+            Role: 'Seller',
+            PayoutAccount: data ? JSON.stringify(data) : undefined
           }).then(function (res) {
             if (res && res.user) {
               window.BookSwapAPI.setCurrentUser(res.user);

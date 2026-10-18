@@ -42,7 +42,7 @@ const Book = {
         const result = await request.query(`
             SELECT *
             FROM Books
-            WHERE SellerID = @SellerID
+            WHERE SellerID = @SellerID AND (Status != 'Removed' OR Status IS NULL)
         `);
 
         return result.recordset;
@@ -206,6 +206,8 @@ const Book = {
             await request.query(`
                 DELETE FROM Cart WHERE BookID = @BookID;
                 DELETE FROM Messages WHERE BookID = @BookID;
+                DELETE FROM Transactions WHERE OrderID IN (SELECT OrderID FROM Orders WHERE BookID = @BookID);
+                DELETE FROM Orders WHERE BookID = @BookID;
                 DELETE FROM Books WHERE BookID = @BookID;
             `);
             return 1;

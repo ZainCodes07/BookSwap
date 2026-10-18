@@ -167,10 +167,39 @@ const deleteMessage = async (req, res) => {
     }
 };
 
+// Get all messages for a specific user
+const getMessagesForUser = async (req, res) => {
+    try {
+        const userId = parseInt(req.params.userId, 10);
+
+        if (isNaN(userId)) {
+            return res.status(400).json({
+                success: false,
+                message: "Invalid user ID"
+            });
+        }
+
+        const messages = await Message.getMessagesForUser(userId);
+
+        res.status(200).json({
+            success: true,
+            messages
+        });
+    } catch (error) {
+        console.error("Get messages for user error:", error);
+
+        res.status(500).json({
+            success: false,
+            message: "Failed to get user messages"
+        });
+    }
+};
+
 module.exports = {
     getAllMessages,
     getMessageById,
     getMessagesBetweenUsers,
+    getMessagesForUser,
     createMessage,
     markAsRead,
     deleteMessage

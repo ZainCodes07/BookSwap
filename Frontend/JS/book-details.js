@@ -242,6 +242,13 @@
     var description = book.Description || book.description || "No description provided.";
     var sellerName = book.sellerName || "Student Seller";
 
+    var user = window.BookSwapAuth ? window.BookSwapAuth.currentUser() : null;
+    var currentUid = user ? (user.UserID || user.id) : null;
+    var isOwner = Boolean(user && (
+      (book.SellerID && currentUid && Number(book.SellerID) === Number(currentUid)) ||
+      (book.sellerEmail && user.email && book.sellerEmail.toLowerCase() === user.email.toLowerCase())
+    ));
+
     var imgUrl = book.ImageUrl || book.photo;
     var coverHtml = imgUrl
       ? '<img src="' + esc(imgUrl) + '" alt="' + esc(title) + '" style="max-height: 300px; max-width: 100%; object-fit: contain; border-radius: 8px; box-shadow: 0 8px 24px rgba(0,0,0,0.3);">'
@@ -250,12 +257,24 @@
           '<p style="font-size: 16px; color: #E0E7FF;">' + esc(author) + '</p>' +
         '</div>';
 
+    var fabHtml = isOwner ? '' : '<button class="bd-chat-fab" type="button" data-open-chat aria-label="Chat with seller">' + CHAT_ICON + '</button>';
+
+    var actionButtonsHtml = isOwner
+      ? '<div style="display: flex; gap: 12px; margin-top: 24px; flex-wrap: wrap;">' +
+          '<a href="Seller/add-listing.html?id=' + encodeURIComponent(book.BookID || book.id) + '" class="btn btn-primary" style="padding: 12px 24px; font-size: 16px; border-radius: 8px; text-decoration: none; display: inline-flex; align-items: center; justify-content: center; gap: 8px;">✏️ Edit My Listing</a>' +
+          '<a href="Seller/seller-dashboard.html" class="btn btn-outline" style="padding: 12px 24px; font-size: 16px; border-radius: 8px; text-decoration: none; display: inline-flex; align-items: center; justify-content: center; gap: 8px;">📊 Seller Dashboard</a>' +
+        '</div>'
+      : '<div style="display: flex; gap: 12px; margin-top: 24px; flex-wrap: wrap;">' +
+          '<button class="btn btn-primary" id="bdAddToCart" type="button" style="padding: 12px 24px; font-size: 16px; border-radius: 8px;">Add to Cart - Rs. ' + esc(price) + '</button>' +
+          '<button class="btn btn-outline" id="bdChatBtn" type="button" data-open-chat style="padding: 12px 24px; font-size: 16px; border-radius: 8px;">Chat with Seller</button>' +
+        '</div>';
+
     wrap.innerHTML =
       '<div class="bd-cover" id="bdCoverBox" style="background: linear-gradient(135deg, #6C38FF, #3B2470); color: #fff; display: flex; flex-direction: column; justify-content: center; align-items: center; padding: 40px; border-radius: 16px; position: relative; min-height: 380px;">' +
         '<span class="bd-badge" style="position: absolute; top: 16px; left: 16px;">' + esc(condition.toUpperCase()) + '</span>' +
         '<span class="bd-label" style="position: absolute; top: 16px; right: 16px; background: rgba(255,255,255,0.2); padding: 4px 10px; border-radius: 999px; font-size: 12px;">' + esc(listingType) + '</span>' +
         coverHtml +
-        '<button class="bd-chat-fab" type="button" data-open-chat aria-label="Chat with seller">' + CHAT_ICON + '</button>' +
+        fabHtml +
       '</div>' +
       '<div class="bd-info">' +
         '<h1 class="bd-title">' + esc(title) + '</h1>' +
@@ -264,26 +283,27 @@
         '<div class="bd-seller"><span class="bd-seller-avatar"></span>' + esc(sellerName) + ' &middot; ' + esc(listingType) + '</div>' +
         '<p class="bd-desc">' + esc(description) + '</p>' +
         '<div class="bd-tags"><span>' + esc(condition) + '</span><span>' + esc(listingType) + '</span></div>' +
-        '<div style="display: flex; gap: 12px; margin-top: 24px; flex-wrap: wrap;">' +
-          '<button class="btn btn-primary" id="bdAddToCart" type="button" style="padding: 12px 24px; font-size: 16px; border-radius: 8px;">Add to Cart - Rs. ' + esc(price) + '</button>' +
-          '<button class="btn btn-outline" id="bdChatBtn" type="button" data-open-chat style="padding: 12px 24px; font-size: 16px; border-radius: 8px;">Chat with Seller</button>' +
-        '</div>' +
+        actionButtonsHtml +
       '</div>';
 
     var coverBox = document.getElementById("bdCoverBox");
     var addToCartBtn = document.getElementById("bdAddToCart");
 
-    addToCartBtn.addEventListener("click", function () {
-      handleAddToCart(book, coverBox);
-      var originalText = addToCartBtn.textContent;
-      addToCartBtn.textContent = "Added to Cart ✓";
-      setTimeout(function () { addToCartBtn.textContent = originalText; }, 1400);
-    });
+    if (addToCartBtn) {
+      addToCartBtn.addEventListener("click", function () {
+        handleAddToCart(book, coverBox);
+        var originalText = addToCartBtn.textContent;
+        addToCartBtn.textContent = "Added to Cart ✓";
+        setTimeout(function () { addToCartBtn.textContent = originalText; }, 1400);
+      });
+    }
 
-    var openers = wrap.querySelectorAll("[data-open-chat]");
-    Array.prototype.forEach.call(openers, function (btn) {
-      btn.addEventListener("click", function () { openChat(btn); });
-    });
+    if (!isOwner) {
+      var openers = wrap.querySelectorAll("[data-open-chat]");
+      Array.prototype.forEach.call(openers, function (btn) {
+        btn.addEventListener("click", function () { openChat(btn); });
+      });
+    }
   }
 
   /* ================= INITIAL LOAD ================= */

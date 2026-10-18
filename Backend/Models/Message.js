@@ -122,6 +122,40 @@ const Message = {
         `);
 
         return result.rowsAffected[0];
+    },
+
+    // Get all messages for a user with names and book info (no personal contact info)
+    getMessagesForUser: async (userId) => {
+        await connectDB();
+
+        const request = new sql.Request();
+
+        request.input("UserID", sql.Int, userId);
+
+        const result = await request.query(`
+            SELECT 
+                m.MessageID,
+                m.SenderID,
+                m.ReceiverID,
+                m.BookID,
+                m.MessageText,
+                m.SentAt,
+                m.IsRead,
+                sender.FullName AS SenderName,
+                receiver.FullName AS ReceiverName,
+                b.Title AS BookTitle,
+                b.ImageUrl AS BookImage,
+                b.Price AS BookPrice,
+                b.SellerID AS BookSellerID
+            FROM Messages m
+            LEFT JOIN Users sender ON m.SenderID = sender.UserID
+            LEFT JOIN Users receiver ON m.ReceiverID = receiver.UserID
+            LEFT JOIN Books b ON m.BookID = b.BookID
+            WHERE m.SenderID = @UserID OR m.ReceiverID = @UserID
+            ORDER BY m.SentAt DESC
+        `);
+
+        return result.recordset;
     }
 
 };

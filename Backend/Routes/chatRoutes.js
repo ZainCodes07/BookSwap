@@ -4,6 +4,7 @@ const {
     getAllMessages,
     getMessageById,
     getMessagesBetweenUsers,
+    getMessagesForUser,
     createMessage,
     markAsRead,
     deleteMessage
@@ -12,6 +13,7 @@ const {
 const router = express.Router();
 
 router.get("/", getAllMessages);
+router.get("/user/:userId", getMessagesForUser);
 router.get("/conversation/:senderId/:receiverId", getMessagesBetweenUsers);
 router.get("/:id", getMessageById);
 

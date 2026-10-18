@@ -190,6 +190,7 @@
     // Chat
     chat: {
       getAll: function () { return request('/chat'); },
+      getByUser: function (userId) { return request('/chat/user/' + userId); },
       getConversation: function (senderId, receiverId) {
         return request('/chat/conversation/' + senderId + '/' + receiverId);
       },

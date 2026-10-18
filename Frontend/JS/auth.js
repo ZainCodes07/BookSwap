@@ -1142,7 +1142,11 @@
       if (!user) return;
 
       var isSeller = user.role === 'seller';
-      $('pfAvatar').textContent = user.name.trim().charAt(0).toUpperCase();
+      if (window.BookSwapAvatars) {
+        window.BookSwapAvatars.insertAvatar($('pfAvatar'), user.name, "100%");
+      } else {
+        $('pfAvatar').textContent = user.name.trim().charAt(0).toUpperCase();
+      }
       $('pfName').textContent = user.name;
       $('pfEmail').textContent = user.email;
       $('pfRole').textContent = isSeller ? 'Seller' : 'Buyer';
@@ -1157,9 +1161,64 @@
       pfForm.address.value = user.address || '';
       pfForm.city.value = user.city || '';
 
-      // Buyer sees "Switch to Seller". Seller sees seller tools (no switch back - a seller can also buy).
+      // Buyer sees "Switch to Seller" & Buyer Messages. Seller sees seller tools (no switch back - a seller can also buy).
+      var buyerMsgBox = $('pfBuyerMessagesBox');
+      if (buyerMsgBox) buyerMsgBox.hidden = isSeller;
       $('pfBuyerBox').hidden = isSeller;
       $('pfSellerBox').hidden = !isSeller;
+
+      if (!isSeller && window.BookSwapAPI) {
+        var uid = user.UserID || user.id;
+        if (uid) {
+          window.BookSwapAPI.chat.getByUser(uid)
+            .then(function (res) {
+              var msgs = (res && res.messages) || [];
+              var unread = msgs.filter(function (m) { return m.ReceiverID === uid && !m.IsRead; }).length;
+              var badge = $('pfMsgBadge');
+              if (badge) {
+                if (unread > 0) {
+                  badge.textContent = unread + ' new';
+                  badge.style.display = 'inline-block';
+                } else {
+                  badge.style.display = 'none';
+                }
+              }
+
+              var list = $('pfBuyerMsgList');
+              if (list && msgs.length > 0) {
+                var threads = {};
+                msgs.forEach(function (m) {
+                  var otherId = (m.SenderID === uid) ? m.ReceiverID : m.SenderID;
+                  var otherName = (m.SenderID === uid) ? (m.ReceiverName || 'Seller') : (m.SenderName || 'Seller');
+                  var key = otherId + '_' + (m.BookID || 0);
+                  if (!threads[key]) {
+                    threads[key] = {
+                      otherId: otherId,
+                      name: otherName,
+                      bookTitle: m.BookTitle || 'Book Chat',
+                      text: m.MessageText,
+                      time: m.SentAt
+                    };
+                  }
+                });
+
+                var threadArr = Object.keys(threads).map(function (k) { return threads[k]; }).slice(0, 2);
+                if (threadArr.length > 0) {
+                  list.innerHTML = threadArr.map(function (t) {
+                    return '<a href="chat.html?user=' + t.otherId + '" class="pf-msg-preview-item">' +
+                      '<div class="pf-msg-item-top">' +
+                        '<strong>' + t.name + '</strong>' +
+                        '<span class="pf-msg-item-book">' + t.bookTitle + '</span>' +
+                      '</div>' +
+                      '<p class="pf-msg-item-text">' + t.text + '</p>' +
+                    '</a>';
+                  }).join('');
+                }
+              }
+            })
+            .catch(function () {});
+        }
+      }
 
       if (isSeller) {
         $('pfPayoutLine').textContent = user.payout ? maskPayout(user.payout) : 'Not added yet';

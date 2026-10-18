@@ -1,4 +1,7 @@
 const Message = require("../Models/Message");
+const User = require("../Models/User");
+const Book = require("../Models/Book");
+const { sendChatMessageNotification } = require("../utils/emailService");
 
 // Get all messages
 const getAllMessages = async (req, res) => {
@@ -99,6 +102,36 @@ const createMessage = async (req, res) => {
             success: true,
             message: "Message sent successfully",
             data: newMessage
+        });
+
+        // Asynchronously trigger email notification to the recipient (non-blocking)
+        setImmediate(async () => {
+            try {
+                const receiver = await User.getUserById(ReceiverID);
+                const sender = await User.getUserById(SenderID);
+                let bookTitle = "Book Listing";
+
+                if (BookID) {
+                    try {
+                        const book = await Book.getBookById(BookID);
+                        if (book && book.Title) bookTitle = book.Title;
+                    } catch (e) {}
+                }
+
+                if (receiver && receiver.Email) {
+                    await sendChatMessageNotification({
+                        receiverEmail: receiver.Email,
+                        receiverName: receiver.FullName || "Student",
+                        senderName: sender ? sender.FullName : "A student",
+                        bookTitle: bookTitle,
+                        bookId: BookID,
+                        senderId: SenderID,
+                        messageText: MessageText
+                    });
+                }
+            } catch (notifyErr) {
+                console.warn("[Chat Notification Email Error]", notifyErr.message);
+            }
         });
     } catch (error) {
         console.error("Create message error:", error);

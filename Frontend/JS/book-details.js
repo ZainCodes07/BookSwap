@@ -162,17 +162,49 @@
       var isMe = m.SenderID === currentUserId || m.from === "me";
       var bubble = document.createElement("div");
       bubble.className = "bd-msg " + (isMe ? "bd-msg-me" : "bd-msg-them");
-      bubble.textContent = m.MessageText || m.text;
+
+      var txtSpan = document.createElement("span");
+      txtSpan.className = "bd-msg-text";
+      txtSpan.textContent = m.MessageText || m.text;
+      bubble.appendChild(txtSpan);
 
       var time = document.createElement("span");
       time.className = "bd-msg-time";
-      time.textContent = formatTime(m.CreatedAt || m.ts);
+      time.textContent = formatTime(m.CreatedAt || m.SentAt || m.ts);
+      if (isMe) {
+        var chk = document.createElement("span");
+        chk.className = "bd-msg-check";
+        chk.textContent = " ✓✓";
+        time.appendChild(chk);
+      }
       bubble.appendChild(time);
 
       chatMessages.appendChild(bubble);
     });
 
     chatMessages.scrollTop = chatMessages.scrollHeight;
+  }
+
+  var bdPollTimer = null;
+  function startBdPolling() {
+    stopBdPolling();
+    bdPollTimer = setInterval(function () {
+      if (!chatEl.classList.contains("is-open") || !currentBook) return;
+      var sellerId = currentBook.SellerID || currentBook.sellerId || 1;
+      loadMessages(sellerId).then(function (messages) {
+        var existingCount = chatMessages.querySelectorAll(".bd-msg").length;
+        if (messages && messages.length !== existingCount) {
+          renderChat(messages);
+        }
+      });
+    }, 2500);
+  }
+
+  function stopBdPolling() {
+    if (bdPollTimer) {
+      clearInterval(bdPollTimer);
+      bdPollTimer = null;
+    }
   }
 
   function openChat(trigger) {
@@ -188,14 +220,21 @@
     chatName.textContent = currentBook.sellerName || "Seller";
     chatBook.textContent = "About: " + (currentBook.Title || currentBook.title);
 
+    var chatAvatar = chatEl.querySelector(".bd-chat-avatar");
+    if (chatAvatar && window.BookSwapAvatars) {
+      window.BookSwapAvatars.insertAvatar(chatAvatar, currentBook.sellerName || "Seller", "38");
+    }
+
     chatEl.classList.add("is-open");
     chatEl.setAttribute("aria-hidden", "false");
     chatInput.focus();
 
     loadMessages(currentBook.SellerID || currentBook.sellerId || 1).then(renderChat);
+    startBdPolling();
   }
 
   function closeChat() {
+    stopBdPolling();
     chatEl.classList.remove("is-open");
     chatEl.setAttribute("aria-hidden", "true");
     if (lastTrigger && typeof lastTrigger.focus === "function") lastTrigger.focus();
@@ -269,6 +308,8 @@
           '<button class="btn btn-outline" id="bdChatBtn" type="button" data-open-chat style="padding: 12px 24px; font-size: 16px; border-radius: 8px;">Chat with Seller</button>' +
         '</div>';
 
+    var sellerAvatarSvg = window.BookSwapAvatars ? window.BookSwapAvatars.getAvatarSvg(sellerName, '30') : '';
+
     wrap.innerHTML =
       '<div class="bd-cover" id="bdCoverBox" style="background: linear-gradient(135deg, #6C38FF, #3B2470); color: #fff; display: flex; flex-direction: column; justify-content: center; align-items: center; padding: 40px; border-radius: 16px; position: relative; min-height: 380px;">' +
         '<span class="bd-badge" style="position: absolute; top: 16px; left: 16px;">' + esc(condition.toUpperCase()) + '</span>' +
@@ -280,7 +321,7 @@
         '<h1 class="bd-title">' + esc(title) + '</h1>' +
         '<div class="bd-stars">' + stars(4) + ' <span>(Verified Student Listing)</span></div>' +
         '<div class="bd-price">Rs. ' + esc(price.toLocaleString("en-PK")) + '</div>' +
-        '<div class="bd-seller"><span class="bd-seller-avatar"></span>' + esc(sellerName) + ' &middot; ' + esc(listingType) + '</div>' +
+        '<div class="bd-seller"><span class="bd-seller-avatar">' + sellerAvatarSvg + '</span>' + esc(sellerName) + ' &middot; ' + esc(listingType) + '</div>' +
         '<p class="bd-desc">' + esc(description) + '</p>' +
         '<div class="bd-tags"><span>' + esc(condition) + '</span><span>' + esc(listingType) + '</span></div>' +
         actionButtonsHtml +

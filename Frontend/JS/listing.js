@@ -84,7 +84,9 @@
         Description: listing.description || listing.Description || null,
         Price: Number(listing.price || listing.Price || 0),
         BookCondition: listing.condition || listing.BookCondition || "Good",
-        ListingType: listing.swap ? "Swap" : "Sale"
+        ListingType: listing.swap ? "Swap" : "Sale",
+        ImageUrl: listing.photo || (listing.photos && listing.photos[0]) || null,
+        CourseName: listing.course || null
       };
 
       if (listing.BookID) {
@@ -93,7 +95,16 @@
       } else {
         window.BookSwapAPI.listings.create(backendPayload)
           .then(function (res) {
-            if (res.book && res.book.BookID) listing.BookID = res.book.BookID;
+            if (res.book && res.book.BookID) {
+              listing.BookID = res.book.BookID;
+              var curList = readAll();
+              var idx = curList.findIndex(function (l) { return l.id === listing.id; });
+              if (idx !== -1) {
+                curList[idx].BookID = res.book.BookID;
+                curList[idx].status = 'live';
+                writeAll(curList);
+              }
+            }
           })
           .catch(function (e) { console.warn('Listing create API error:', e.message); });
       }
@@ -109,9 +120,11 @@
   }
 
   function remove(id) {
+    var item = get(id);
+    var bookId = item && item.BookID ? item.BookID : id;
     writeAll(readAll().filter(function (l) { return l.id !== id; }));
     if (window.BookSwapAPI) {
-      window.BookSwapAPI.listings.delete(id).catch(function () {});
+      window.BookSwapAPI.listings.delete(bookId).catch(function () {});
     }
   }
 
@@ -271,9 +284,64 @@
     var filter = 'all';
     var $ = function (id) { return document.getElementById(id); };
 
+    function syncSellerWithBackend(user, cb) {
+      if (!window.BookSwapAPI || !user) { if (cb) cb(); return; }
+      var uid = user.UserID || user.id;
+      if (!uid) { if (cb) cb(); return; }
+
+      window.BookSwapAPI.listings.getBySeller(uid)
+        .then(function (res) {
+          var apiBooks = (res && res.books) || [];
+          if (Array.isArray(apiBooks) && apiBooks.length) {
+            var localList = readAll();
+            apiBooks.forEach(function (b) {
+              var found = localList.find(function (l) {
+                return l.BookID === b.BookID || (l.title && b.Title && l.title.trim().toLowerCase() === b.Title.trim().toLowerCase());
+              });
+              if (found) {
+                found.BookID = b.BookID;
+                found.status = 'live';
+                found.title = b.Title;
+                found.price = Number(b.Price || 0);
+                if (b.ImageUrl) found.photo = b.ImageUrl;
+                if (b.CourseName) found.course = b.CourseName;
+              } else {
+                localList.push({
+                  id: 'l' + b.BookID,
+                  BookID: b.BookID,
+                  sellerEmail: user.email,
+                  sellerName: user.name || user.FullName,
+                  status: 'live',
+                  title: b.Title,
+                  author: b.Author,
+                  course: b.CourseName || 'Other',
+                  condition: b.BookCondition || 'Good',
+                  price: Number(b.Price || 0),
+                  type: b.ListingType === 'Swap' ? 'swap' : 'sell',
+                  photo: b.ImageUrl || '',
+                  views: 5,
+                  createdAt: b.CreatedAt || new Date().toISOString()
+                });
+              }
+            });
+            writeAll(localList);
+          }
+          if (cb) cb();
+        })
+        .catch(function () {
+          if (cb) cb();
+        });
+    }
+
+    var didSync = false;
     function renderDashboard() {
       var user = gate();
       if (!user) return;
+
+      if (!didSync) {
+        didSync = true;
+        syncSellerWithBackend(user, renderDashboard);
+      }
 
       if (/[?&]demo=1/.test(window.location.search)) addDemoListings();
 
@@ -871,11 +939,14 @@
           id: 'l' + Date.now(),
           sellerEmail: user.email,
           sellerName: user.name,
-          status: 'pending',
+          status: 'live',
           views: 0,
           createdAt: new Date().toISOString(),
           soldAt: ''
         };
+        if (existing && existing.BookID) {
+          listing.BookID = existing.BookID;
+        }
         ['title', 'author', 'edition', 'course', 'condition', 'type', 'swapFor', 'description', 'photo', 'photos'].forEach(function (k) {
           listing[k] = v[k];
         });
@@ -897,12 +968,12 @@
     function showDone(wasEdit) {
       el('alFormWrap').hidden = true;
       el('alDone').hidden = false;
-      el('alDoneTitle').textContent = wasEdit ? 'Saved' : 'In review';
+      el('alDoneTitle').textContent = wasEdit ? 'Saved' : 'Listed!';
       el('alDoneText').innerHTML = wasEdit
         ? 'Your listing is updated. Buyers see it right away.'
-        : "Quick check from us, then it's live. Find it under <strong>Waiting</strong>.";
-      el('alHeading').textContent = wasEdit ? 'All Set' : 'Nice One';
-      el('alSub').textContent = wasEdit ? 'Edits are live.' : 'One less book gathering dust.';
+        : 'Your listing is live on BookSwap. Buyers can see it right away.';
+      el('alHeading').textContent = wasEdit ? 'All Set' : 'Your Book is Live!';
+      el('alSub').textContent = wasEdit ? 'Edits are live.' : 'Ready for students to browse and buy.';
       window.scrollTo({ top: 0, behavior: 'smooth' });
     }
 

@@ -98,6 +98,7 @@ const User = {
 
         request.input("UserID", sql.Int, userId);
         request.input("FullName", sql.NVarChar(100), user.FullName);
+        request.input("Role", sql.NVarChar(20), user.Role || null);
         request.input("Phone", sql.NVarChar(20), user.Phone || null);
         request.input("Address", sql.NVarChar(255), user.Address || null);
 
@@ -105,6 +106,7 @@ const User = {
             UPDATE Users
             SET
                 FullName = @FullName,
+                Role = COALESCE(@Role, Role),
                 Phone = @Phone,
                 Address = @Address
             OUTPUT INSERTED.*

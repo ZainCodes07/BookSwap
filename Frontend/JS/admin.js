@@ -325,7 +325,7 @@
         }
         return '<tr>' +
             '<td class="strong">' + esc(l.title) + '</td>' +
-            '<td>' + esc(COURSES[l.course]) + '</td>' +
+            '<td>' + esc(COURSES[l.course] || l.course || 'Other') + '</td>' +
             '<td>' + esc(l.seller) + '</td>' +
             '<td>' + esc(l.condition) + '</td>' +
             '<td class="num">' + rupees(l.price) + '</td>' +
@@ -357,12 +357,18 @@
       var act = btn.getAttribute('data-act');
 
       if (act === 'approve') {
-        item.status = 'live';          // BACKEND: POST /api/admin/listings/:id/approve
+        item.status = 'live';
+        if (window.BookSwapAPI && item.id) {
+          window.BookSwapAPI.listings.update(item.id, { Status: 'Available' }).catch(function () {});
+        }
         toast('"' + item.title + '" is now live.');
         render();
       }
       if (act === 'restore') {
-        item.status = 'live';          // BACKEND: POST /api/admin/listings/:id/restore
+        item.status = 'live';
+        if (window.BookSwapAPI && item.id) {
+          window.BookSwapAPI.listings.update(item.id, { Status: 'Available' }).catch(function () {});
+        }
         toast('"' + item.title + '" is live again.');
         render();
       }
@@ -474,12 +480,12 @@
             return {
               id: l.BookID,
               title: l.Title,
-              course: 'programming',
+              course: l.CourseName || (COURSES[l.course] ? l.course : 'Other'),
               seller: 'Seller #' + l.SellerID,
               condition: l.BookCondition,
               price: Number(l.Price || 0),
               listed: (l.CreatedAt || new Date().toISOString()).slice(0, 10),
-              status: 'live'
+              status: (l.Status === 'pending' || l.Status === 'Pending') ? 'pending' : 'live'
             };
           });
         }

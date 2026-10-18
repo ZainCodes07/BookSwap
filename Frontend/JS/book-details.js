@@ -111,7 +111,8 @@
             BookID: bookId,
             title: book.Title || book.title,
             price: Number(book.Price || book.price || 0),
-            qty: 1
+            qty: 1,
+            photo: book.ImageUrl || book.photo || null
           });
         }
         localStorage.setItem(CART_KEY, JSON.stringify(cart));
@@ -241,14 +242,19 @@
     var description = book.Description || book.description || "No description provided.";
     var sellerName = book.sellerName || "Student Seller";
 
+    var imgUrl = book.ImageUrl || book.photo;
+    var coverHtml = imgUrl
+      ? '<img src="' + esc(imgUrl) + '" alt="' + esc(title) + '" style="max-height: 300px; max-width: 100%; object-fit: contain; border-radius: 8px; box-shadow: 0 8px 24px rgba(0,0,0,0.3);">'
+      : '<div style="text-align: center;">' +
+          '<h2 style="font-size: 24px; margin-bottom: 8px; color: #fff;">' + esc(title) + '</h2>' +
+          '<p style="font-size: 16px; color: #E0E7FF;">' + esc(author) + '</p>' +
+        '</div>';
+
     wrap.innerHTML =
       '<div class="bd-cover" id="bdCoverBox" style="background: linear-gradient(135deg, #6C38FF, #3B2470); color: #fff; display: flex; flex-direction: column; justify-content: center; align-items: center; padding: 40px; border-radius: 16px; position: relative; min-height: 380px;">' +
         '<span class="bd-badge" style="position: absolute; top: 16px; left: 16px;">' + esc(condition.toUpperCase()) + '</span>' +
         '<span class="bd-label" style="position: absolute; top: 16px; right: 16px; background: rgba(255,255,255,0.2); padding: 4px 10px; border-radius: 999px; font-size: 12px;">' + esc(listingType) + '</span>' +
-        '<div style="text-align: center;">' +
-          '<h2 style="font-size: 24px; margin-bottom: 8px; color: #fff;">' + esc(title) + '</h2>' +
-          '<p style="font-size: 16px; color: #E0E7FF;">' + esc(author) + '</p>' +
-        '</div>' +
+        coverHtml +
         '<button class="bd-chat-fab" type="button" data-open-chat aria-label="Chat with seller">' + CHAT_ICON + '</button>' +
       '</div>' +
       '<div class="bd-info">' +
@@ -283,9 +289,74 @@
   /* ================= INITIAL LOAD ================= */
 
   var params = new URLSearchParams(window.location.search);
-  var bookId = parseInt(params.get("id"), 10) || 1;
+  var rawId = params.get("id") || "1";
+  var bookId = parseInt(rawId, 10);
 
-  if (window.BookSwapAPI) {
+  var DEMO_BOOKS = [
+    { id: 1,  title: 'Introduction to Algorithms', author: 'Cormen, Leiserson, Rivest, Stein', subject: 'dsa', price: 2200, original: 6500, condition: 'Good', swap: true,  seller: 'Hamza', semester: 6, sold: 41, listedDaysAgo: 9 },
+    { id: 2,  title: 'Computer Networking: A Top-Down Approach', author: 'Kurose & Ross', subject: 'networking', price: 1800, original: 5200, condition: 'Like new', swap: false, seller: 'Ayesha', semester: 7, sold: 38, listedDaysAgo: 1 },
+    { id: 3,  title: 'Database System Concepts', author: 'Silberschatz, Korth, Sudarshan', subject: 'databases', price: 1600, original: 4800, condition: 'Good', swap: true, seller: 'Bilal', semester: 5, sold: 35, listedDaysAgo: 3 },
+    { id: 4,  title: 'Operating System Concepts', author: 'Silberschatz, Galvin, Gagne', subject: 'os', price: 1700, original: 5000, condition: 'Fair', swap: true, seller: 'Usman', semester: 8, sold: 29, listedDaysAgo: 12 },
+    { id: 5,  title: 'Data Structures and Algorithms in Java', author: 'Goodrich, Tamassia, Goldwasser', subject: 'dsa', price: 1400, original: 4200, condition: 'Like new', swap: false, seller: 'Fatima', semester: 4, sold: 27, listedDaysAgo: 2 },
+    { id: 6,  title: 'C++ How to Program', author: 'Paul Deitel & Harvey Deitel', subject: 'programming', price: 1200, original: 3900, condition: 'Good', swap: true, seller: 'Ali', semester: 3, sold: 33, listedDaysAgo: 5 },
+    { id: 7,  title: 'Computer Networks', author: 'Andrew S. Tanenbaum', subject: 'networking', price: 1900, original: 5400, condition: 'Like new', swap: false, seller: 'Zara', semester: 7, sold: 24, listedDaysAgo: 0 },
+    { id: 8,  title: 'Object-Oriented Programming in C++', author: 'Robert Lafore', subject: 'oop', price: 1300, original: 4000, condition: 'Good', swap: true, seller: 'Saad', semester: 2, sold: 31, listedDaysAgo: 4 },
+    { id: 9,  title: 'Fundamentals of Database Systems', author: 'Elmasri & Navathe', subject: 'databases', price: 1500, original: 4600, condition: 'Good', swap: false, seller: 'Hira', semester: 5, sold: 22, listedDaysAgo: 1 },
+    { id: 10, title: 'Computer Organization and Design', author: 'Patterson & Hennessy', subject: 'os', price: 1900, original: 5600, condition: 'Fair', swap: true, seller: 'Taha', semester: 4, sold: 18, listedDaysAgo: 6 },
+    { id: 11, title: 'Head First Java', author: 'Kathy Sierra & Bert Bates', subject: 'oop', price: 1100, original: 3800, condition: 'Like new', swap: true, seller: 'Maryam', semester: 1, sold: 26, listedDaysAgo: 2 },
+    { id: 12, title: 'Clean Code', author: 'Robert C. Martin', subject: 'oop', price: 1000, original: 3200, condition: 'Good', swap: false, seller: 'Danish', semester: 5, sold: 20, listedDaysAgo: 7 }
+  ];
+
+  function fallbackLookup() {
+    var localMatch = null;
+    try {
+      var stored = JSON.parse(localStorage.getItem("bookswap_listings") || "[]");
+      localMatch = stored.find(function (item) {
+        return String(item.BookID) === String(rawId) || String(item.id) === String(rawId);
+      });
+    } catch (e) {}
+
+    if (localMatch) {
+      currentBook = {
+        BookID: localMatch.BookID || localMatch.id,
+        Title: localMatch.title,
+        Author: localMatch.author,
+        Price: localMatch.price,
+        BookCondition: localMatch.condition,
+        ListingType: localMatch.type === 'swap' ? 'Swap' : 'Sale',
+        Description: localMatch.description || ('Verified student listing for ' + (localMatch.course || 'course studies') + '.'),
+        sellerName: localMatch.sellerName || 'Student Seller',
+        ImageUrl: localMatch.photo || null
+      };
+      document.title = (currentBook.Title || "Book") + " - BookSwap";
+      render(currentBook);
+      if (params.get("chat") === "1") openChat(null);
+      return true;
+    }
+
+    var demoBook = DEMO_BOOKS.find(function (b) { return b.id === bookId; });
+    if (demoBook) {
+      currentBook = {
+        BookID: demoBook.id,
+        Title: demoBook.title,
+        Author: demoBook.author,
+        Price: demoBook.price,
+        BookCondition: demoBook.condition,
+        ListingType: demoBook.swap ? "Swap" : "Sale",
+        Description: "Standard textbook for " + (demoBook.subject ? demoBook.subject.toUpperCase() : "course studies") + ". Great condition, verified student listing.",
+        sellerName: demoBook.seller + " (" + demoBook.semester + "th sem)",
+        SellerID: 1
+      };
+      document.title = (demoBook.title || "Book") + " - BookSwap";
+      render(currentBook);
+      if (params.get("chat") === "1") openChat(null);
+      return true;
+    }
+
+    return false;
+  }
+
+  if (window.BookSwapAPI && !isNaN(bookId)) {
     window.BookSwapAPI.listings.getById(bookId)
       .then(function (res) {
         var book = res.book;
@@ -297,13 +368,24 @@
       })
       .catch(function (err) {
         console.warn("[Book Details Fetch Error]", err.message);
-        wrap.innerHTML =
-          '<div style="text-align: center; padding: 60px 20px;">' +
-            '<h2>Book Listing #' + bookId + '</h2>' +
-            '<p style="color: #64748B; margin: 12px 0 24px;">' + esc(err.message || "Book listing not found in database.") + '</p>' +
-            '<a href="index.html" class="btn btn-primary">Browse All Books</a>' +
-          '</div>';
+        if (!fallbackLookup()) {
+          wrap.innerHTML =
+            '<div style="text-align: center; padding: 60px 20px;">' +
+              '<h2>Book Listing #' + esc(rawId) + '</h2>' +
+              '<p style="color: #64748B; margin: 12px 0 24px;">' + esc(err.message || "Book listing not found in database.") + '</p>' +
+              '<a href="index.html" class="btn btn-primary">Browse All Books</a>' +
+            '</div>';
+        }
       });
+  } else {
+    if (!fallbackLookup()) {
+      wrap.innerHTML =
+        '<div style="text-align: center; padding: 60px 20px;">' +
+          '<h2>Book Listing #' + esc(rawId) + '</h2>' +
+          '<p style="color: #64748B; margin: 12px 0 24px;">Book listing not found.</p>' +
+          '<a href="index.html" class="btn btn-primary">Browse All Books</a>' +
+        '</div>';
+    }
   }
 
 })();

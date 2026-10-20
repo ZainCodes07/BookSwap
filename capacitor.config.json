@@ -1,5 +1,17 @@
 {
   "appId": "com.bookswap.app",
   "appName": "BookSwap",
-  "webDir": "Frontend"
+  "webDir": "Frontend",
+  "plugins": {
+    "SplashScreen": {
+      "launchShowDuration": 1200,
+      "launchAutoHide": true,
+      "backgroundColor": "#0F172A",
+      "androidSplashResourceName": "splash",
+      "androidScaleType": "CENTER_CROP",
+      "showSpinner": false,
+      "splashFullScreen": true,
+      "splashImmersive": true
+    }
+  }
 }

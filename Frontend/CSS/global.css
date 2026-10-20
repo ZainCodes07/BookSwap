@@ -9483,3 +9483,279 @@ html.auth-lock { overflow: hidden; }
   font-size: 12px;
   color: #64748B;
 }
+
+/* ==========================================================================
+   ANIMATED MOBILE SPLASH SCREEN & IN-APP UPDATER
+   ========================================================================== */
+
+/* --- Splash Screen --- */
+.app-splash-screen {
+  position: fixed;
+  inset: 0;
+  z-index: 999999;
+  background: radial-gradient(circle at 50% 40%, #1E1B4B 0%, #0F172A 70%, #080D1A 100%);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-direction: column;
+  transition: opacity 0.45s ease, visibility 0.45s ease;
+}
+
+.app-splash-screen.is-hidden {
+  opacity: 0;
+  visibility: hidden;
+  pointer-events: none;
+}
+
+.splash-card {
+  position: relative;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  text-align: center;
+  padding: 24px;
+}
+
+.splash-glow {
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  width: 240px;
+  height: 240px;
+  background: radial-gradient(circle, rgba(168, 85, 247, 0.45) 0%, rgba(108, 56, 255, 0.15) 50%, transparent 70%);
+  filter: blur(32px);
+  pointer-events: none;
+  animation: splashAura 2s infinite ease-in-out;
+}
+
+.splash-logo-box {
+  position: relative;
+  width: 104px;
+  height: 104px;
+  display: grid;
+  place-items: center;
+  margin-bottom: 16px;
+  animation: splashPopUp 1.6s cubic-bezier(0.175, 0.885, 0.32, 1.275) forwards;
+}
+
+.splash-logo {
+  width: 96px;
+  height: 96px;
+  object-fit: contain;
+  filter: drop-shadow(0 12px 28px rgba(108, 56, 255, 0.55));
+}
+
+.splash-text {
+  animation: splashTextFade 1.6s ease forwards;
+}
+
+.splash-title {
+  margin: 0;
+  font-size: 34px;
+  font-weight: 800;
+  color: #fff;
+  letter-spacing: -0.5px;
+}
+
+.splash-title span {
+  background: linear-gradient(90deg, #A855F7, #C084FC);
+  -webkit-background-clip: text;
+  background-clip: text;
+  color: transparent;
+}
+
+.splash-subtitle {
+  margin: 6px 0 0;
+  font-size: 13px;
+  font-weight: 500;
+  color: #94A3B8;
+  letter-spacing: 2px;
+  text-transform: uppercase;
+}
+
+.splash-dots {
+  display: flex;
+  gap: 8px;
+  margin-top: 24px;
+}
+
+.splash-dots span {
+  width: 8px;
+  height: 8px;
+  border-radius: 50%;
+  background: var(--primary-light);
+  animation: splashDotPulse 1.2s infinite ease-in-out;
+}
+
+.splash-dots span:nth-child(2) { animation-delay: 0.2s; }
+.splash-dots span:nth-child(3) { animation-delay: 0.4s; }
+
+@keyframes splashPopUp {
+  0% {
+    transform: scale(0.3) translateY(45px);
+    opacity: 0;
+  }
+  45% {
+    transform: scale(1.1) translateY(-6px);
+    opacity: 1;
+  }
+  70% {
+    transform: scale(1) translateY(0);
+    opacity: 1;
+  }
+  100% {
+    transform: scale(0.8) translateY(30px);
+    opacity: 0;
+  }
+}
+
+@keyframes splashTextFade {
+  0%, 15% {
+    opacity: 0;
+    transform: translateY(14px);
+  }
+  40%, 70% {
+    opacity: 1;
+    transform: translateY(0);
+  }
+  100% {
+    opacity: 0;
+    transform: translateY(18px);
+  }
+}
+
+@keyframes splashAura {
+  0%, 100% { transform: translate(-50%, -50%) scale(1); opacity: 0.5; }
+  50% { transform: translate(-50%, -50%) scale(1.25); opacity: 0.85; }
+}
+
+@keyframes splashDotPulse {
+  0%, 100% { transform: scale(0.7); opacity: 0.3; }
+  50% { transform: scale(1.25); opacity: 1; }
+}
+
+/* --- In-App Auto Updater Modal --- */
+.app-update-modal {
+  position: fixed;
+  inset: 0;
+  z-index: 99999;
+  display: grid;
+  place-items: center;
+  padding: 20px;
+  font-family: var(--font);
+}
+
+.app-update-modal[hidden] {
+  display: none !important;
+}
+
+.app-update-backdrop {
+  position: absolute;
+  inset: 0;
+  background: rgba(15, 23, 42, 0.78);
+  backdrop-filter: blur(6px);
+  -webkit-backdrop-filter: blur(6px);
+}
+
+.app-update-dialog {
+  position: relative;
+  width: 100%;
+  max-width: 420px;
+  background: #fff;
+  border-radius: 24px;
+  padding: 30px 24px 24px;
+  box-shadow: 0 25px 60px rgba(0, 0, 0, 0.4);
+  text-align: center;
+  animation: updateModalPop 0.3s cubic-bezier(0.16, 1, 0.3, 1);
+  overflow: hidden;
+}
+
+@keyframes updateModalPop {
+  from { transform: scale(0.9) translateY(20px); opacity: 0; }
+  to { transform: scale(1) translateY(0); opacity: 1; }
+}
+
+.app-update-icon {
+  width: 68px;
+  height: 68px;
+  margin: 0 auto 16px;
+  background: linear-gradient(135deg, var(--primary), var(--secondary));
+  border-radius: 20px;
+  display: grid;
+  place-items: center;
+  font-size: 32px;
+  box-shadow: 0 10px 25px rgba(108, 56, 255, 0.35);
+}
+
+.app-update-title {
+  margin: 0 0 6px;
+  font-size: 22px;
+  font-weight: 700;
+  color: var(--dark);
+}
+
+.app-update-version {
+  display: inline-block;
+  padding: 3px 12px;
+  background: #EDE9FE;
+  color: var(--primary);
+  border-radius: 999px;
+  font-size: 12px;
+  font-weight: 600;
+  margin-bottom: 14px;
+}
+
+.app-update-notes {
+  margin: 0 0 22px;
+  font-size: 13.5px;
+  color: #64748B;
+  line-height: 1.55;
+  background: #F8FAFC;
+  padding: 12px 14px;
+  border-radius: 12px;
+  border: 1px solid #E2E8F0;
+  text-align: left;
+}
+
+.app-update-actions {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+}
+
+.app-update-btn-primary {
+  width: 100%;
+  padding: 13px 20px;
+  background: linear-gradient(135deg, var(--primary), var(--secondary));
+  border: 0;
+  border-radius: 14px;
+  color: #fff;
+  font-size: 14.5px;
+  font-weight: 600;
+  cursor: pointer;
+  box-shadow: 0 8px 20px rgba(108, 56, 255, 0.35);
+  transition: transform 0.2s ease, box-shadow 0.2s ease;
+  text-decoration: none;
+  display: block;
+}
+
+.app-update-btn-primary:active {
+  transform: scale(0.98);
+}
+
+.app-update-btn-ghost {
+  width: 100%;
+  padding: 10px 16px;
+  background: transparent;
+  border: 0;
+  color: #94A3B8;
+  font-size: 13.5px;
+  font-weight: 500;
+  cursor: pointer;
+  transition: color 0.2s ease;
+}
+
+.app-update-btn-ghost:hover {
+  color: var(--dark);
+}

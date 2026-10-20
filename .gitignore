@@ -22,3 +22,7 @@ android/.externalNativeBuild/
 # OS Files
 .DS_Store
 Thumbs.db
+
+# Binaries
+*.apk
+

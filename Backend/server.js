@@ -40,6 +40,19 @@ app.use("/api/cart", cartRoutes);
 app.use("/api/payment", paymentRoutes);
 app.use("/api/admin", adminRoutes);
 
+// App Version endpoint for Mobile In-App Updater
+app.get("/api/app-version", (req, res) => {
+    res.json({
+        latestVersion: "1.1.0",
+        versionCode: 2,
+        minVersion: "1.0.0",
+        downloadUrl: "https://book-swap-mocha.vercel.app/download/BookSwap.apk",
+        releaseNotes: "• New logo splash screen with pop-up animations\n• Mobile drawer & layout refinements\n• One-click in-app updates without uninstalling",
+        mandatory: false,
+        releasedAt: "2026-10-20"
+    });
+});
+
 // Connect Database
 connectDB();
 

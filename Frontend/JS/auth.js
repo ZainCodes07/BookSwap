@@ -805,6 +805,50 @@
       if (notifWrap) notifWrap.style.display = 'none';
     }
 
+    // Sync mobile drawer user state
+    var drawerGuestCard = document.getElementById('drawerGuestCard');
+    var drawerUserCard = document.getElementById('drawerUserCard');
+    var drawerUserLinks = document.getElementById('drawerUserLinks');
+    var drawerUserName = document.getElementById('drawerUserName');
+    var drawerUserEmail = document.getElementById('drawerUserEmail');
+    var drawerUserRole = document.getElementById('drawerUserRole');
+    var drawerUserInitial = document.getElementById('drawerUserInitial');
+    var drawerLogoutBtn = document.getElementById('drawerLogoutBtn');
+    var drawerSellerLink = document.getElementById('drawerSellerLink');
+
+    if (user) {
+      if (drawerGuestCard) drawerGuestCard.style.display = 'none';
+      if (drawerUserCard) drawerUserCard.style.display = 'flex';
+      if (drawerUserLinks) drawerUserLinks.style.display = 'block';
+
+      var displayName = (user.FullName || user.name || 'Student').trim();
+      var displayEmail = (user.Email || user.email || '').trim();
+      var displayRole = (user.Role || user.role || 'Student');
+
+      if (drawerUserName) drawerUserName.textContent = displayName;
+      if (drawerUserEmail) drawerUserEmail.textContent = displayEmail;
+      if (drawerUserRole) drawerUserRole.textContent = displayRole;
+      if (drawerUserInitial) drawerUserInitial.textContent = displayName.charAt(0).toUpperCase();
+
+      if (drawerSellerLink) {
+        if (displayRole.toLowerCase() === 'seller' || displayRole.toLowerCase() === 'admin') {
+          drawerSellerLink.style.display = 'flex';
+        } else {
+          drawerSellerLink.style.display = 'none';
+        }
+      }
+
+      if (drawerLogoutBtn) {
+        drawerLogoutBtn.onclick = function () {
+          logout();
+        };
+      }
+    } else {
+      if (drawerGuestCard) drawerGuestCard.style.display = 'flex';
+      if (drawerUserCard) drawerUserCard.style.display = 'none';
+      if (drawerUserLinks) drawerUserLinks.style.display = 'none';
+    }
+
     var cartBadge = document.getElementById('cartCount') || document.getElementById('navCartBadge');
     if (cartBadge) {
       if (user && window.BookSwapAPI) {
@@ -1018,6 +1062,20 @@
   // Global click gate: If guest clicks any interactive element, prompt login
   document.addEventListener('click', function (e) {
     if (modal && modal.contains(e.target)) return;
+
+    // Allow mobile drawer interactions for guests
+    if (e.target.closest('#navToggle, #navDrawer, #navDrawerBackdrop, .nav-toggle, .drawer-close')) {
+      if (e.target.closest('#drawerSignInBtn, [data-auth-open]')) {
+        e.preventDefault();
+        var drawer = document.getElementById('navDrawer');
+        var backdrop = document.getElementById('navDrawerBackdrop');
+        if (drawer) drawer.classList.remove('is-open');
+        if (backdrop) backdrop.classList.remove('is-open');
+        document.body.classList.remove('drawer-open');
+        return open('login');
+      }
+      return;
+    }
 
     var el = e.target.closest('[data-auth-open], [data-auth-required], [data-seller-required], .nav-avatar, a[href*="profile.html"]');
 

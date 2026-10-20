@@ -43,25 +43,61 @@
   /* ---------- Navigation behaviour ---------- */
   function initNavigation() {
     var nav = document.getElementById('siteNav');
-    if (!nav) return;
-
-    // Mobile menu toggle
+    var drawer = document.getElementById('navDrawer');
+    var backdrop = document.getElementById('navDrawerBackdrop');
     var toggle = document.getElementById('navToggle');
+    var closeBtn = document.getElementById('navDrawerClose');
+
+    function openDrawer() {
+      if (drawer) {
+        drawer.classList.add('is-open');
+        drawer.setAttribute('aria-hidden', 'false');
+      }
+      if (backdrop) backdrop.classList.add('is-open');
+      if (toggle) toggle.setAttribute('aria-expanded', 'true');
+      document.body.classList.add('drawer-open');
+    }
+
+    function closeDrawer() {
+      if (drawer) {
+        drawer.classList.remove('is-open');
+        drawer.setAttribute('aria-hidden', 'true');
+      }
+      if (backdrop) backdrop.classList.remove('is-open');
+      if (toggle) toggle.setAttribute('aria-expanded', 'false');
+      document.body.classList.remove('drawer-open');
+    }
+
     if (toggle) {
-      toggle.addEventListener('click', function () {
-        var open = nav.classList.toggle('open');
-        toggle.setAttribute('aria-expanded', open ? 'true' : 'false');
+      toggle.addEventListener('click', function (e) {
+        e.stopPropagation();
+        if (drawer && drawer.classList.contains('is-open')) {
+          closeDrawer();
+        } else {
+          openDrawer();
+        }
       });
     }
 
-    // Highlight current page link
+    if (closeBtn) closeBtn.addEventListener('click', closeDrawer);
+    if (backdrop) backdrop.addEventListener('click', closeDrawer);
+
+    if (drawer) {
+      drawer.querySelectorAll('a').forEach(function (a) {
+        a.addEventListener('click', closeDrawer);
+      });
+    }
+
+    // Highlight current page link (both desktop nav and drawer)
     var current = window.location.pathname.split('/').pop() || 'index.html';
-    nav.querySelectorAll('.nav-links a').forEach(function (a) {
-      var file = new URL(a.href).pathname.split('/').pop();
-      if (file === current) {
-        a.classList.add('active');
-        a.setAttribute('aria-current', 'page');
-      }
+    document.querySelectorAll('.nav-links a, .drawer-nav-list a').forEach(function (a) {
+      try {
+        var file = new URL(a.href, window.location.origin).pathname.split('/').pop();
+        if (file === current) {
+          a.classList.add('active');
+          a.setAttribute('aria-current', 'page');
+        }
+      } catch (err) {}
     });
 
     // Search -> search.html?q=...

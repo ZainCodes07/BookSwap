@@ -9,8 +9,8 @@
   'use strict';
 
   // App version constants
-  var CURRENT_VERSION = '1.1.0';
-  var CURRENT_VERSION_CODE = 2;
+  var CURRENT_VERSION = '1.2.0';
+  var CURRENT_VERSION_CODE = 3;
   var UPDATE_DISMISSED_KEY = 'bookswap_update_dismissed_ver';
   var UPDATE_DISMISSED_TIME_KEY = 'bookswap_update_dismissed_time';
 

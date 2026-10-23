@@ -43,13 +43,13 @@ app.use("/api/admin", adminRoutes);
 // App Version endpoint for Mobile In-App Updater
 app.get("/api/app-version", (req, res) => {
     res.json({
-        latestVersion: "1.1.0",
-        versionCode: 2,
+        latestVersion: "1.2.0",
+        versionCode: 3,
         minVersion: "1.0.0",
         downloadUrl: "https://book-swap-mocha.vercel.app/download/BookSwap.apk",
-        releaseNotes: "• New logo splash screen with pop-up animations\n• Mobile drawer & layout refinements\n• One-click in-app updates without uninstalling",
+        releaseNotes: "• New tagline & refreshed hero bookshelf colors\n• Fixed Core Courses card layout on mobile\n• Fixed Chat screen layout and message bar\n• One-click update without uninstalling",
         mandatory: false,
-        releasedAt: "2026-10-20"
+        releasedAt: "2026-10-23"
     });
 });
 

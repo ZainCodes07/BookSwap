@@ -28,13 +28,13 @@
 
   // cover = background colour of the book cover, ink = text colour on it
   var BOOKS = [
-    { id: 1,  title: 'Introduction to Algorithms', author: 'Cormen, Leiserson, Rivest, Stein', subject: 'dsa', price: 2200, original: 6500, condition: 'Good', swap: true,  seller: 'Hamza', semester: 6, sold: 41, listedDaysAgo: 9,  cover: '#0F172A', ink: '#FDE68A' },
+    { id: 1,  title: 'Introduction to Algorithms', author: 'Cormen, Leiserson, Rivest, Stein', subject: 'dsa', price: 2200, original: 6500, condition: 'Good', swap: true,  seller: 'Hamza', semester: 6, sold: 41, listedDaysAgo: 9,  cover: '#E11D48', ink: '#FFFFFF' },
     { id: 2,  title: 'Computer Networking: A Top-Down Approach', author: 'Kurose & Ross', subject: 'networking', price: 1800, original: 5200, condition: 'Like new', swap: false, seller: 'Ayesha', semester: 7, sold: 38, listedDaysAgo: 1, cover: '#6C38FF', ink: '#FFFFFF' },
     { id: 3,  title: 'Database System Concepts', author: 'Silberschatz, Korth, Sudarshan', subject: 'databases', price: 1600, original: 4800, condition: 'Good', swap: true, seller: 'Bilal', semester: 5, sold: 35, listedDaysAgo: 3, cover: '#F472B6', ink: '#0F172A' },
     { id: 4,  title: 'Operating System Concepts', author: 'Silberschatz, Galvin, Gagne', subject: 'os', price: 1700, original: 5000, condition: 'Fair', swap: true, seller: 'Usman', semester: 8, sold: 29, listedDaysAgo: 12, cover: '#FDE68A', ink: '#0F172A' },
     { id: 5,  title: 'Data Structures and Algorithms in Java', author: 'Goodrich, Tamassia, Goldwasser', subject: 'dsa', price: 1400, original: 4200, condition: 'Like new', swap: false, seller: 'Fatima', semester: 4, sold: 27, listedDaysAgo: 2, cover: '#14B8A6', ink: '#0F172A' },
     { id: 6,  title: 'C++ How to Program', author: 'Paul Deitel & Harvey Deitel', subject: 'programming', price: 1200, original: 3900, condition: 'Good', swap: true, seller: 'Ali', semester: 3, sold: 33, listedDaysAgo: 5, cover: '#A855F7', ink: '#FFFFFF' },
-    { id: 7,  title: 'Computer Networks', author: 'Andrew S. Tanenbaum', subject: 'networking', price: 1900, original: 5400, condition: 'Like new', swap: false, seller: 'Zara', semester: 7, sold: 24, listedDaysAgo: 0, cover: '#1E1B4B', ink: '#C4B5FD' },
+    { id: 7,  title: 'Computer Networks', author: 'Andrew S. Tanenbaum', subject: 'networking', price: 1900, original: 5400, condition: 'Like new', swap: false, seller: 'Zara', semester: 7, sold: 24, listedDaysAgo: 0, cover: '#0284C7', ink: '#FFFFFF' },
     { id: 8,  title: 'Object-Oriented Programming in C++', author: 'Robert Lafore', subject: 'oop', price: 1300, original: 4000, condition: 'Good', swap: true, seller: 'Saad', semester: 2, sold: 31, listedDaysAgo: 4, cover: '#BE185D', ink: '#FFFFFF' },
     { id: 9,  title: 'Fundamentals of Database Systems', author: 'Elmasri & Navathe', subject: 'databases', price: 1500, original: 4600, condition: 'Good', swap: false, seller: 'Hira', semester: 5, sold: 22, listedDaysAgo: 1, cover: '#0E7490', ink: '#FFFFFF' },
     { id: 10, title: 'Computer Organization and Design', author: 'Patterson & Hennessy', subject: 'os', price: 1900, original: 5600, condition: 'Fair', swap: true, seller: 'Taha', semester: 4, sold: 18, listedDaysAgo: 6, cover: '#334155', ink: '#F8FAFC' },
@@ -160,17 +160,35 @@
     var heights  = [94, 84, 100, 88, 96];   // % heights so spines look natural
     var widths   = [54, 46, 60, 50, 56];    // px
 
+    function getSpineColors(book, idx) {
+      var t = (book.title || '').toLowerCase();
+      if (t.indexOf('probability') !== -1) {
+        return { cover: '#E11D48', ink: '#FFFFFF' };
+      }
+      if (t.indexOf('network') !== -1) {
+        return { cover: '#0284C7', ink: '#FFFFFF' };
+      }
+      var darkList = ['#0f172a', '#1e1b4b', '#000000', '#0a0f1d', '#111827'];
+      if (book.cover && darkList.indexOf(book.cover.toLowerCase()) !== -1) {
+        var altSpines = ['#E11D48', '#0284C7', '#059669', '#EA580C', '#8B5CF6'];
+        return { cover: altSpines[idx % altSpines.length], ink: '#FFFFFF' };
+      }
+      return { cover: book.cover || '#6C38FF', ink: book.ink || '#FFFFFF' };
+    }
+
     var spines = standing.map(function (book, i) {
+      var sc = getSpineColors(book, i);
       return '<a class="spine" href="book-details.html?id=' + book.id + '" ' +
-        'style="--cover:' + book.cover + ';--ink:' + book.ink + ';--h:' + heights[i] + '%;--w:' + widths[i] + 'px;--i:' + i + '" ' +
+        'style="--cover:' + sc.cover + ';--ink:' + sc.ink + ';--h:' + heights[i] + '%;--w:' + widths[i] + 'px;--i:' + i + '" ' +
         'title="' + esc(book.title) + ' - ' + rupees(book.price) + '">' +
           '<span class="spine-title">' + esc(book.title) + '</span>' +
         '</a>';
     }).join('');
 
     var stack = '<div class="book-stack">' + lying.map(function (book, i) {
+      var sc = getSpineColors(book, 5 + i);
       return '<a class="lying-book" href="book-details.html?id=' + book.id + '" ' +
-        'style="--cover:' + book.cover + ';--ink:' + book.ink + ';--i:' + (5 + i) + '" ' +
+        'style="--cover:' + sc.cover + ';--ink:' + sc.ink + ';--i:' + (5 + i) + '" ' +
         'title="' + esc(book.title) + ' - ' + rupees(book.price) + '">' +
           '<span class="lying-title">' + esc(book.title) + '</span>' +
         '</a>';
@@ -521,7 +539,7 @@
             return s === 'available' || s === 'live';
           });
           if (Array.isArray(apiBooks) && apiBooks.length > 0) {
-            var palette = ['#0F172A', '#6C38FF', '#F472B6', '#14B8A6', '#A855F7', '#BE185D', '#0E7490'];
+            var palette = ['#E11D48', '#6C38FF', '#EC4899', '#059669', '#EA580C', '#8B5CF6', '#0284C7', '#0D9488'];
             var mapped = apiBooks.map(function (b, idx) {
               return {
                 id: b.BookID,

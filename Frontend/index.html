@@ -12,6 +12,7 @@
 
   <!-- ===== ANIMATED MOBILE SPLASH SCREEN ===== -->
   <div class="app-splash-screen" id="appSplashScreen">
+    <script>if(sessionStorage.getItem("bookswap_splash_shown")){var s=document.getElementById("appSplashScreen");if(s)s.style.display="none";}</script>
     <div class="splash-card">
       <div class="splash-glow"></div>
       <div class="splash-logo-box">
@@ -101,7 +102,7 @@
             <span class="float-shadow" aria-hidden="true"></span>
           </div>
           <div class="shelf-plank" aria-hidden="true"></div>
-          <p class="shelf-caption">Top picks from CS students. Tap a book to open it.</p>
+          <p class="shelf-caption">Top picks from CS students.</p>
         </div>
 
       </div>
@@ -140,7 +141,7 @@
             <p>List your old textbook in under a minute. Sell it for cash or trade it with a junior for next semester's book.</p>
           </div>
           <div class="swap-actions">
-            <a href="seller/add-listing.html" class="btn btn-light">List a book</a>
+            <a href="Seller/add-listing.html" class="btn btn-light">List a book</a>
             <a href="search.html?swap=1" class="btn btn-outline-light">Browse swaps</a>
           </div>
         </div>

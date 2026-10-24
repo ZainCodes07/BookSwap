@@ -9,8 +9,8 @@
   'use strict';
 
   // App version constants
-  var CURRENT_VERSION = '1.2.0';
-  var CURRENT_VERSION_CODE = 3;
+  var CURRENT_VERSION = '1.2.1';
+  var CURRENT_VERSION_CODE = 4;
   var UPDATE_DISMISSED_KEY = 'bookswap_update_dismissed_ver';
   var UPDATE_DISMISSED_TIME_KEY = 'bookswap_update_dismissed_time';
 
@@ -23,6 +23,12 @@
   function initSplashScreen() {
     var splash = document.getElementById('appSplashScreen');
     if (!splash) return;
+    if (sessionStorage.getItem('bookswap_splash_shown')) {
+      splash.style.display = 'none';
+      if (splash.parentNode) splash.parentNode.removeChild(splash);
+      return;
+    }
+    sessionStorage.setItem('bookswap_splash_shown', 'true');
 
     // Show for 1.3s with pop-up animation, then smoothly pop-down / fade out
     setTimeout(function () {

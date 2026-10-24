@@ -43,13 +43,13 @@ app.use("/api/admin", adminRoutes);
 // App Version endpoint for Mobile In-App Updater
 app.get("/api/app-version", (req, res) => {
     res.json({
-        latestVersion: "1.2.0",
-        versionCode: 3,
+        latestVersion: "1.2.1",
+        versionCode: 4,
         minVersion: "1.0.0",
         downloadUrl: "https://github.com/ZainCodes07/BookSwap/releases/latest/download/BookSwap.apk",
-        releaseNotes: "• New tagline & refreshed hero bookshelf colors\n• Fixed Core Courses card layout on mobile\n• Fixed Chat screen layout and message bar\n• One-click update without uninstalling",
+        releaseNotes: "• Fixed seller links in footer & navigation\n• Added BS syllabus core courses & live search\n• Fixed Android back gesture navigation\n• Made hero bookshelf decorative (0% unwanted redirects)",
         mandatory: false,
-        releasedAt: "2026-10-23"
+        releasedAt: "2026-10-25"
     });
 });
 

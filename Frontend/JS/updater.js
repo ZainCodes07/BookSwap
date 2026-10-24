@@ -79,22 +79,28 @@
 
     function hideModal() {
       modal.classList.add('is-hidden');
+      modal.setAttribute('hidden', '');
+      modal.style.display = 'none';
     }
 
     if (dismissBtn) {
-      dismissBtn.addEventListener('click', function () {
-        var verEl = document.getElementById('appUpdateVersion');
-        var targetVer = verEl ? verEl.textContent.replace('v', '').trim() : CURRENT_VERSION;
+      dismissBtn.addEventListener('click', function (e) {
+        if (e) { e.preventDefault(); e.stopPropagation(); }
         try {
-          localStorage.setItem(UPDATE_DISMISSED_KEY, targetVer);
-          localStorage.setItem(UPDATE_DISMISSED_TIME_KEY, Date.now().toString());
-        } catch (e) {}
+          sessionStorage.setItem('bookswap_session_update_dismissed', 'true');
+        } catch (err) {}
         hideModal();
       });
     }
 
     if (backdrop) {
-      backdrop.addEventListener('click', hideModal);
+      backdrop.addEventListener('click', function (e) {
+        if (e) { e.preventDefault(); e.stopPropagation(); }
+        try {
+          sessionStorage.setItem('bookswap_session_update_dismissed', 'true');
+        } catch (err) {}
+        hideModal();
+      });
     }
 
     return modal;
@@ -115,16 +121,17 @@
     }
 
     if (downloadBtn) {
-      downloadBtn.href = info.downloadUrl || '#';
+      downloadBtn.href = info.downloadUrl || 'https://github.com/ZainCodes07/BookSwap/releases/latest/download/BookSwap.apk';
       downloadBtn.onclick = function () {
-        // Allow standard link navigation or trigger browser download
         setTimeout(function () {
-          modal.classList.add('is-hidden');
-        }, 1000);
+          hideModal();
+        }, 800);
       };
     }
 
     modal.classList.remove('is-hidden');
+    modal.removeAttribute('hidden');
+    modal.style.display = 'grid';
   }
 
   /* --------------------------------------------------------------------------
@@ -209,13 +216,11 @@
       }
 
       if (hasUpdate) {
-        // If automatic check, verify if dismissed recently (within 24 hours)
+        // If automatic check, verify if dismissed during current app session
         if (!manual) {
           try {
-            var dismissedVer = localStorage.getItem(UPDATE_DISMISSED_KEY);
-            var dismissedTime = parseInt(localStorage.getItem(UPDATE_DISMISSED_TIME_KEY) || '0', 10);
-            var ONE_DAY_MS = 24 * 60 * 60 * 1000;
-            if (dismissedVer === (info.latestVersion || '') && (Date.now() - dismissedTime) < ONE_DAY_MS) {
+            var sessionDismissed = sessionStorage.getItem('bookswap_session_update_dismissed');
+            if (sessionDismissed === 'true') {
               return;
             }
           } catch (e) {}

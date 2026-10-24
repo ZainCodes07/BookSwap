@@ -46,7 +46,7 @@ app.get("/api/app-version", (req, res) => {
         latestVersion: "1.2.0",
         versionCode: 3,
         minVersion: "1.0.0",
-        downloadUrl: "https://book-swap-mocha.vercel.app/download/BookSwap.apk",
+        downloadUrl: "https://github.com/ZainCodes07/BookSwap/releases/latest/download/BookSwap.apk",
         releaseNotes: "• New tagline & refreshed hero bookshelf colors\n• Fixed Core Courses card layout on mobile\n• Fixed Chat screen layout and message bar\n• One-click update without uninstalling",
         mandatory: false,
         releasedAt: "2026-10-23"

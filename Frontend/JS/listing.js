@@ -32,7 +32,7 @@
      ====================================================================== */
   // CS core courses, same order as the home page
   var COURSES = ['Programming Fundamentals', 'Object Oriented Programming', 'Data Structures',
-                 'Databases', 'Computer Networks', 'Operating Systems', 'Other'];
+                 'Databases', 'Digital Logic Design', 'Computer Networks', 'Operating Systems', 'Other'];
 
   var CONDITIONS = ['Like new', 'Good', 'Fair', 'Heavily used'];
 

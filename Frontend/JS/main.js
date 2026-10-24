@@ -138,7 +138,7 @@
     var chips = $('heroChips');
     if (chips) {
       chips.innerHTML = SUBJECTS.slice(0, 5).map(function (s) {
-        return '<a class="chip" href="category.html?subject=' + s.key + '">' + esc(s.short) + '</a>';
+        return '<a class="chip" href="search.html?q=' + encodeURIComponent(s.name) + '">' + esc(s.short) + '</a>';
       }).join('');
     }
     var count = $('heroBookCount');
@@ -178,20 +178,20 @@
 
     var spines = standing.map(function (book, i) {
       var sc = getSpineColors(book, i);
-      return '<a class="spine" href="book-details.html?id=' + book.id + '" ' +
+      return '<div class="spine" ' +
         'style="--cover:' + sc.cover + ';--ink:' + sc.ink + ';--h:' + heights[i] + '%;--w:' + widths[i] + 'px;--i:' + i + '" ' +
         'title="' + esc(book.title) + ' - ' + rupees(book.price) + '">' +
           '<span class="spine-title">' + esc(book.title) + '</span>' +
-        '</a>';
+        '</div>';
     }).join('');
 
     var stack = '<div class="book-stack">' + lying.map(function (book, i) {
       var sc = getSpineColors(book, 5 + i);
-      return '<a class="lying-book" href="book-details.html?id=' + book.id + '" ' +
+      return '<div class="lying-book" ' +
         'style="--cover:' + sc.cover + ';--ink:' + sc.ink + ';--i:' + (5 + i) + '" ' +
         'title="' + esc(book.title) + ' - ' + rupees(book.price) + '">' +
           '<span class="lying-title">' + esc(book.title) + '</span>' +
-        '</a>';
+        '</div>';
     }).join('') + '</div>';
 
     shelf.innerHTML = spines + stack;
@@ -203,7 +203,7 @@
     if (!grid) return;
 
     grid.innerHTML = SUBJECTS.map(function (s) {
-      return '<a class="subject-tile" href="category.html?subject=' + s.key + '">' +
+      return '<a class="subject-tile" href="search.html?q=' + encodeURIComponent(s.name) + '">' +
           '<span class="subject-icon" aria-hidden="true">' + esc(s.icon) + '</span>' +
           '<span class="subject-name">' + esc(s.name) + '</span>' +
         '</a>';

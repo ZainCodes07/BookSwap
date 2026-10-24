@@ -25,7 +25,12 @@
     var title = (book.Title || book.title || "").toLowerCase();
     var author = (book.Author || book.author || "").toLowerCase();
     var desc = (book.Description || book.description || "").toLowerCase();
-    return title.indexOf(query) !== -1 || author.indexOf(query) !== -1 || desc.indexOf(query) !== -1;
+    var subject = (book.Subject || book.subject || book.Course || book.course || "").toLowerCase();
+    var full = title + " " + author + " " + desc + " " + subject;
+
+    if (full.indexOf(query) !== -1) return true;
+    var words = query.split(/\s+/).filter(function (w) { return w.length > 2; });
+    return words.length > 0 && words.some(function (w) { return full.indexOf(w) !== -1; });
   }
 
   var DEMO_SEARCH_BOOKS = [
@@ -77,7 +82,7 @@
   }
 
   var params = new URLSearchParams(window.location.search);
-  var q = params.get("q");
+  var q = params.get("q") || params.get("sub") || params.get("subject");
   if (q) input.value = q;
 
   input.addEventListener("input", render);

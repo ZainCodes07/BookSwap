@@ -350,8 +350,8 @@
   /* ================= INITIAL LOAD ================= */
 
   var params = new URLSearchParams(window.location.search);
-  var rawId = params.get("id") || "1";
-  var bookId = parseInt(rawId, 10);
+  var rawId = params.get("id");
+  var bookId = rawId ? parseInt(rawId, 10) : NaN;
 
   var DEMO_BOOKS = [
     { id: 1,  title: 'Introduction to Algorithms', author: 'Cormen, Leiserson, Rivest, Stein', subject: 'dsa', price: 2200, original: 6500, condition: 'Good', swap: true,  seller: 'Hamza', semester: 6, sold: 41, listedDaysAgo: 9 },

@@ -9762,8 +9762,12 @@ html.auth-lock { overflow: hidden; }
   font-family: var(--font);
 }
 
-.app-update-modal[hidden] {
+.app-update-modal[hidden],
+.app-update-modal.is-hidden {
   display: none !important;
+  visibility: hidden !important;
+  opacity: 0 !important;
+  pointer-events: none !important;
 }
 
 .app-update-backdrop {

@@ -1157,7 +1157,7 @@
     var shop = { seller: null, course: 'All', search: '', sort: 'new' };
 
     // BACKEND: GET /api/shops/:sellerId  ->  { id, name, city, joined } (public fields only)
-    function findSeller(id) {
+    function findSeller(id, passedName) {
       if (!id) return null;
       var idStr = String(id).toLowerCase().trim();
       var users;
@@ -1171,42 +1171,37 @@
       if (u) {
         return {
           id: u.id || u.UserID || id,
-          name: u.name,
-          email: u.email,
-          city: u.city || 'FAST NUCES, Campus',
-          joined: u.joined || '2025-09-01',
-          rating: u.rating || 4.9,
-          reviewsCount: u.reviewsCount || 18
+          name: u.name || u.FullName || (passedName || 'Seller'),
+          email: u.email || '',
+          city: u.city || '',
+          joined: u.joined || '',
+          rating: null,
+          reviewsCount: 0
         };
       }
 
-      var DEMO_SELLERS = {
-        'hamza': { id: 'hamza', name: 'Hamza Tariq', email: 'hamza@example.com', city: 'FAST NUCES, CS Dept', semester: 6, joined: '2025-09-01', rating: 4.9, reviewsCount: 18 },
-        'ayesha': { id: 'ayesha', name: 'Ayesha Khan', email: 'ayesha@example.com', city: 'SE Dept, Campus', semester: 7, joined: '2025-08-15', rating: 5.0, reviewsCount: 24 },
-        'bilal': { id: 'bilal', name: 'Bilal Ahmed', email: 'bilal@example.com', city: 'CS Dept, Library Corner', semester: 5, joined: '2025-10-01', rating: 4.8, reviewsCount: 12 },
-        'usman': { id: 'usman', name: 'Usman Ali', email: 'usman@example.com', city: 'Hostel 3, Campus', semester: 8, joined: '2025-07-20', rating: 4.9, reviewsCount: 31 },
-        'fatima': { id: 'fatima', name: 'Fatima Noor', email: 'fatima@example.com', city: 'AI Dept', semester: 4, joined: '2026-01-10', rating: 5.0, reviewsCount: 9 },
-        'ali': { id: 'ali', name: 'Ali Raza', email: 'ali@example.com', city: 'CS Dept, Lab 4', semester: 3, joined: '2026-02-01', rating: 4.7, reviewsCount: 15 },
-        'zara': { id: 'zara', name: 'Zara Siddiqui', email: 'zara@example.com', city: 'SE Dept', semester: 7, joined: '2025-09-10', rating: 5.0, reviewsCount: 22 },
-        '1': { id: '1', name: 'Hamza Tariq', email: 'hamza@example.com', city: 'FAST NUCES, CS Dept', semester: 6, joined: '2025-09-01', rating: 4.9, reviewsCount: 18 },
-        '2': { id: '2', name: 'Ayesha Khan', email: 'ayesha@example.com', city: 'SE Dept, Campus', semester: 7, joined: '2025-08-15', rating: 5.0, reviewsCount: 24 }
-      };
+      var nameToUse = passedName;
+      if (!nameToUse) {
+        if (!isNaN(idStr)) {
+          nameToUse = 'Seller';
+        } else {
+          nameToUse = idStr.charAt(0).toUpperCase() + idStr.slice(1);
+        }
+      }
 
-      if (DEMO_SELLERS[idStr]) return DEMO_SELLERS[idStr];
-
-      var capitalized = idStr.charAt(0).toUpperCase() + idStr.slice(1);
       return {
         id: id,
-        name: capitalized,
-        email: idStr.indexOf('@') !== -1 ? idStr : idStr + '@campus.bookswap.pk',
-        city: 'Verified Student Seller, Campus',
-        joined: '2025-09-01',
-        rating: 4.9,
-        reviewsCount: 14
+        name: nameToUse,
+        email: idStr.indexOf('@') !== -1 ? idStr : '',
+        city: '',
+        joined: '',
+        rating: null,
+        reviewsCount: 0
       };
     }
 
     function firstName(name) {
+      if (!name || !isNaN(name)) return 'Seller';
       var n = String(name || 'Seller').trim().split(/\s+/)[0];
       return n.charAt(0).toUpperCase() + n.slice(1);      // "ali" -> "Ali"
     }
@@ -1230,11 +1225,13 @@
     }
 
     function renderShop() {
-      var id = new URLSearchParams(window.location.search).get('seller');
+      var params = new URLSearchParams(window.location.search);
+      var id = params.get('seller');
+      var nameParam = params.get('name');
       var me = Auth.currentUser();
 
-      if (id) shop.seller = findSeller(id);
-      else if (me && me.role === 'seller') shop.seller = findSeller(me.id);
+      if (id) shop.seller = findSeller(id, nameParam);
+      else if (me && me.role === 'seller') shop.seller = findSeller(me.id, me.name);
       else shop.seller = null;
 
       if (!shop.seller) {
@@ -1248,109 +1245,176 @@
       var owner = isOwner();
       if (owner && /[?&]demo=1/.test(window.location.search)) addDemoListings();
 
-      // BACKEND: GET /api/shops/:sellerId/listings  (live + sold only)
-      var all = readAll().filter(function (l) {
+      function renderListings(all) {
+        var live = all.filter(function (l) {
+          var st = (l.status || l.Status || 'live').toLowerCase();
+          return st === 'live' || st === 'available' || st === 'approved';
+        });
+        var sold = all.filter(function (l) {
+          var st = (l.status || l.Status || '').toLowerCase();
+          return st === 'sold';
+        }).sort(function (a, b) { return String(b.soldAt || b.createdAt).localeCompare(String(a.soldAt || a.createdAt)); });
+
+        var waiting = all.filter(function (l) {
+          var st = (l.status || l.Status || '').toLowerCase();
+          return st === 'pending';
+        }).length;
+
+        var swapsDone = all.filter(function (l) {
+          var isSwap = ((l.type || l.ListingType || '').toLowerCase() === 'swap');
+          var isSoldOrCompleted = ((l.status || l.Status || '').toLowerCase() === 'sold');
+          return isSwap && isSoldOrCompleted;
+        }).length;
+
+        var courses = [];
+        live.forEach(function (l) { if (courses.indexOf(l.course) === -1) courses.push(l.course); });
+
+        // Header
+        buildSlides(live);
+        var first = firstName(shop.seller.name);
+        document.title = first + "'s Shop - BookSwap";
+        q('msAvatar').textContent = first.charAt(0).toUpperCase();
+        q('msName').textContent = first + "'s Shop";
+        var city = q('msCity'), since = q('msSince');
+        city.hidden = !shop.seller.city;
+        city.textContent = shop.seller.city || '';
+
+        if (shop.seller.joined) {
+          var d = new Date(shop.seller.joined);
+          if (!isNaN(d.getTime())) {
+            since.textContent = 'Since ' + d.toLocaleDateString('en-GB', { month: 'short', year: 'numeric' });
+            since.hidden = false;
+          } else {
+            since.hidden = true;
+          }
+        } else {
+          since.hidden = true;
+        }
+
+        q('msManage').hidden = !owner;
+
+        // Owner banner
+        q('msOwner').hidden = !owner;
+        if (owner) {
+          q('msOwnerNote').textContent = waiting
+            ? waiting + (waiting === 1 ? ' book is' : ' books are') + ' waiting for review and will show up once approved.'
+            : 'Share the link so buyers can find you.';
+        }
+
+        // Real Stats from actual listings
+        q('msStatLive').textContent = live.length;
+        q('msStatSold').textContent = sold.length;
+        q('msStatSwaps').textContent = swapsDone;
+
+        // Course chips (only courses that are on the shelf)
+        if (['All'].concat(courses).indexOf(shop.course) === -1) shop.course = 'All';
+        var chips = q('msChips');
+        chips.innerHTML = '';
+        chips.hidden = courses.length < 2;
+        ['All'].concat(COURSES.filter(function (c) { return courses.indexOf(c) !== -1; })).forEach(function (c) {
+          var b = document.createElement('button');
+          b.type = 'button';
+          b.className = 'ms-tab' + (c === shop.course ? ' is-active' : '');
+          b.setAttribute('aria-pressed', c === shop.course ? 'true' : 'false');
+          var count = c === 'All' ? live.length : live.filter(function (l) { return l.course === c; }).length;
+          b.innerHTML = escapeHtml(c) + ' <span>' + count + '</span>';
+          b.addEventListener('click', function () { shop.course = c; renderShop(); });
+          chips.appendChild(b);
+        });
+
+        // Shelf
+        var term = shop.search.toLowerCase();
+        var shown = live.filter(function (l) {
+          if (shop.course !== 'All' && l.course !== shop.course) return false;
+          if (!term) return true;
+          return (l.title + ' ' + l.author + ' ' + l.course).toLowerCase().indexOf(term) !== -1;
+        });
+        shown.sort(function (a, b) {
+          if (shop.sort === 'new') return b.createdAt.localeCompare(a.createdAt);
+          var sa = a.type === 'swap', sb = b.type === 'swap';
+          if (sa !== sb) return sa ? 1 : -1;
+          var diff = Number(a.price || 0) - Number(b.price || 0);
+          return shop.sort === 'low' ? diff : -diff;
+        });
+
+        q('msEmpty').hidden = live.length > 0;
+        q('msEmptyText').textContent = owner
+          ? (waiting ? 'Your books show up here once they\'re approved.' : 'List a book and it shows up here once approved.')
+          : 'No books currently listed on this shelf.';
+        q('msNone').hidden = !live.length || shown.length > 0;
+        document.querySelector('.ms-tools').hidden = live.length < 2;
+
+        var grid = q('msGrid');
+        grid.innerHTML = '';
+        grid.hidden = !shown.length;
+        shown.forEach(function (l) { grid.appendChild(bookCard(l, owner, false)); });
+
+        // Sold
+        q('msSoldWrap').hidden = !sold.length;
+        var soldGrid = q('msSoldGrid');
+        soldGrid.innerHTML = '';
+        sold.slice(0, 8).forEach(function (l) { soldGrid.appendChild(bookCard(l, owner, true)); });
+      }
+
+      var localListings = readAll().filter(function (l) {
         return l.sellerEmail === shop.seller.email ||
                (l.sellerName && l.sellerName.toLowerCase() === shop.seller.name.toLowerCase()) ||
                (l.seller && String(l.seller).toLowerCase() === String(shop.seller.id).toLowerCase());
       });
 
-      if (all.length === 0) {
-        all = [
-          { id: 's1', title: 'Data Structures and Algorithms', author: 'Goodrich & Tamassia', course: 'Data Structures', condition: 'Like new', type: 'both', price: 1400, status: 'live', sellerEmail: shop.seller.email, sellerName: shop.seller.name, createdAt: new Date(Date.now() - 86400000*3).toISOString() },
-          { id: 's2', title: 'Computer Networking: Top-Down Approach', author: 'Kurose & Ross', course: 'Computer Networks', condition: 'Good', type: 'sell', price: 1800, status: 'live', sellerEmail: shop.seller.email, sellerName: shop.seller.name, createdAt: new Date(Date.now() - 86400000*5).toISOString() },
-          { id: 's3', title: 'Database System Concepts', author: 'Silberschatz & Korth', course: 'Databases', condition: 'Good', type: 'sell', price: 1600, status: 'sold', soldAt: new Date(Date.now() - 86400000*12).toISOString(), sellerEmail: shop.seller.email, sellerName: shop.seller.name, createdAt: new Date(Date.now() - 86400000*20).toISOString() },
-          { id: 's4', title: 'Operating System Concepts', author: 'Silberschatz & Galvin', course: 'Operating Systems', condition: 'Fair', type: 'sell', price: 1700, status: 'sold', soldAt: new Date(Date.now() - 86400000*18).toISOString(), sellerEmail: shop.seller.email, sellerName: shop.seller.name, createdAt: new Date(Date.now() - 86400000*30).toISOString() }
-        ];
-      }
-      var live = all.filter(function (l) { return l.status === 'live'; });
-      var sold = all.filter(function (l) { return l.status === 'sold'; })
-        .sort(function (a, b) { return String(b.soldAt).localeCompare(String(a.soldAt)); });
-      var waiting = all.filter(function (l) { return l.status === 'pending'; }).length;
-      var swapsDone = readSwaps().filter(function (x) { return x.sellerEmail === shop.seller.email && x.status === 'accepted'; }).length;
-      var courses = [];
-      live.forEach(function (l) { if (courses.indexOf(l.course) === -1) courses.push(l.course); });
+      renderListings(localListings);
 
-      // Header
-      buildSlides(live);
-      var first = firstName(shop.seller.name);
-      document.title = first + "'s Shelf - BookSwap";
-      q('msAvatar').textContent = first.charAt(0).toUpperCase();
-      q('msName').textContent = first + "'s Shelf";
-      var city = q('msCity'), since = q('msSince');
-      city.hidden = !shop.seller.city;
-      city.textContent = shop.seller.city || '';
-      since.hidden = !shop.seller.joined;
-      since.textContent = shop.seller.joined
-        ? 'Since ' + new Date(shop.seller.joined).toLocaleDateString('en-GB', { month: 'short', year: 'numeric' })
-        : '';
-
-      // Share buttons
-      q('msWa').href = 'https://wa.me/?text=' + encodeURIComponent(
-        (owner ? 'My used CS books on BookSwap: ' : first + "'s used CS books on BookSwap: ") + shopLink());
-      q('msManage').hidden = !owner;
-
-      // Owner banner
-      q('msOwner').hidden = !owner;
-      if (owner) {
-        q('msOwnerNote').textContent = waiting
-          ? waiting + (waiting === 1 ? ' book is' : ' books are') + ' waiting for review and will show up once approved.'
-          : 'Share the link so juniors can find you.';
+      // Fetch live listings from backend API
+      if (window.BookSwapAPI && window.BookSwapAPI.listings && shop.seller.id) {
+        window.BookSwapAPI.listings.getBySeller(shop.seller.id).then(function (res) {
+          if (res && res.books && res.books.length > 0) {
+            var apiBooks = res.books.map(function (b) {
+              return {
+                id: b.BookID,
+                title: b.Title,
+                author: b.Author,
+                course: b.CourseName || 'Other',
+                condition: b.BookCondition || 'Good',
+                type: (b.ListingType || '').toLowerCase() === 'swap' ? 'swap' : 'sell',
+                price: Number(b.Price || 0),
+                status: (b.Status && b.Status.toLowerCase() === 'sold') ? 'sold' : 'live',
+                photo: b.ImageUrl || null,
+                sellerEmail: b.SellerEmail || shop.seller.email,
+                sellerName: b.SellerName || shop.seller.name,
+                createdAt: b.CreatedAt || new Date().toISOString()
+              };
+            });
+            if (res.books[0].SellerName && (!shop.seller.name || shop.seller.name === 'Seller')) {
+              shop.seller.name = res.books[0].SellerName;
+            }
+            renderListings(apiBooks);
+          }
+        }).catch(function (err) {
+          console.warn('[Shop Listings API]', err);
+        });
       }
 
-      // Stats
-      q('msStatLive').textContent = live.length;
-      q('msStatSold').textContent = sold.length;
-      q('msStatSwaps').textContent = swapsDone;
-
-      // Course chips (only courses that are on the shelf)
-      if (['All'].concat(courses).indexOf(shop.course) === -1) shop.course = 'All';
-      var chips = q('msChips');
-      chips.innerHTML = '';
-      chips.hidden = courses.length < 2;   // one course only -> no tabs needed
-      ['All'].concat(COURSES.filter(function (c) { return courses.indexOf(c) !== -1; })).forEach(function (c) {
-        var b = document.createElement('button');
-        b.type = 'button';
-        b.className = 'ms-tab' + (c === shop.course ? ' is-active' : '');
-        b.setAttribute('aria-pressed', c === shop.course ? 'true' : 'false');
-        var count = c === 'All' ? live.length : live.filter(function (l) { return l.course === c; }).length;
-        b.innerHTML = escapeHtml(c) + ' <span>' + count + '</span>';
-        b.addEventListener('click', function () { shop.course = c; renderShop(); });
-        chips.appendChild(b);
-      });
-
-      // Shelf
-      var term = shop.search.toLowerCase();
-      var shown = live.filter(function (l) {
-        if (shop.course !== 'All' && l.course !== shop.course) return false;
-        if (!term) return true;
-        return (l.title + ' ' + l.author + ' ' + l.course).toLowerCase().indexOf(term) !== -1;
-      });
-      shown.sort(function (a, b) {
-        if (shop.sort === 'new') return b.createdAt.localeCompare(a.createdAt);
-        var sa = a.type === 'swap', sb = b.type === 'swap';
-        if (sa !== sb) return sa ? 1 : -1;               // swap-only books always go last
-        var diff = Number(a.price || 0) - Number(b.price || 0);
-        return shop.sort === 'low' ? diff : -diff;
-      });
-
-      q('msEmpty').hidden = live.length > 0;
-      q('msEmptyText').textContent = owner
-        ? (waiting ? 'Your books show up here once they\'re approved.' : 'List a book and it shows up here once approved.')
-        : 'New books land here as soon as they\'re approved. Check back soon.';
-      q('msNone').hidden = !live.length || shown.length > 0;
-      document.querySelector('.ms-tools').hidden = live.length < 2;
-
-      var grid = q('msGrid');
-      grid.innerHTML = '';
-      grid.hidden = !shown.length;
-      shown.forEach(function (l) { grid.appendChild(bookCard(l, owner, false)); });
-
-      // Sold
-      q('msSoldWrap').hidden = !sold.length;
-      var soldGrid = q('msSoldGrid');
-      soldGrid.innerHTML = '';
-      sold.slice(0, 8).forEach(function (l) { soldGrid.appendChild(bookCard(l, owner, true)); });
+      // If seller name or joined date missing, fetch real user profile from API
+      if (window.BookSwapAPI && window.BookSwapAPI.users && shop.seller.id && !isNaN(shop.seller.id)) {
+        window.BookSwapAPI.users.getById(shop.seller.id).then(function (uRes) {
+          if (uRes && uRes.user) {
+            if (uRes.user.FullName) shop.seller.name = uRes.user.FullName;
+            if (uRes.user.Email) shop.seller.email = uRes.user.Email;
+            if (uRes.user.CreatedAt) {
+              shop.seller.joined = uRes.user.CreatedAt;
+              var d = new Date(uRes.user.CreatedAt);
+              if (!isNaN(d.getTime())) {
+                q('msSince').textContent = 'Since ' + d.toLocaleDateString('en-GB', { month: 'short', year: 'numeric' });
+                q('msSince').hidden = false;
+              }
+            }
+            var updatedFirst = firstName(shop.seller.name);
+            q('msName').textContent = updatedFirst + "'s Shop";
+            document.title = updatedFirst + "'s Shop - BookSwap";
+            q('msAvatar').textContent = updatedFirst.charAt(0).toUpperCase();
+          }
+        }).catch(function () {});
+      }
     }
 
     // No photo yet? Show a clean pastel cover with the title instead.

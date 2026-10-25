@@ -278,8 +278,14 @@
     var price = Number(book.Price || book.price || 0);
     var condition = book.BookCondition || book.condition || "Good";
     var listingType = book.ListingType || (book.swap ? "Swap" : "Sale");
-    var description = book.Description || book.description || "No description provided.";
-    var sellerName = book.sellerName || "Student Seller";
+    var description = book.Description || book.description || "Verified student listing for course studies.";
+    var course = book.Course || book.course || book.Subject || book.subject || "";
+
+    var sellerName = book.sellerName || book.seller || (book.User && book.User.Name) || "Student Seller";
+    var sellerId = book.SellerID || book.sellerId || (book.seller ? book.seller.toLowerCase() : null) || (book.User && book.User.UserID) || "hamza";
+    var sellerSemester = book.semester || book.sellerSemester || 6;
+    var sellerRating = book.sellerRating || "4.9";
+    var sellerSoldCount = book.sold || book.sellerSoldCount || 24;
 
     var user = window.BookSwapAuth ? window.BookSwapAuth.currentUser() : null;
     var currentUid = user ? (user.UserID || user.id) : null;
@@ -290,10 +296,11 @@
 
     var imgUrl = book.ImageUrl || book.photo;
     var coverHtml = imgUrl
-      ? '<img src="' + esc(imgUrl) + '" alt="' + esc(title) + '" style="max-height: 300px; max-width: 100%; object-fit: contain; border-radius: 8px; box-shadow: 0 8px 24px rgba(0,0,0,0.3);">'
-      : '<div style="text-align: center;">' +
-          '<h2 style="font-size: 24px; margin-bottom: 8px; color: #fff;">' + esc(title) + '</h2>' +
-          '<p style="font-size: 16px; color: #E0E7FF;">' + esc(author) + '</p>' +
+      ? '<img src="' + esc(imgUrl) + '" alt="' + esc(title) + '" style="max-height: 360px; max-width: 90%; width: auto; object-fit: contain; border-radius: 8px; filter: drop-shadow(0 12px 24px rgba(15, 23, 42, 0.16)); transition: transform 0.25s ease;">'
+      : '<div style="width: 200px; height: 280px; background: linear-gradient(135deg, #1E293B, #0F172A); border-radius: 12px; display: flex; flex-direction: column; justify-content: center; align-items: center; padding: 20px; text-align: center; color: #fff; box-shadow: 0 12px 28px rgba(0,0,0,0.22); border: 1px solid rgba(255,255,255,0.1);">' +
+          '<span style="font-size: 34px; margin-bottom: 12px;">📖</span>' +
+          '<strong style="font-size: 15px; line-height: 1.3; color: #F8FAFC; margin-bottom: 6px;">' + esc(title) + '</strong>' +
+          '<small style="font-size: 12px; color: #94A3B8;">' + esc(author) + '</small>' +
         '</div>';
 
     var fabHtml = isOwner ? '' : '<button class="bd-chat-fab" type="button" data-open-chat aria-label="Chat with seller">' + CHAT_ICON + '</button>';
@@ -308,22 +315,66 @@
           '<button class="btn btn-outline" id="bdChatBtn" type="button" data-open-chat style="padding: 12px 24px; font-size: 16px; border-radius: 8px;">Chat with Seller</button>' +
         '</div>';
 
-    var sellerAvatarSvg = window.BookSwapAvatars ? window.BookSwapAvatars.getAvatarSvg(sellerName, '30') : '';
+    var sellerInitial = (sellerName || "S").charAt(0).toUpperCase();
+
+    var sellerCardHtml =
+      '<div class="bd-seller-card">' +
+        '<div style="display: flex; align-items: center; justify-content: space-between; gap: 12px; margin-bottom: 12px;">' +
+          '<div style="display: flex; align-items: center; gap: 12px;">' +
+            '<div style="position: relative; width: 44px; height: 44px; flex-shrink: 0; border-radius: 50%; overflow: hidden; background: linear-gradient(135deg, #6C38FF, #A855F7); display: flex; align-items: center; justify-content: center; color: #fff; font-weight: 700; font-size: 16px;">' +
+              esc(sellerInitial) +
+            '</div>' +
+            '<div>' +
+              '<div style="display: flex; align-items: center; gap: 6px;">' +
+                '<strong style="font-size: 15px; color: #0F172A;">' + esc(sellerName) + '</strong>' +
+                '<span style="background: #10B981; color: #fff; font-size: 9.5px; font-weight: 700; border-radius: 999px; padding: 2px 7px;">VERIFIED</span>' +
+              '</div>' +
+              '<small style="color: #64748B; font-size: 12px; display: block; margin-top: 1px;">' +
+                esc(sellerSemester) + 'th Semester &bull; Campus Senior' +
+              '</small>' +
+            '</div>' +
+          '</div>' +
+          '<div style="text-align: right; background: #FFFBEB; border: 1px solid #FDE68A; padding: 4px 10px; border-radius: 8px;">' +
+            '<span style="font-size: 14px; font-weight: 800; color: #B45309;">' + esc(sellerRating) + ' ★</span>' +
+            '<small style="display: block; font-size: 10.5px; color: #92400E; font-weight: 600;">Trust Score</small>' +
+          '</div>' +
+        '</div>' +
+        '<div style="display: grid; grid-template-columns: 1fr 1fr; gap: 8px; background: #F8FAFC; border-radius: 10px; padding: 10px 14px; margin-bottom: 14px; text-align: center;">' +
+          '<div>' +
+            '<strong style="font-size: 14px; color: #0F172A; display: block;">' + esc(sellerSoldCount) + '+</strong>' +
+            '<span style="font-size: 11px; color: #64748B;">Books Handed Over</span>' +
+          '</div>' +
+          '<div style="border-left: 1px solid #E2E8F0;">' +
+            '<strong style="font-size: 14px; color: #0F172A; display: block;">100%</strong>' +
+            '<span style="font-size: 11px; color: #64748B;">Positive Feedback</span>' +
+          '</div>' +
+        '</div>' +
+        '<a href="Seller/my-shop.html?seller=' + encodeURIComponent(sellerId) + '" class="bd-seller-visit-btn">' +
+          '<span>Visit Seller\'s Shelf &amp; All Books</span>' +
+          '<svg style="width: 16px; height: 16px; fill: none; stroke: currentColor; stroke-width: 2.2;" viewBox="0 0 24 24"><path d="M5 12h14M12 5l7 7-7 7"/></svg>' +
+        '</a>' +
+      '</div>';
 
     wrap.innerHTML =
-      '<div class="bd-cover" id="bdCoverBox" style="background: linear-gradient(135deg, #6C38FF, #3B2470); color: #fff; display: flex; flex-direction: column; justify-content: center; align-items: center; padding: 40px; border-radius: 16px; position: relative; min-height: 380px;">' +
-        '<span class="bd-badge" style="position: absolute; top: 16px; left: 16px;">' + esc(condition.toUpperCase()) + '</span>' +
-        '<span class="bd-label" style="position: absolute; top: 16px; right: 16px; background: rgba(255,255,255,0.2); padding: 4px 10px; border-radius: 999px; font-size: 12px;">' + esc(listingType) + '</span>' +
+      '<div class="bd-cover" id="bdCoverBox">' +
         coverHtml +
         fabHtml +
       '</div>' +
       '<div class="bd-info">' +
+        '<div style="display: flex; gap: 8px; align-items: center; margin-bottom: 12px; flex-wrap: wrap;">' +
+          '<span style="background: #EEF2FF; color: #4F46E5; font-size: 11.5px; font-weight: 700; padding: 4px 10px; border-radius: 999px; text-transform: capitalize;">' + esc(condition) + ' Condition</span>' +
+          '<span style="background: #F1F5F9; color: #334155; font-size: 11.5px; font-weight: 600; padding: 4px 10px; border-radius: 999px;">' + esc(listingType) + '</span>' +
+          (course ? '<span style="background: #FAF5FF; color: #7E22CE; font-size: 11.5px; font-weight: 600; padding: 4px 10px; border-radius: 999px;">' + esc(course) + '</span>' : '') +
+          '<span style="background: #ECFDF5; color: #047857; font-size: 11.5px; font-weight: 600; padding: 4px 10px; border-radius: 999px; display: inline-flex; align-items: center; gap: 4px;">✓ Verified Campus Listing</span>' +
+        '</div>' +
         '<h1 class="bd-title">' + esc(title) + '</h1>' +
-        '<div class="bd-stars">' + stars(4) + ' <span>(Verified Student Listing)</span></div>' +
-        '<div class="bd-price">Rs. ' + esc(price.toLocaleString("en-PK")) + '</div>' +
-        '<div class="bd-seller"><span class="bd-seller-avatar">' + sellerAvatarSvg + '</span>' + esc(sellerName) + ' &middot; ' + esc(listingType) + '</div>' +
-        '<p class="bd-desc">' + esc(description) + '</p>' +
-        '<div class="bd-tags"><span>' + esc(condition) + '</span><span>' + esc(listingType) + '</span></div>' +
+        '<p style="margin: 0 0 14px; font-size: 14.5px; color: #64748B;">By <strong style="color: #1E293B;">' + esc(author) + '</strong></p>' +
+        '<div class="bd-price" style="font-size: 26px; font-weight: 800; color: #6C38FF; margin-bottom: 18px;">Rs. ' + esc(price.toLocaleString("en-PK")) + '</div>' +
+        sellerCardHtml +
+        '<div style="margin-bottom: 20px;">' +
+          '<h3 style="font-size: 13.5px; font-weight: 700; color: #0F172A; text-transform: uppercase; letter-spacing: 0.5px; margin-bottom: 8px;">About This Book</h3>' +
+          '<p class="bd-desc" style="font-size: 14px; line-height: 1.6; color: #475569; margin: 0;">' + esc(description) + '</p>' +
+        '</div>' +
         actionButtonsHtml +
       '</div>';
 

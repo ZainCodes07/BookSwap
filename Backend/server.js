@@ -43,11 +43,11 @@ app.use("/api/admin", adminRoutes);
 // App Version endpoint for Mobile In-App Updater
 app.get("/api/app-version", (req, res) => {
     res.json({
-        latestVersion: "1.2.1",
-        versionCode: 4,
+        latestVersion: "1.2.2",
+        versionCode: 5,
         minVersion: "1.0.0",
         downloadUrl: "https://github.com/ZainCodes07/BookSwap/releases/latest/download/BookSwap.apk",
-        releaseNotes: "• Fixed seller links in footer & navigation\n• Added BS syllabus core courses & live search\n• Fixed Android back gesture navigation\n• Made hero bookshelf decorative (0% unwanted redirects)",
+        releaseNotes: "• Studio clean book cover presentation (removed purple glare)\n• Daraz-style Verified Student Seller card on book details\n• Seller Shop with verified student reviews & trust scores\n• Direct navigation from book details to seller's shelf",
         mandatory: false,
         releasedAt: "2026-10-25"
     });

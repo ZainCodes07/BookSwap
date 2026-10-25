@@ -43,7 +43,7 @@
           <span class="ms-avatar" id="msAvatar" aria-hidden="true">B</span>
           <div>
             <p class="ms-kicker">BookSwap shop</p>
-            <h1 id="msName">Seller's Shelf</h1>
+            <h1 id="msName">Seller's Shop</h1>
             <ul class="ms-meta">
               <li><strong id="msStatLive">0</strong> on the shelf</li>
               <li><strong id="msStatSold">0</strong> sold</li>
@@ -58,10 +58,6 @@
             <svg viewBox="0 0 24 24" aria-hidden="true"><circle cx="18" cy="5" r="3"/><circle cx="6" cy="12" r="3"/><circle cx="18" cy="19" r="3"/><path d="m8.6 13.5 6.8 4M15.4 6.5l-6.8 4"/></svg>
             Copy link
           </button>
-          <a href="#" class="ms-pill ms-pill-dark" id="msWa" target="_blank" rel="noopener">
-            <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M21 11.5a8.4 8.4 0 0 1-12.6 7.3L3 20.5l1.8-5.2A8.4 8.4 0 1 1 21 11.5z"/></svg>
-            WhatsApp
-          </a>
           <a href="seller-dashboard.html" class="ms-pill ms-pill-purple" id="msManage" hidden>Manage listings</a>
         </div>
       </header>
@@ -118,19 +114,23 @@
         <div class="ms-grid ms-grid-small" id="msSoldGrid"></div>
       </section>
 
-      <!-- Student Reviews & Campus Trust Section (Daraz Style) -->
+      <!-- Student Reviews & Campus Trust Section -->
       <section class="ms-reviews" id="msReviewsWrap">
         <div class="ms-reviews-head">
           <div>
             <h2 id="msReviewsTitle">Student Reviews &amp; Campus Trust</h2>
             <p>Verified feedback from fellow students on campus.</p>
           </div>
-          <div class="ms-rating-box">
-            <span class="ms-rating-score" id="msRatingScore">4.9 ★</span>
-            <span class="ms-rating-count" id="msRatingCount">18 verified ratings</span>
+          <div class="ms-rating-box" id="msRatingBox" hidden>
+            <span class="ms-rating-score" id="msRatingScore"></span>
+            <span class="ms-rating-count" id="msRatingCount"></span>
           </div>
         </div>
-        <div class="ms-reviews-grid" id="msReviewsList"></div>
+        <div class="ms-reviews-grid" id="msReviewsList">
+          <p class="sd-none" style="padding: 24px 0; color: #64748B; width: 100%;">
+            No reviews yet for this seller. Reviews will appear here once exchanges are completed.
+          </p>
+        </div>
       </section>
     </div>
 

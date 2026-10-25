@@ -7,8 +7,9 @@ const Book = {
         await connectDB();
 
         const result = await sql.query(`
-            SELECT *
-            FROM Books
+            SELECT b.*, u.FullName AS SellerName, u.Email AS SellerEmail
+            FROM Books b
+            LEFT JOIN Users u ON b.SellerID = u.UserID
         `);
 
         return result.recordset;
@@ -23,9 +24,10 @@ const Book = {
         request.input("BookID", sql.Int, bookId);
 
         const result = await request.query(`
-            SELECT *
-            FROM Books
-            WHERE BookID = @BookID
+            SELECT b.*, u.FullName AS SellerName, u.Email AS SellerEmail
+            FROM Books b
+            LEFT JOIN Users u ON b.SellerID = u.UserID
+            WHERE b.BookID = @BookID
         `);
 
         return result.recordset[0];
@@ -40,9 +42,10 @@ const Book = {
         request.input("SellerID", sql.Int, sellerId);
 
         const result = await request.query(`
-            SELECT *
-            FROM Books
-            WHERE SellerID = @SellerID AND (Status != 'Removed' OR Status IS NULL)
+            SELECT b.*, u.FullName AS SellerName, u.Email AS SellerEmail
+            FROM Books b
+            LEFT JOIN Users u ON b.SellerID = u.UserID
+            WHERE b.SellerID = @SellerID AND (b.Status != 'Removed' OR b.Status IS NULL)
         `);
 
         return result.recordset;
@@ -235,6 +238,8 @@ const Book = {
             SELECT
                 b.BookID,
                 b.SellerID,
+                u.FullName AS SellerName,
+                u.Email AS SellerEmail,
                 b.CategoryID,
                 b.CourseID,
                 b.Title,
@@ -249,6 +254,8 @@ const Book = {
                 co.CourseName,
                 co.CourseCode
             FROM Books b
+            LEFT JOIN Users u
+                ON b.SellerID = u.UserID
             INNER JOIN Categories c
                 ON b.CategoryID = c.CategoryID
             LEFT JOIN Courses co

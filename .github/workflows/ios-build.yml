@@ -1,0 +1,55 @@
+name: Build iOS App
+
+on:
+  push:
+    branches:
+      - main
+  workflow_dispatch:
+
+jobs:
+  build-ios:
+    name: Build iOS IPA
+    runs-on: macos-14
+    steps:
+      - name: Checkout Repository
+        uses: actions/checkout@v4
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: 20
+          cache: 'npm'
+
+      - name: Install Dependencies
+        run: npm install
+
+      - name: Sync Capacitor iOS
+        run: npx cap sync ios
+
+      - name: Build iOS Archive
+        run: |
+          cd ios/App
+          xcodebuild \
+            -project App.xcodeproj \
+            -scheme App \
+            -destination "generic/platform=iOS" \
+            -configuration Release \
+            -archivePath build/BookSwap.xcarchive \
+            CODE_SIGNING_ALLOWED=NO \
+            archive
+
+      - name: Package into IPA
+        run: |
+          mkdir -p build-ipa/Payload
+          cp -r ios/App/build/BookSwap.xcarchive/Products/Applications/App.app build-ipa/Payload/
+          cd build-ipa
+          zip -r BookSwap.ipa Payload
+          cd ..
+          mv build-ipa/BookSwap.ipa ./BookSwap.ipa
+
+      - name: Upload IPA Artifact
+        uses: actions/upload-artifact@v4
+        with:
+          name: BookSwap-iOS-IPA
+          path: BookSwap.ipa
+          retention-days: 14
